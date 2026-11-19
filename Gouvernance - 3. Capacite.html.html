@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gouvernance — Capacité DNSI (V3.2)</title>
+<style>
+:root{
+  --brand:#C00000;
+  --text:#222;
+  --muted:#666;
+  --border:#e8e8e8;
+  --card:#fff;
+  --bg:#f6f7fb;
+
+  --ok:#1BAE70;
+  --warn:#F59E0B;
+  --bad:#E11D48;
+
+  --potBlue:#2563eb;
+  --hpOrange:#f59e0b;
+  --remGreen:#16a34a;
+
+  --ghost:#9aa3af;
+}
+
+*{box-sizing:border-box;}
+html,body{
+  margin:0; padding:0;
+  font-family:Calibri,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:13px;
+}
+
+@page{ size:A3 landscape; margin:10mm; }
+@media print{
+  *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
+  html,body{background:#fff !important;}
+  .no-print,.page-ver{display:none !important;}
+  .wrap{max-width:none !important; margin:0 !important; padding:0 !important;}
+  .bar{box-shadow:none !important;}
+  .card{break-inside:avoid; page-break-inside:avoid;}
+}
+
+.wrap{max-width:1200px;margin:0 auto;padding:10px 12px 26px;}
+
+.bar{
+  background:var(--brand);
+  color:#fff;
+  border-radius:18px;
+  padding:10px 14px;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+  margin-bottom:8px;
+  position:relative;
+}
+.bar::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.25);
+  pointer-events:none;
+}
+.bar-inner{position:relative; min-height:52px; display:flex; align-items:center; justify-content:center;}
+.title{text-align:center}
+.title .date{font-weight:800;font-size:14px;letter-spacing:.2px;margin-bottom:2px;}
+.title .name{font-weight:900;font-size:28px;line-height:1.1;margin:0 auto;}
+.title .meta-line{margin-top:2px;font-size:13px;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar .ver{position:absolute; right:12px; top:8px; font-size:10px; opacity:.9; font-weight:800;}
+
+.toolbar{
+  display:flex; flex-wrap:wrap;
+  gap:8px; align-items:center;
+  margin:6px 0 6px;
+}
+.btn{
+  border:none;border-radius:999px;
+  padding:7px 12px;
+  font-size:12px;
+  cursor:pointer;
+  background:var(--brand); color:#fff;
+  box-shadow:0 3px 8px rgba(0,0,0,.18);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.btn.secondary{background:#e5e7eb;color:#111827;box-shadow:none;}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none;}
+#fileInput{display:none}
+
+.help{font-size:11px;margin-bottom:8px;color:var(--muted);}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1.25fr .75fr;
+  gap:12px;
+  align-items:start;
+}
+@media(max-width:1100px){ .grid{grid-template-columns:1fr;} }
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 6px 16px rgba(0,0,0,.04);
+}
+.sect{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:10px;
+}
+.sect > div{font-weight:950;text-transform:uppercase;letter-spacing:.5px;font-size:12px;}
+.sect small{color:var(--muted);font-size:12px;}
+
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--border);
+  background:#f8fafc;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:12px;
+}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}
+.ghost{color:var(--ghost);font-style:italic;}
+
+.hr{height:1px;background:var(--border);margin:10px 0;}
+
+.cap-grid{display:grid;grid-template-columns: 300px 1fr;gap:12px;align-items:stretch;}
+@media(max-width:900px){ .cap-grid{grid-template-columns:1fr;} }
+
+.pie-card{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:260px;
+  background:linear-gradient(180deg,#fff,#fafbff);
+}
+.legend{display:flex;flex-direction:column;gap:10px;}
+.item{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:10px 12px;
+  background:#fff;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.left{display:flex;align-items:center;gap:10px;min-width:0;}
+.dot{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.12);}
+.dot.pot{background:var(--potBlue);}
+.dot.hp{background:var(--hpOrange);}
+.dot.rem{background:var(--remGreen);}
+
+.title2{font-weight:950;}
+.sub2{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+.val{font-weight:950;font-size:16px;}
+
+.kv2{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:6px;}
+.kv2 .k{color:var(--muted);font-size:12px;}
+.note{font-size:12px;color:var(--muted);line-height:1.35;}
+
+.alert{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:10px 12px;
+  background:#fff;
+}
+.alert.ok{border-color:#86efac;background:#ecfdf5;}
+.alert.warn{border-color:#fdba74;background:#fff7ed;}
+.alert.bad{border-color:#fca5a5;background:#fef2f2;}
+.alert .h{font-weight:950;margin-bottom:4px;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:999px;
+  padding:3px 10px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid var(--border);
+  background:#f8fafc;
+}
+.badge.ok{border-color:#86efac;background:#ecfdf5;color:#166534;}
+.badge.warn{border-color:#fdba74;background:#fff7ed;color:#9a3412;}
+.badge.bad{border-color:#fca5a5;background:#fef2f2;color:#991b1b;}
+
+.page-ver{position:fixed; right:8px; bottom:4px; font-size:10px; color:#999;}
+
+/* ===== Editor modal ===== */
+.editor-backdrop{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.35);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.editor{
+  width:min(1100px, 92vw);
+  max-height:86vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:18px;
+  border:1px solid #e5e7eb;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  padding:16px;
+}
+.editor-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+.editor-title{font-weight:950;font-size:16px;margin:0;}
+.editor-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+.editor-foot{
+  position:sticky; bottom:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0), #fff 45%);
+  padding-top:12px;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:10px;
+}
+.form{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 12px;
+}
+@media(max-width:900px){ .form{grid-template-columns:1fr;} }
+.field label{display:block;font-weight:900;font-size:12px;margin-bottom:4px;}
+.field input, .field textarea{
+  width:100%;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  padding:8px 10px;
+  font-size:12px;
+  outline:none;
+  background:#f9fafb;
+  font-family:inherit;
+}
+.field textarea{min-height:70px;resize:vertical;}
+.field input:focus, .field textarea:focus{
+  border-color:#c7d2fe;
+  box-shadow:0 0 0 3px rgba(99,102,241,.15);
+  background:#fff;
+}
+.sectionbox{
+  border:1px solid rgba(17,24,39,.08);
+  border-radius:16px;
+  padding:12px;
+  background:linear-gradient(180deg,#fff,#fafbff);
+  margin-top:12px;
+}
+.sectionbox .h{font-weight:950;text-transform:uppercase;letter-spacing:.5px;font-size:12px;margin-bottom:10px;}
+.smallhint{font-size:11px;color:#6b7280;margin-top:3px;}
+</style>
+</head>
+
+<body>
+<div class="wrap" id="printRoot">
+  <div class="bar">
+    <div class="bar-inner">
+      <div class="title">
+        <div class="date">CAPACITÉ DNSI — <span id="today">—</span></div>
+        <div class="name">Gouvernance DNSI — Capacité</div>
+        <div class="meta-line">Hors-projet (maintenance) • Réserve projets (résultat) • Contrôles cohérence</div>
+      </div>
+    </div>
+    <div class="ver" id="appVer">V3.2</div>
+  </div>
+
+  <div class="toolbar no-print">
+    <button class="btn" id="btnEdit">✏️ Modifier</button>
+    <button class="btn secondary" id="btnRefresh">🔄 Réactualiser</button>
+    <button class="btn secondary" id="btnSave">💾 Sauvegarder (.json)</button>
+    <button class="btn secondary" id="btnLoad">📥 Importer Gouvernance (.json)</button>
+    <button class="btn secondary" id="btnPdf">🖨️ Exporter PDF</button>
+    <input id="fileInput" type="file" accept="application/json" />
+  </div>
+
+  <div class="help no-print">
+    Ici : <b>cadre de capacité</b> (DNSI) + <b>contrôles de cohérence</b>. La <b>marge / arbitrage</b> est gérée dans <b>Stratégie</b>.
+  </div>
+
+  <div class="grid">
+    <!-- LEFT -->
+    <div class="card">
+      <div class="sect">
+        <div>Vision globale</div>
+        <small class="mono">Unité : jours</small>
+      </div>
+
+      <div class="row" style="justify-content:space-between;">
+        <div class="row">
+          <span class="pill">Période : <span class="mono" id="period">—</span></span>
+          <span class="pill">Dernière maj : <span class="mono" id="updatedAt">—</span></span>
+        </div>
+        <div class="row">
+          <span class="badge" id="cohBadge">—</span>
+        </div>
+      </div>
+
+      <div class="cap-grid" style="margin-top:12px;">
+        <div class="pie-card">
+          <canvas id="pie" width="280" height="240" aria-label="Camembert capacité"></canvas>
+        </div>
+
+        <div class="legend">
+          <div class="item">
+            <div class="left">
+              <span class="dot pot"></span>
+              <div style="min-width:0">
+                <div class="title2">Potentiel total</div>
+                <div class="sub2">Réservoir théorique (ressources disponibles)</div>
+              </div>
+            </div>
+            <div class="val mono" id="vPot">—</div>
+          </div>
+
+          <div class="item">
+            <div class="left">
+              <span class="dot hp"></span>
+              <div style="min-width:0">
+                <div class="title2">Hors-projet</div>
+                <div class="sub2">RUN/MCO, SSI, réglementaire, transverse…</div>
+              </div>
+            </div>
+            <div class="val mono" id="vHP">—</div>
+          </div>
+
+          <div class="item">
+            <div class="left">
+              <span class="dot rem"></span>
+              <div style="min-width:0">
+                <div class="title2">Réserve projets</div>
+                <div class="sub2">Résultat : Potentiel − Hors-projet</div>
+              </div>
+            </div>
+            <div class="val mono" id="vRem">—</div>
+          </div>
+
+          <div class="note" style="margin-top:4px;">
+            ✅ La <b>réserve projets</b> alimente la <b>Stratégie</b>. <br/>
+            ⚠️ Ici, pas de “marge” : l’alerte sur dépassement est gérée par la Stratégie.
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="sect" style="margin-bottom:6px;">
+        <div>Contrôles de cohérence</div>
+        <small>bloquants au clic “Appliquer”</small>
+      </div>
+
+      <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="c1">—</div></div>
+      <div class="kv2"><div class="k">C2 — Σ détail hors-projet ≈ Hors-projet (si détaillé)</div><div class="mono" id="c2">—</div></div>
+      <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="c3">—</div></div>
+
+      <div class="hr"></div>
+
+      <div class="sect" style="margin-bottom:6px;">
+        <div>Lecture “maintenance”</div>
+        <small>signal (non bloquant)</small>
+      </div>
+
+      <div class="kv2"><div class="k">Part hors-projet</div><div class="mono" id="hpPct">—</div></div>
+      <div class="note" id="hpHint">—</div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="card">
+      <div class="sect">
+        <div>Lecture & explication</div>
+        <small>CODIR-friendly</small>
+      </div>
+
+      <div class="alert" id="alertBox">
+        <div class="h" id="alertTitle">—</div>
+        <div class="note" id="alertText">—</div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="sect" style="margin-bottom:6px;">
+        <div>Détails (hors-projet)</div>
+        <small class="ghost">optionnel</small>
+      </div>
+
+      <div class="kv2"><div class="k">RUN / MCO</div><div class="mono" id="dRun">—</div></div>
+      <div class="kv2"><div class="k">Réglementaire</div><div class="mono" id="dReg">—</div></div>
+      <div class="kv2"><div class="k">SSI</div><div class="mono" id="dSsi">—</div></div>
+      <div class="kv2"><div class="k">Transverse</div><div class="mono" id="dTrans">—</div></div>
+      <div class="kv2"><div class="k">Autres</div><div class="mono" id="dOther">—</div></div>
+
+      <div class="note" id="detailNote" style="margin-top:10px;">
+        Astuce : ces postes servent à expliquer le “hors-projet” et réduire les débats (“d’où sort ce chiffre ?”).
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="sect" style="margin-bottom:6px;">
+        <div>Notes</div>
+        <small>DNSI</small>
+      </div>
+      <div class="note" id="notesBox">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-ver">Capacité DNSI — V3.2 Popup</div>
+
+<!-- Editor Modal -->
+<div class="editor-backdrop no-print" id="editBackdrop" role="dialog" aria-modal="true">
+  <div class="editor">
+    <div class="editor-head">
+      <div>
+        <h3 class="editor-title">Modifier la capacité (simple)</h3>
+        <div class="editor-sub">
+          Saisie DNSI : <b>Potentiel total</b> et <b>Hors-projet</b>. La <b>Réserve projets</b> est calculée automatiquement.
+        </div>
+      </div>
+      <button class="btn secondary" id="btnClose">✖ Fermer</button>
+    </div>
+
+    <div class="sectionbox">
+      <div class="h">Valeurs</div>
+      <div class="form">
+        <div class="field">
+          <label>Période — début</label>
+          <input id="eStart" type="date" />
+          <div class="smallhint">Optionnel, pour contextualiser (ex : année N+1).</div>
+        </div>
+        <div class="field">
+          <label>Période — fin</label>
+          <input id="eEnd" type="date" />
+        </div>
+
+        <div class="field">
+          <label>Potentiel total (jours)</label>
+          <input id="ePot" type="number" min="0" step="1" />
+          <div class="smallhint">Ressources disponibles sur la période (saisie / estimation).</div>
+        </div>
+
+        <div class="field">
+          <label>Hors-projet total (jours)</label>
+          <input id="eHP" type="number" min="0" step="1" />
+          <div class="smallhint">RUN/MCO + SSI + réglementaire + transverse + autres.</div>
+        </div>
+
+        <div class="field" style="grid-column:1/-1;">
+          <label>Notes (DNSI)</label>
+          <textarea id="eNotes"></textarea>
+          <div class="smallhint">Explications / hypothèses (texte libre).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sectionbox">
+      <div class="h">Détail du hors-projet (optionnel)</div>
+      <div class="form">
+        <div class="field"><label>RUN / MCO</label><input id="eRun" type="number" min="0" step="1" /></div>
+        <div class="field"><label>Réglementaire</label><input id="eReg" type="number" min="0" step="1" /></div>
+        <div class="field"><label>SSI</label><input id="eSsi" type="number" min="0" step="1" /></div>
+        <div class="field"><label>Transverse</label><input id="eTrans" type="number" min="0" step="1" /></div>
+        <div class="field"><label>Autres</label><input id="eOther" type="number" min="0" step="1" /></div>
+        <div class="field" style="grid-column:1/-1;">
+          <label>Commentaire hors-projet</label>
+          <textarea id="eHPNote"></textarea>
+        </div>
+      </div>
+      <div class="smallhint">
+        Contrôle : si tu renseignes le détail, on vérifie <b>Σ détail ≈ hors-projet total</b> (tolérance ±2 jours).
+      </div>
+    </div>
+
+    <!-- Contrôles (info en live, mais blocage au clic Appliquer) -->
+    <div class="sectionbox">
+      <div class="h">Contrôles (info)</div>
+      <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="mC1">—</div></div>
+      <div class="kv2"><div class="k">C2 — Σ détail ≈ Hors-projet (si détaillé)</div><div class="mono" id="mC2">—</div></div>
+      <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="mC3">—</div></div>
+      <div class="note" id="mCMsg">—</div>
+    </div>
+
+    <div class="editor-foot">
+      <button class="btn secondary" id="btnCancel">Annuler</button>
+      <button class="btn" id="btnApply">Appliquer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Keys & version
+========================= */
+const APP_VERSION = "V3.2";
+const STORAGE_KEY = "GOUVERNANCE_JSON";
+
+/* =========================
+   Utils
+========================= */
+function el(id){ return document.getElementById(id); }
+function nowISO(){ return new Date().toISOString(); }
+function todayFr(){ return new Date().toLocaleDateString("fr-FR"); }
+function fmtJ(n){
+  const v = Number(n);
+  if (!Number.isFinite(v)) return "—";
+  return v.toLocaleString("fr-FR") + " j";
+}
+function safeNum(n, fallback=0){
+  const v = Number(n);
+  return Number.isFinite(v) ? v : fallback;
+}
+function clampMin0(n){ return Math.max(0, safeNum(n,0)); }
+function getCss(varName){
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+/* =========================
+   Model
+========================= */
+function defaultGov(){
+  const year = new Date().getFullYear() + 1;
+  return {
+    meta: {
+      schema: "gouvernance-dnsi",
+      version: "3.2",
+      perimetre: "DNSI",
+      annee_cible: year,
+      dernier_enregistrement: ""
+    },
+    portefeuille: { projets: [] },
+    capacite: {
+      periode: { debut: `${year}-01-01`, fin: `${year}-12-31` },
+      total_jours: 0,
+      run_hors_projet_jours: 0,
+      capacite_projet_jours: 0,
+      notes: "",
+      detail_hors_projet: {
+        run_mco_jours: 0,
+        reglementaire_jours: 0,
+        ssi_jours: 0,
+        transverse_jours: 0,
+        autres_jours: 0,
+        commentaire: ""
+      }
+    },
+    strategie_courante: {
+      id: "STRAT-COURANTE",
+      nom: "Stratégie — Brouillon",
+      hypotheses: { delta_jours: 0, commentaire: "" },
+      selection: { projets_lances: [], projets_decales: [] },
+      calcul: { charge_retenue_jours: 0, charge_totale_jours: 0, ecart_capacite_jours: 0, verdict: "a_completer" },
+      date_creation: nowISO()
+    }
+  };
+}
+
+function normalizeGovernance(raw){
+  if (!raw || typeof raw !== "object") return null;
+  if (raw?.meta?.schema !== "gouvernance-dnsi") return null;
+
+  const base = defaultGov();
+  const out = {
+    ...base,
+    ...raw,
+    meta: { ...base.meta, ...(raw.meta||{}) },
+    portefeuille: { ...base.portefeuille, ...(raw.portefeuille||{}) },
+    capacite: { ...base.capacite, ...(raw.capacite||{}) },
+    strategie_courante: { ...base.strategie_courante, ...(raw.strategie_courante||{}) }
+  };
+  out.capacite.detail_hors_projet = { ...base.capacite.detail_hors_projet, ...(out.capacite.detail_hors_projet||{}) };
+
+  out.capacite.capacite_projet_jours = Math.max(0,
+    safeNum(out.capacite.total_jours,0) - safeNum(out.capacite.run_hors_projet_jours,0)
+  );
+  return out;
+}
+
+/* =========================
+   Storage IO
+========================= */
+function loadGov(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    return (obj?.meta?.schema === "gouvernance-dnsi") ? obj : null;
+  }catch{ return null; }
+}
+function saveGov(obj){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+}
+function downloadJSON(filename, obj){
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+async function readJsonFile(file){
+  const text = await file.text();
+  return JSON.parse(text);
+}
+
+/* =========================
+   Exports for Fiche gouvernance
+   (clé lue par la fiche) :contentReference[oaicite:1]{index=1}
+========================= */
+function writeSupportExports(GOV){
+  const cap = GOV.capacite || {};
+  const pot = safeNum(cap.total_jours,0);
+  const hp  = safeNum(cap.run_hors_projet_jours,0);
+  const rem = Math.max(0, pot - hp);
+  const updatedAt = GOV?.meta?.dernier_enregistrement || nowISO();
+
+  const full = {
+    version: APP_VERSION,
+    periode: cap.periode || null,
+    dnsiSynthese: {
+      potentielTotalJours: pot,
+      horsProjetTotalJours: hp,
+      capaciteRestanteProjetsJours: rem
+    },
+    detailHorsProjet: cap.detail_hors_projet || {},
+    notes: cap.notes || "",
+    updatedAt
+  };
+
+  const summary = {
+    version: APP_VERSION,
+    potentielTotalJ: pot,
+    horsProjetJ: hp,
+    restantProjetsJ: rem,
+    updatedAt
+  };
+
+  localStorage.setItem("dnsigov.capacity", JSON.stringify(full));
+  localStorage.setItem("dnsigov.capacity.summary", JSON.stringify(summary));
+}
+
+/* =========================
+   Broadcast (file:// friendly best effort)
+========================= */
+function broadcastUpdate(){
+  try{ window.opener?.postMessage({ type:"capacity-updated" }, "*"); }catch{}
+  try{ window.postMessage({ type:"capacity-updated" }, "*"); }catch{}
+  try{ window.opener?.postMessage({ type:"GOUVERNANCE_UPDATED", payload: GOV }, "*"); }catch{}
+  try{ window.postMessage({ type:"GOUVERNANCE_UPDATED", payload: GOV }, "*"); }catch{}
+}
+
+/* =========================
+   Pie
+========================= */
+function drawPie({pot, hp, rem}){
+  const c = el("pie");
+  if(!c) return;
+  const ctx = c.getContext("2d");
+  const w = c.width, h = c.height;
+  ctx.clearRect(0,0,w,h);
+
+  const total = pot > 0 ? pot : 1;
+  const parts = [
+    { label:"Hors-projet", value: Math.max(0, hp), color: getCss("--hpOrange") },
+    { label:"Réserve", value: Math.max(0, rem), color: getCss("--remGreen") },
+  ];
+
+  const cx = w/2, cy = h/2;
+  const radius = Math.min(w,h) * 0.38;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius+10, 0, Math.PI*2);
+  ctx.fillStyle = "rgba(0,0,0,.04)";
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,radius,0,Math.PI*2);
+  ctx.closePath();
+  ctx.fillStyle = getCss("--potBlue");
+  ctx.globalAlpha = 0.15;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  let start = -Math.PI/2;
+  for(const p of parts){
+    const angle = (p.value/total) * (Math.PI*2);
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,radius,start,start+angle);
+    ctx.closePath();
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    start += angle;
+  }
+
+  ctx.beginPath();
+  ctx.arc(cx,cy,radius,0,Math.PI*2);
+  ctx.strokeStyle = "rgba(17,24,39,.18)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.font = "950 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+  ctx.fillStyle = "rgba(17,24,39,.82)";
+  ctx.textAlign = "center";
+  ctx.fillText("Potentiel total", cx, cy - 4);
+
+  ctx.font = "950 16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+  ctx.fillStyle = getCss("--potBlue");
+  ctx.fillText(`${(pot||0).toLocaleString("fr-FR")} j`, cx, cy + 18);
+}
+
+/* =========================
+   Coherence compute (lecture)
+========================= */
+function computeCoherence(cap){
+  const pot = safeNum(cap.total_jours, 0);
+  const hp  = safeNum(cap.run_hors_projet_jours, 0);
+  const rem = Math.max(0, pot - hp);
+
+  const d = cap.detail_hors_projet || {};
+  const detailSum =
+    safeNum(d.run_mco_jours,0) +
+    safeNum(d.reglementaire_jours,0) +
+    safeNum(d.ssi_jours,0) +
+    safeNum(d.transverse_jours,0) +
+    safeNum(d.autres_jours,0);
+
+  const hasDetail = detailSum > 0 || String(d.commentaire||"").trim().length > 0;
+
+  const c3ok = (pot >= 0 && hp >= 0);
+  const c1ok = (hp <= pot);
+  const c2ok = (!hasDetail) ? true : (Math.abs(detailSum - hp) <= 2);
+
+  let global = "ok";
+  if (!c3ok || !c1ok) global = "bad";
+  else if (hasDetail && !c2ok) global = "warn";
+
+  const msg =
+    (!c3ok) ? "Incohérence : valeur négative." :
+    (!c1ok) ? "Incohérence : hors-projet > potentiel." :
+    (hasDetail && !c2ok) ? "Cohérence partielle : le détail hors-projet ne retombe pas sur le total." :
+    "Cohérence OK.";
+
+  return { pot, hp, rem, detailSum, hasDetail, c1ok, c2ok, c3ok, global, msg };
+}
+
+function setBadge(badgeEl, state, text){
+  badgeEl.className = "badge " + (state === "ok" ? "ok" : state === "warn" ? "warn" : "bad");
+  badgeEl.textContent = text;
+}
+
+/* =========================
+   Render (lecture uniquement)
+========================= */
+function render(GOV){
+  const cap = GOV.capacite || {};
+  const coh = computeCoherence(cap);
+
+  cap.capacite_projet_jours = coh.rem;
+
+  const p = cap.periode || {};
+  el("period").textContent = (p.debut && p.fin) ? `${p.debut} → ${p.fin}` : "—";
+  el("updatedAt").textContent = (GOV?.meta?.dernier_enregistrement) ? GOV.meta.dernier_enregistrement : "—";
+
+  el("vPot").textContent = fmtJ(coh.pot);
+  el("vHP").textContent  = fmtJ(coh.hp);
+  el("vRem").textContent = fmtJ(coh.rem);
+
+  drawPie({pot:coh.pot, hp:coh.hp, rem:coh.rem});
+
+  el("c1").textContent = coh.c1ok ? "✅ OK" : "⛔ KO (hors-projet > potentiel)";
+  el("c2").textContent = (!coh.hasDetail) ? "—" : (coh.c2ok ? "✅ OK" : "⚠️ Écart (détail ≠ total)");
+  el("c3").textContent = coh.c3ok ? "✅ OK" : "⛔ KO";
+
+  const b = el("cohBadge");
+  if (coh.global === "ok") setBadge(b, "ok", "Cohérence : OK");
+  else if (coh.global === "warn") setBadge(b, "warn", "Cohérence : À vérifier");
+  else setBadge(b, "bad", "Cohérence : KO");
+
+  const alertBox = el("alertBox");
+  alertBox.className = "alert " + (coh.global === "ok" ? "ok" : coh.global === "warn" ? "warn" : "bad");
+  el("alertTitle").textContent =
+    (coh.global === "ok") ? "✅ Capacité cohérente" :
+    (coh.global === "warn") ? "⚠️ Cohérence partielle" :
+    "⛔ Incohérence à corriger";
+  el("alertText").textContent = coh.msg;
+
+  const hpPct = (coh.pot > 0) ? Math.round((coh.hp / coh.pot) * 100) : 0;
+  el("hpPct").textContent = (coh.pot > 0) ? `${hpPct}%` : "—";
+  const hint =
+    (coh.pot === 0) ? "Renseigne d’abord le potentiel total." :
+    (hpPct >= 80) ? "Signal fort : maintenance/hors-projet très élevée. À investiguer (RUN/MCO, réglementaire, SSI…).":
+    (hpPct >= 60) ? "Signal : maintenance/hors-projet importante. Utile pour piloter et expliquer la charge de fonctionnement." :
+    "Lecture : niveau de maintenance/hors-projet raisonnable au regard du potentiel.";
+  el("hpHint").textContent = hint;
+
+  const d = cap.detail_hors_projet || {};
+  el("dRun").textContent   = fmtJ(d.run_mco_jours);
+  el("dReg").textContent   = fmtJ(d.reglementaire_jours);
+  el("dSsi").textContent   = fmtJ(d.ssi_jours);
+  el("dTrans").textContent = fmtJ(d.transverse_jours);
+  el("dOther").textContent = fmtJ(d.autres_jours);
+
+  el("notesBox").textContent = cap.notes ? cap.notes : "—";
+}
+
+/* =========================
+   Commit (écritures storage)
+========================= */
+function commitChanges(){
+  GOV.meta.dernier_enregistrement = nowISO();
+  saveGov(GOV);
+  writeSupportExports(GOV);
+  broadcastUpdate();
+  render(GOV);
+}
+
+/* =========================
+   Modal coherence checks
+   - INFO en live
+   - BLOQUANT au clic Appliquer
+========================= */
+function getModalState(){
+  const pot = clampMin0(el("ePot").value);
+  const hp  = clampMin0(el("eHP").value);
+
+  const dSum =
+    clampMin0(el("eRun").value) +
+    clampMin0(el("eReg").value) +
+    clampMin0(el("eSsi").value) +
+    clampMin0(el("eTrans").value) +
+    clampMin0(el("eOther").value);
+
+  const hasDetail = dSum > 0 || String(el("eHPNote").value||"").trim().length > 0;
+
+  const errs = [];
+  if (hp > pot) errs.push(`C1 — Hors-projet (${hp} j) > Potentiel (${pot} j).`);
+  if (hasDetail && Math.abs(dSum - hp) > 2){
+    errs.push(`C2 — Σ détail (${dSum} j) ≠ Hors-projet total (${hp} j).`);
+  }
+
+  const c1ok = errs.find(e => e.startsWith("C1")) ? false : true;
+  const c2ok = errs.find(e => e.startsWith("C2")) ? false : true;
+  const c3ok = true; // clampMin0 empêche négatif
+
+  return {pot, hp, dSum, hasDetail, errs, c1ok, c2ok, c3ok};
+}
+
+function modalCheckInfo(){
+  const st = getModalState();
+
+  el("mC1").textContent = st.c1ok ? "✅ OK" : "⛔ KO";
+  el("mC2").textContent = (!st.hasDetail) ? "—" : (st.c2ok ? "✅ OK" : "⛔ KO");
+  el("mC3").textContent = "✅ OK";
+
+  let msg = "Tout est cohérent : tu peux appliquer.";
+  if (!st.c1ok) msg = "Le hors-projet ne peut pas dépasser le potentiel.";
+  else if (st.hasDetail && !st.c2ok) msg = "Le détail hors-projet doit retomber sur le total (tolérance ±2 j).";
+  el("mCMsg").textContent = msg;
+
+  // IMPORTANT : on NE grise plus le bouton pendant la saisie
+  el("btnApply").disabled = false;
+}
+
+/* Popup bloquant */
+function showBlockingPopup(errors){
+  alert(
+`❌ Impossible d'appliquer : incohérences détectées
+
+- ${errors.join("\n- ")}
+
+Corrige la saisie puis réessaie.`
+  );
+}
+
+/* =========================
+   Editor open/close/apply
+========================= */
+let GOV = null;
+let editorSnapshot = null;
+
+function openEditor(G){
+  const cap = G.capacite || {};
+  editorSnapshot = JSON.parse(JSON.stringify(cap));
+
+  el("eStart").value = cap?.periode?.debut || "";
+  el("eEnd").value   = cap?.periode?.fin || "";
+
+  el("ePot").value = safeNum(cap.total_jours,0);
+  el("eHP").value  = safeNum(cap.run_hors_projet_jours,0);
+  el("eNotes").value = cap.notes || "";
+
+  const d = cap.detail_hors_projet || {};
+  el("eRun").value = safeNum(d.run_mco_jours,0);
+  el("eReg").value = safeNum(d.reglementaire_jours,0);
+  el("eSsi").value = safeNum(d.ssi_jours,0);
+  el("eTrans").value = safeNum(d.transverse_jours,0);
+  el("eOther").value = safeNum(d.autres_jours,0);
+  el("eHPNote").value = d.commentaire || "";
+
+  el("editBackdrop").style.display = "flex";
+  setTimeout(modalCheckInfo, 0);
+}
+function closeEditor(){ el("editBackdrop").style.display = "none"; }
+function cancelEditor(){
+  if (editorSnapshot){
+    GOV.capacite = editorSnapshot;
+    editorSnapshot = null;
+  }
+  closeEditor();
+  render(GOV);
+}
+
+function applyEditor(){
+  // BLOQUANT : on vérifie ici
+  const st = getModalState();
+  if (st.errs.length > 0){
+    showBlockingPopup(st.errs);
+    return; // rien n'est enregistré
+  }
+
+  const cap = GOV.capacite || {};
+  cap.periode = cap.periode || {};
+  cap.periode.debut = el("eStart").value || cap.periode.debut || "";
+  cap.periode.fin   = el("eEnd").value   || cap.periode.fin   || "";
+
+  cap.total_jours = clampMin0(el("ePot").value);
+  cap.run_hors_projet_jours = clampMin0(el("eHP").value);
+  cap.capacite_projet_jours = Math.max(0, cap.total_jours - cap.run_hors_projet_jours);
+
+  cap.notes = el("eNotes").value || "";
+
+  cap.detail_hors_projet = {
+    run_mco_jours: clampMin0(el("eRun").value),
+    reglementaire_jours: clampMin0(el("eReg").value),
+    ssi_jours: clampMin0(el("eSsi").value),
+    transverse_jours: clampMin0(el("eTrans").value),
+    autres_jours: clampMin0(el("eOther").value),
+    commentaire: el("eHPNote").value || ""
+  };
+
+  GOV.capacite = cap;
+  editorSnapshot = null;
+  closeEditor();
+
+  // commit => maj fiche gouvernance + exports
+  commitChanges();
+}
+
+/* =========================
+   Refresh
+========================= */
+function refreshAll(){
+  const obj = loadGov();
+  GOV = obj ? normalizeGovernance(obj) : defaultGov();
+  render(GOV);
+}
+
+/* =========================
+   UI wiring
+========================= */
+function wireUI(){
+  el("btnPdf").addEventListener("click", () => window.print());
+  el("btnRefresh").addEventListener("click", refreshAll);
+  el("btnEdit").addEventListener("click", () => openEditor(GOV));
+
+  el("btnClose").addEventListener("click", closeEditor);
+  el("btnCancel").addEventListener("click", cancelEditor);
+  el("editBackdrop").addEventListener("click", (e) => { if (e.target === el("editBackdrop")) closeEditor(); });
+  el("btnApply").addEventListener("click", applyEditor);
+
+  // Live info (non bloquant)
+  ["ePot","eHP","eRun","eReg","eSsi","eTrans","eOther","eHPNote"].forEach(id=>{
+    el(id).addEventListener("input", modalCheckInfo);
+  });
+
+  el("btnSave").addEventListener("click", () => {
+    if (!GOV) return;
+    commitChanges();
+    downloadJSON("Gouvernance.json", GOV);
+  });
+
+  el("btnLoad").addEventListener("click", () => el("fileInput").click());
+  el("fileInput").addEventListener("change", async () => {
+    const f = el("fileInput").files?.[0];
+    if (!f) return;
+    try{
+      const raw = await readJsonFile(f);
+      const obj = normalizeGovernance(raw);
+      if (!obj){ alert("Format invalide : fichier gouvernance non reconnu."); return; }
+      GOV = obj;
+      commitChanges();
+    }catch{
+      alert("Erreur : JSON invalide.");
+    } finally {
+      el("fileInput").value = "";
+    }
+  });
+
+  window.addEventListener("storage", (ev) => {
+    const k = ev?.key;
+    if (k === STORAGE_KEY || k === "dnsigov.capacity" || k === "dnsigov.capacity.summary"){
+      refreshAll();
+    }
+  });
+  window.addEventListener("message", (ev) => {
+    const d = ev?.data;
+    if (!d || typeof d !== "object") return;
+    if (d.type === "strategie-updated" || d.type === "GOUVERNANCE_UPDATED" || d.type === "capacity-updated"){
+      refreshAll();
+    }
+  });
+}
+
+/* =========================
+   Boot
+========================= */
+(function boot(){
+  el("today").textContent = todayFr();
+  GOV = normalizeGovernance(loadGov()) || defaultGov();
+  wireUI();
+  render(GOV);
+})();
+</script>
+
+<!-- REGLES DE LECTURE CAPACITE DNSI -->
+<div style="
+  margin-top:16px;
+  padding:12px 14px;
+  background:#f5f5f5;
+  border-left:4px solid #cc0000;
+  font-size:13px;
+  line-height:1.4;
+">
+  <strong>ℹ️ Règles de lecture – Capacité DNSI</strong>
+  <ul style="margin:8px 0 0 18px; padding:0;">
+    <li>La capacité est <strong>déclarative</strong> (choix managérial).</li>
+    <li>La <strong>maintenance / RUN</strong> est une <strong>contrainte prioritaire</strong>.</li>
+    <li>Le reste correspond à la <strong>capacité mobilisable projets</strong>.</li>
+    <li>Les alertes signalent des <strong>tensions ou incohérences</strong>, sans bloquer.</li>
+  </ul>
+</div>
+
+</body>
+</html>
