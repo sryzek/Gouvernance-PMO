@@ -1,0 +1,20 @@
+{
+  "name": "Gouvernance DNSI — Suite PPM",
+  "short_name": "Gouv DNSI",
+  "description": "Pilotage Programmes, Portefeuille Projets, Capacité et Stratégie DNSI",
+  "start_url": "./Gouvernance%20-%200.%20Synthese.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f7fb",
+  "theme_color": "#C10F1A",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
