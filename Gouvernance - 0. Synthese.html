@@ -4,6 +4,10 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Cockpit CODIR — Synthèse Gouvernance (V2.6)</title>
+<meta name="theme-color" content="#C10F1A" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" type="image/png" href="./icon.png" />
+<link rel="apple-touch-icon" href="./icon.png" />
 <style>
 :root{
   --brand:#C10F1A;
@@ -805,6 +809,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if(ev?.data?.type === "GOUVERNANCE_UPDATED") renderAll();
     };
   }catch(e){}
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+}
 });
 </script>
 </body>
