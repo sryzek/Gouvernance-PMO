@@ -1,9 +1,14 @@
+
+
+
+Icône HTML
+Gouvernance - 0. Synthese
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cockpit CODIR — Synthèse Gouvernance (V2.6)</title>
+<title>Cockpit CODIR — Synthèse Gouvernance (V2.7)</title>
 <meta name="theme-color" content="#C10F1A" />
 <link rel="manifest" href="./manifest.json" />
 <link rel="icon" type="image/png" href="./icon.png" />
@@ -11,6 +16,7 @@
 <style>
 :root{
   --brand:#C10F1A;
+  --brand-dark:#a50d16;
   --brand-light:rgba(193,15,26,0.08);
   --text:#0f172a;
   --muted:#64748b;
@@ -44,7 +50,7 @@ html,body{
   html, body{background:#fff !important;}
   .wrap{max-width:100%; padding:0; margin:0;}
   .topbar{box-shadow:none; position:static; margin-bottom:10px;}
-  .toolbar, .ppm-nav, .no-print, .toast{display:none !important;}
+  .toolbar, .ppm-nav, .no-print, .toast, .guide-section, .onboarding-wrap, .guide-tip{display:none !important;}
   .grid-2x2{gap:12px; padding:0;}
   .panel{break-inside:avoid; page-break-inside:avoid; box-shadow:none; border:1px solid #cbd5e1;}
 }
@@ -92,6 +98,10 @@ html,body{
   display:inline-flex; align-items:center; gap:6px;
 }
 .btn:hover{background:rgba(255,255,255,.14);}
+.btn.guide-on{
+  background:#fff; color:var(--brand); border-color:#fff;
+}
+.btn.guide-on:hover{background:#f1f5f9;}
 .btn.action{background:#0f172a; border-color:#0f172a; color:#fff;}
 .btn.action:hover{background:#1e293b;}
 
@@ -126,6 +136,194 @@ html,body{
   font-size:11px; font-weight:800; color:var(--muted);
 }
 
+/* =========================================================
+   ONBOARDING PREMIÈRE VISITE (BASE VIDE)
+========================================================= */
+.onboarding-wrap{
+  padding:0 20px;
+  margin-bottom:16px;
+}
+.onboarding-card{
+  background:linear-gradient(135deg, #ffffff 0%, #fff5f5 100%);
+  border:1.5px solid rgba(193,15,26,.22);
+  border-radius:18px;
+  padding:18px 20px;
+  box-shadow:0 8px 24px rgba(193,15,26,.06);
+}
+.onboarding-head{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  margin-bottom:14px;
+}
+.onboarding-title{font-weight:900; font-size:16px; color:var(--text);}
+.onboarding-sub{font-size:12.5px; color:var(--muted); margin-top:3px; line-height:1.45;}
+.onboarding-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+}
+@media (max-width: 860px){ .onboarding-grid{grid-template-columns:1fr;} }
+.ob-option{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+  display:flex; flex-direction:column; justify-content:space-between; gap:10px;
+}
+.ob-option.primary{
+  border-color:rgba(193,15,26,.35);
+  box-shadow:0 4px 14px rgba(193,15,26,.08);
+}
+.ob-opt-title{font-weight:900; font-size:13.5px; color:var(--text);}
+.ob-opt-desc{font-size:12px; color:var(--muted); line-height:1.4; margin-top:4px;}
+
+/* =========================================================
+   GUIDE PMO EN 4 ÉTAPES (REPLIABLE)
+========================================================= */
+.guide-section{
+  padding:0 20px;
+  margin-bottom:16px;
+}
+.guide-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(15,23,42,.04);
+  overflow:hidden;
+}
+.guide-head{
+  padding:12px 18px;
+  background:linear-gradient(90deg, #f8fafc 0%, #fff 100%);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+}
+.guide-head-left{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.guide-title{font-weight:900; font-size:14px; color:var(--text);}
+.guide-progress-pill{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 10px; border-radius:999px;
+  font-size:11.5px; font-weight:900;
+  background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;
+}
+.guide-progress-pill.done{
+  background:#f0fdf4; color:#166534; border-color:#bbf7d0;
+}
+.guide-next-hint{
+  font-size:12px; color:var(--muted); font-weight:600;
+}
+.guide-head-actions{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.guide-mini-btn{
+  border:1px solid var(--border);
+  background:#fff; color:var(--text);
+  padding:5px 11px; border-radius:999px;
+  font-size:11.5px; font-weight:800; cursor:pointer;
+  display:inline-flex; align-items:center; gap:5px;
+}
+.guide-mini-btn:hover{background:#f1f5f9;}
+.guide-mini-btn.danger{border-color:#fecaca; background:#fff1f2; color:#991b1b;}
+.guide-mini-btn.danger:hover{background:#ffe4e6;}
+
+.guide-steps{
+  padding:14px 18px 16px;
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:12px;
+}
+@media (max-width: 1100px){ .guide-steps{grid-template-columns:repeat(2, 1fr);} }
+@media (max-width: 600px){ .guide-steps{grid-template-columns:1fr;} }
+
+.step-card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px 13px;
+  background:#fafbfc;
+  display:flex; flex-direction:column; justify-content:space-between; gap:10px;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.step-card.is-done{
+  background:#f0fdf4;
+  border-color:#bbf7d0;
+}
+.step-card.is-warn{
+  background:#fffbeb;
+  border-color:#fde68a;
+}
+.step-card.is-next{
+  background:#fff;
+  border:2px solid var(--brand);
+  box-shadow:0 6px 18px rgba(193,15,26,.12);
+}
+.step-top{
+  display:flex; align-items:center; justify-content:space-between; gap:6px;
+}
+.step-num{
+  font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.4px;
+  color:var(--muted);
+}
+.step-card.is-next .step-num{color:var(--brand);}
+.step-status{
+  font-size:10.5px; font-weight:900;
+  padding:2px 8px; border-radius:999px;
+  background:#e2e8f0; color:#334155;
+  white-space:nowrap;
+}
+.step-card.is-done .step-status{background:#dcfce7; color:#166534;}
+.step-card.is-warn .step-status{background:#fef3c7; color:#92400e;}
+.step-card.is-next .step-status{background:var(--brand); color:#fff;}
+.step-title{
+  font-weight:900; font-size:13.5px; color:var(--text); margin-top:4px;
+}
+.step-desc{
+  font-size:11.5px; color:var(--muted); line-height:1.4; margin-top:4px;
+}
+.step-metric{
+  font-size:11.5px; font-weight:800; color:var(--text); margin-top:6px;
+}
+.step-cta{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  text-decoration:none;
+  padding:7px 11px; border-radius:10px;
+  font-size:12px; font-weight:800;
+  border:1px solid var(--border);
+  background:#fff; color:var(--text);
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.step-cta:hover{background:#f1f5f9;}
+.step-card.is-next .step-cta,
+.step-cta.primary{
+  background:var(--brand); color:#fff; border-color:var(--brand);
+}
+.step-card.is-next .step-cta:hover,
+.step-cta.primary:hover{
+  background:var(--brand-dark);
+}
+.step-cta.dark{
+  background:#0f172a; color:#fff; border-color:#0f172a;
+}
+.step-cta.dark:hover{background:#1e293b;}
+
+/* Micro-aides contextuelles dans les quadrants (Mode Guide uniquement) */
+.guide-tip{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  padding:9px 12px;
+  border-radius:11px;
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-left:3.5px solid #3b82f6;
+  font-size:11.5px;
+  color:#334155;
+  line-height:1.4;
+  margin-bottom:14px;
+}
+body.guide-hidden .guide-section,
+body.guide-hidden .guide-tip{
+  display:none !important;
+}
+
 /* Grille 4 Quadrants */
 .grid-2x2{
   display:grid;
@@ -154,13 +352,21 @@ html,body{
   display:flex; align-items:center; gap:8px;
 }
 .panel-sub{font-size:12px; color:var(--muted); margin-top:3px; font-weight:500;}
+.panel-actions{
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; flex-shrink:0;
+}
 .panel-link{
   text-decoration:none;
   font-size:11.5px; font-weight:800; color:var(--brand);
-  padding:4px 10px; border-radius:999px;
+  padding:5px 10px; border-radius:999px;
   background:var(--brand-light); white-space:nowrap;
+  display:inline-flex; align-items:center; gap:4px;
 }
 .panel-link:hover{background:rgba(193,15,26,.14);}
+.panel-link.primary{
+  background:var(--brand); color:#fff;
+}
+.panel-link.primary:hover{background:var(--brand-dark);}
 .panel-body{padding:18px 20px; flex:1;}
 
 /* KPIs */
@@ -243,7 +449,20 @@ td{
 .empty-note{
   padding:16px; border-radius:12px; background:#f8fafc;
   border:1px dashed #cbd5e1; color:var(--muted);
-  font-size:12.5px; text-align:center; line-height:1.45;
+  font-size:12.5px; text-align:center; line-height:1.5;
+}
+.empty-actions{
+  display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:10px;
+}
+
+.inline-cta-bar{
+  margin-top:12px;
+  padding:9px 12px;
+  border-radius:10px;
+  background:#f8fafc;
+  border:1px dashed #cbd5e1;
+  display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;
+  font-size:11.5px; color:var(--muted);
 }
 
 .toast{
@@ -268,11 +487,12 @@ td{
       <div class="brand-ui">
         <div class="badge">PMO</div>
         <div>
-          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.6)</div>
+          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.7)</div>
           <div class="sub" id="subDate">Gouvernance DNSI • Programmes ➔ Portefeuille ➔ Capacité ➔ Stratégie</div>
         </div>
       </div>
       <div class="toolbar no-print">
+        <button class="btn guide-on" id="btnToggleGuide" title="Afficher ou masquer le parcours guidé PMO (masqué automatiquement en PDF)">🧭 Mode Guide : ON</button>
         <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
         <button class="btn" id="btnImport">📥 Importer (.json)</button>
         <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
@@ -296,6 +516,118 @@ td{
     </div>
   </nav>
 
+  <!-- ÉCRAN DE DÉMARRAGE RAPIDE (AFFICHÉ UNIQUEMENT SI LA BASE EST VIDE) -->
+  <section class="onboarding-wrap no-print" id="onboardingWrap" style="display:none;">
+    <div class="onboarding-card">
+      <div class="onboarding-head">
+        <div>
+          <div class="onboarding-title">👋 Bienvenue dans votre Cockpit de Gouvernance PMO</div>
+          <div class="onboarding-sub">
+            Aucune donnée n'est encore chargée sur cet appareil. Choisissez comment démarrer (tous les écrans partagent le même fichier <b>Gouvernance.json</b>) :
+          </div>
+        </div>
+      </div>
+      <div class="onboarding-grid">
+        <div class="ob-option primary">
+          <div>
+            <div class="ob-opt-title">1. Démarrer de zéro (Guidé)</div>
+            <div class="ob-opt-desc">Créez votre premier programme stratégique dans le Support 1, puis ajoutez vos demandes, votre capacité et votre scénario.</div>
+          </div>
+          <a class="step-cta primary" href="Gouvernance - 1. Programmes.html?action=new">➕ Créer mon 1er programme</a>
+        </div>
+        <div class="ob-option">
+          <div>
+            <div class="ob-opt-title">2. Charger un fichier existant</div>
+            <div class="ob-opt-desc">Vous avez déjà un fichier <b>Gouvernance.json</b> sauvegardé depuis votre PC ou un collègue ? Importez-le directement ici.</div>
+          </div>
+          <button class="step-cta dark" id="btnObImport" type="button">📥 Importer Gouvernance.json</button>
+        </div>
+        <div class="ob-option">
+          <div>
+            <div class="ob-opt-title">3. Tester avec un jeu de démo</div>
+            <div class="ob-opt-desc">Chargez un exemple réaliste (3 programmes, 5 projets, capacité et scénario) pour découvrir le cockpit, effaçable en 1 clic.</div>
+          </div>
+          <button class="step-cta" id="btnObDemo" type="button">🧪 Charger l'exemple de démo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDE PMO EN 4 ÉTAPES (MASQUÉ EN PDF ET BASCULABLE VIA MODE GUIDE) -->
+  <section class="guide-section no-print" id="guideSection">
+    <div class="guide-card">
+      <div class="guide-head">
+        <div class="guide-head-left">
+          <span class="guide-title">🧭 Parcours PMO — Construire la gouvernance en 4 étapes</span>
+          <span class="guide-progress-pill" id="guideProgressPill">0 / 4 étapes prêtes</span>
+          <span class="guide-next-hint" id="guideNextHint">Suivez l'étape mise en surbrillance pour alimenter automatiquement ce cockpit.</span>
+        </div>
+        <div class="guide-head-actions">
+          <button class="guide-mini-btn danger" id="btnClearDemo" type="button" style="display:none;" title="Supprimer le jeu de démonstration pour repartir à zéro">🧹 Vider la démo</button>
+          <button class="guide-mini-btn" id="btnHideGuideInline" type="button" title="Masquer le guide pour une vue CODIR épurée">👁️ Vue CODIR épurée</button>
+        </div>
+      </div>
+
+      <div class="guide-steps">
+        <!-- ÉTAPE 1 -->
+        <div class="step-card" id="stepCard1">
+          <div>
+            <div class="step-top">
+              <span class="step-num">Étape 1 · Programmes</span>
+              <span class="step-status" id="stepStatus1">À faire</span>
+            </div>
+            <div class="step-title">🎯 Définir les Programmes</div>
+            <div class="step-desc">Créez les grands axes de la collectivité (seuls le Nom et l'Objectif sont obligatoires).</div>
+            <div class="step-metric" id="stepMetric1">0 programme actif</div>
+          </div>
+          <a class="step-cta" id="stepCta1" href="Gouvernance - 1. Programmes.html?action=new">➕ Créer un programme</a>
+        </div>
+
+        <!-- ÉTAPE 2 -->
+        <div class="step-card" id="stepCard2">
+          <div>
+            <div class="step-top">
+              <span class="step-num">Étape 2 · Portefeuille</span>
+              <span class="step-status" id="stepStatus2">À faire</span>
+            </div>
+            <div class="step-title">📚 Recenser les Projets</div>
+            <div class="step-desc">Captez les idées métiers, rattachez-les à un programme et qualifiez leurs charges.</div>
+            <div class="step-metric" id="stepMetric2">0 projet au portefeuille</div>
+          </div>
+          <a class="step-cta" id="stepCta2" href="Gouvernance - 2. Portefeuille.html?action=new">➕ Nouvelle demande</a>
+        </div>
+
+        <!-- ÉTAPE 3 -->
+        <div class="step-card" id="stepCard3">
+          <div>
+            <div class="step-top">
+              <span class="step-num">Étape 3 · Capacité</span>
+              <span class="step-status" id="stepStatus3">À faire</span>
+            </div>
+            <div class="step-title">⚙️ Fixer la Capacité DNSI</div>
+            <div class="step-desc">Saisissez votre potentiel en jours et le hors-projet (RUN/MCO) pour calculer la réserve.</div>
+            <div class="step-metric" id="stepMetric3">Réserve : 0 j</div>
+          </div>
+          <a class="step-cta" id="stepCta3" href="Gouvernance - 3. Capacite.html?action=edit">⚙️ Définir la capacité</a>
+        </div>
+
+        <!-- ÉTAPE 4 -->
+        <div class="step-card" id="stepCard4">
+          <div>
+            <div class="step-top">
+              <span class="step-num">Étape 4 · Stratégie</span>
+              <span class="step-status" id="stepStatus4">À faire</span>
+            </div>
+            <div class="step-title">🧠 Arbitrer le Scénario</div>
+            <div class="step-desc">Engagez les projets retenus face à la réserve et cochez ⭐ les projets phares CODIR.</div>
+            <div class="step-metric" id="stepMetric4">0 projet engagé</div>
+          </div>
+          <a class="step-cta" id="stepCta4" href="Gouvernance - 4. Strategie.html">🧠 Arbitrer le scénario</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- GRILLE CODIR (4 Quadrants) -->
   <div class="grid-2x2">
 
@@ -306,10 +638,18 @@ td{
           <div class="panel-title">🎯 1. Programmes & Alignement Stratégique</div>
           <div class="panel-sub" id="progSub">Répartition de la charge engagée (scénario actif) par Programme</div>
         </div>
-        <a class="panel-link no-print" href="Gouvernance - 1. Programmes.html">Gérer ➔</a>
+        <div class="panel-actions no-print">
+          <a class="panel-link primary" href="Gouvernance - 1. Programmes.html?action=new">➕ Nouveau</a>
+          <a class="panel-link" href="Gouvernance - 1. Programmes.html">Gérer ➔</a>
+        </div>
       </div>
-      <div class="panel-body" id="dynamicProgrammesContainer">
-        <!-- Rempli dynamiquement -->
+      <div class="panel-body">
+        <div class="guide-tip no-print">
+          <span><b>💡 Comment ça marche ?</b> Ce bloc montre comment votre effort projet se répartit par programme. Créez vos programmes via <b>➕ Nouveau</b> ; les jauges se remplissent dès que des projets rattachés sont engagés dans <b>4. Stratégie</b>.</span>
+        </div>
+        <div id="dynamicProgrammesContainer">
+          <!-- Rempli dynamiquement -->
+        </div>
       </div>
     </section>
 
@@ -320,9 +660,15 @@ td{
           <div class="panel-title">📚 2. Portefeuille (La Demande)</div>
           <div class="panel-sub">Entonnoir des demandes métiers, projets actifs et couverture Programme</div>
         </div>
-        <a class="panel-link no-print" href="Gouvernance - 2. Portefeuille.html">Ouvrir ➔</a>
+        <div class="panel-actions no-print">
+          <a class="panel-link primary" href="Gouvernance - 2. Portefeuille.html?action=new">➕ Demande</a>
+          <a class="panel-link" href="Gouvernance - 2. Portefeuille.html">Ouvrir ➔</a>
+        </div>
       </div>
       <div class="panel-body">
+        <div class="guide-tip no-print">
+          <span><b>💡 Comment ça marche ?</b> Ce bloc synthétise toutes vos idées et projets. Pensez à qualifier chaque demande (programme + charge en jours) dans <b>2. Portefeuille</b> pour qu'elle devienne intégrable dans un scénario.</span>
+        </div>
         <div class="kpi-grid">
           <div class="kpi-card">
             <div class="kpi-label">Volume Total</div>
@@ -351,6 +697,8 @@ td{
           <div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:#e2e8f0;" id="prioBar"></div>
           <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-weight:800;" id="prioLabels"></div>
         </div>
+
+        <div class="inline-cta-bar no-print" id="pfInlineHint" style="display:none;"></div>
       </div>
     </section>
 
@@ -361,9 +709,15 @@ td{
           <div class="panel-title">⚙️ 3. Capacité DNSI (Les Moyens)</div>
           <div class="panel-sub">Potentiel global, maintenance incompressible (MCO/RUN) et réserve projets</div>
         </div>
-        <a class="panel-link no-print" href="Gouvernance - 3. Capacite.html">Ajuster ➔</a>
+        <div class="panel-actions no-print">
+          <a class="panel-link primary" href="Gouvernance - 3. Capacite.html?action=edit">⚙️ Définir</a>
+          <a class="panel-link" href="Gouvernance - 3. Capacite.html">Ajuster ➔</a>
+        </div>
       </div>
       <div class="panel-body">
+        <div class="guide-tip no-print">
+          <span><b>💡 Comment ça marche ?</b> Déclarez votre potentiel total en jours et votre charge de fonctionnement (MCO/RUN) dans <b>3. Capacité</b>. La différence donne automatiquement la <b>Réserve Projets</b> utilisable pour arbitrer.</span>
+        </div>
         <div class="cap-layout">
           <div class="pie-container">
             <canvas id="pieCapacite" width="190" height="190"></canvas>
@@ -392,6 +746,7 @@ td{
             </div>
           </div>
         </div>
+        <div class="inline-cta-bar no-print" id="capInlineHint" style="display:none;"></div>
       </div>
     </section>
 
@@ -402,9 +757,14 @@ td{
           <div class="panel-title">🧠 4. Stratégie & Arbitrage (L'Équilibre)</div>
           <div class="panel-sub">Scénario soumis au CODIR : <span id="stratName" style="font-weight:800; color:var(--text);">—</span></div>
         </div>
-        <a class="panel-link no-print" href="Gouvernance - 4. Strategie.html">Simuler ➔</a>
+        <div class="panel-actions no-print">
+          <a class="panel-link primary" href="Gouvernance - 4. Strategie.html">🧠 Simuler ➔</a>
+        </div>
       </div>
       <div class="panel-body">
+        <div class="guide-tip no-print">
+          <span><b>💡 Comment ça marche ?</b> Dans <b>4. Stratégie</b>, glissez vos projets dans le scénario pour comparer charge engagée et réserve projets, puis cochez <b>⭐ Synthèse PDF</b> sur les projets phares à mettre en avant ici.</span>
+        </div>
 
         <div class="strat-box" id="stratAlert">
           <div class="strat-title" id="stratVerdictTitle">⚖️ Analyse en cours...</div>
@@ -450,12 +810,13 @@ td{
 
   </div>
 
-  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.6) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.7) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
 </div>
 
 <script>
-const APP_VERSION = "V2.6";
+const APP_VERSION = "V2.7";
 const STORAGE_KEY = "GOUVERNANCE_JSON";
+const GUIDE_PREF_KEY = "DNSI_GOV_GUIDE_MODE";
 const FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#2563eb", "#10b981", "#ef4444", "#0891b2", "#475569"];
 
 const $ = id => document.getElementById(id);
@@ -472,7 +833,7 @@ function toast(msg){
   d.className = "toast";
   d.textContent = msg;
   document.body.appendChild(d);
-  setTimeout(() => d.remove(), 2500);
+  setTimeout(() => d.remove(), 2600);
 }
 
 function normalizePriority(v){
@@ -489,6 +850,14 @@ function loadGov(){
     if(raw) return JSON.parse(raw);
   }catch(e){}
   return null;
+}
+
+function broadcastGovUpdated(){
+  try{
+    const bc = new BroadcastChannel("dnsi-gouvernance");
+    bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "synthese" });
+    bc.close();
+  }catch(e){}
 }
 
 function getProgrammesList(gov){
@@ -508,28 +877,386 @@ function getProjectRAF(p){
   return Math.max(0, Math.round(chargeTot * (1 - av/100)));
 }
 
+/* =============================
+   Mode Guide (ON / OFF mémorisé)
+============================== */
+function isGuideEnabled(){
+  const raw = localStorage.getItem(GUIDE_PREF_KEY);
+  return raw === null ? true : raw === "1";
+}
+
+function applyGuideMode(enabled){
+  localStorage.setItem(GUIDE_PREF_KEY, enabled ? "1" : "0");
+  document.body.classList.toggle("guide-hidden", !enabled);
+  const btn = $("btnToggleGuide");
+  if(btn){
+    btn.textContent = enabled ? "🧭 Mode Guide : ON" : "🧭 Mode Guide : OFF";
+    btn.classList.toggle("guide-on", enabled);
+  }
+}
+
+/* =============================
+   Jeu de démonstration pédagogique
+============================== */
+function buildDemoGovernance(){
+  const now = new Date().toISOString();
+  const y = new Date().getFullYear() + 1;
+  return {
+    meta: {
+      schema: "gouvernance-dnsi",
+      version: "3.3",
+      perimetre: "DNSI",
+      nom: "Gouvernance DNSI (Démo)",
+      annee_cible: y,
+      isDemo: true,
+      dernier_enregistrement: now,
+      lastUpdatedAt: now
+    },
+    programmes: [
+      {
+        id: "PGM-001",
+        code: "FIN",
+        icone: "💶",
+        couleur: "#2563eb",
+        titre: "Modernisation Financière & Gestion",
+        description: "Refonte des outils financiers et dématérialisation des circuits comptables.",
+        statut: "actif",
+        direction_porteuse: "Direction des Finances",
+        sponsor_metier: "DAF",
+        pilote_dnsi: "Chef de projet SIGF",
+        continu: false,
+        debut_q: 1, debut_y: y, fin_q: 4, fin_y: y,
+        budget_cible_k: 250,
+        charge_cible_j: 220
+      },
+      {
+        id: "PGM-002",
+        code: "CYBER",
+        icone: "🛡️",
+        couleur: "#f59e0b",
+        titre: "Cybersécurité & Résilience SI",
+        description: "Renforcement de la sécurité, continuité d'activité et conformité réglementaire.",
+        statut: "actif",
+        direction_porteuse: "DNSI / DGS",
+        sponsor_metier: "RSSI",
+        pilote_dnsi: "Pôle Infra & SSI",
+        continu: false,
+        debut_q: 1, debut_y: y, fin_q: 3, fin_y: y + 1,
+        budget_cible_k: 180,
+        charge_cible_j: 180
+      },
+      {
+        id: "PGM-003",
+        code: "USAGER",
+        icone: "🚀",
+        couleur: "#8b5cf6",
+        titre: "Services Numériques aux Usagers",
+        description: "Nouveaux téléservices citoyens et parcours dématérialisés.",
+        statut: "actif",
+        direction_porteuse: "Direction Relation Usagers",
+        sponsor_metier: "DGA Services",
+        pilote_dnsi: "Pôle Usages",
+        continu: false,
+        debut_q: 2, debut_y: y, fin_q: 4, fin_y: y + 1,
+        budget_cible_k: 140,
+        charge_cible_j: 150
+      }
+    ],
+    portefeuille: {
+      projets: [
+        {
+          id: "FIN-2027-01",
+          nom: "Déploiement Nouveau SIGF",
+          direction: "Finances",
+          status: "cadrage_valide",
+          has_pivot: true,
+          phase: "Réalisation",
+          programme_id: "PGM-001",
+          axe_strategique: "PGM-001",
+          priorite: "P1",
+          cdp_nom: "Équipe SIGF",
+          avancement: 25,
+          budget: { year: y, amountK: 180, investK: 180, fonctK: 25 },
+          charges: { unite: "jours", cdp: 120, mco: 40, total: 160 },
+          charge_estimee_jours: 160,
+          _last_pivot_update_at: now
+        },
+        {
+          id: "SSI-2027-01",
+          nom: "Plan PRA & Sauvegardes Immuables",
+          direction: "DNSI",
+          status: "cadrage_valide",
+          has_pivot: true,
+          phase: "Cadrage",
+          programme_id: "PGM-002",
+          axe_strategique: "PGM-002",
+          priorite: "P1",
+          cdp_nom: "Pôle Infra",
+          avancement: 10,
+          budget: { year: y, amountK: 95, investK: 95, fonctK: 15 },
+          charges: { unite: "jours", cdp: 40, mco: 80, total: 120 },
+          charge_estimee_jours: 120,
+          _last_pivot_update_at: now
+        },
+        {
+          id: "USA-2027-01",
+          nom: "Portail Famille Nouvelle Génération",
+          direction: "Éducation",
+          status: "pre_cadrage",
+          has_pivot: false,
+          phase: "",
+          programme_id: "PGM-003",
+          axe_strategique: "PGM-003",
+          priorite: "P2",
+          cdp_nom: "Référent Usagers",
+          avancement: 0,
+          budget: { year: y, amountK: 70, investK: 70, fonctK: 12 },
+          charges: { unite: "jours", cdp: 70, mco: 20, total: 90 },
+          charge_estimee_jours: 90,
+          _last_pivot_update_at: now
+        },
+        {
+          id: "FIN-2027-02",
+          nom: "Parapheur Électronique Commandes",
+          direction: "Finances",
+          status: "pre_cadrage",
+          has_pivot: false,
+          phase: "",
+          programme_id: "PGM-001",
+          axe_strategique: "PGM-001",
+          priorite: "P2",
+          cdp_nom: "MOA Finances",
+          avancement: 0,
+          budget: { year: y, amountK: 35, investK: 35, fonctK: 6 },
+          charges: { unite: "jours", cdp: 35, mco: 15, total: 50 },
+          charge_estimee_jours: 50,
+          _last_pivot_update_at: now
+        },
+        {
+          id: "DIV-2027-01",
+          nom: "Refonte Intranet Agents (À rattacher)",
+          direction: "Communication",
+          status: "idee",
+          has_pivot: false,
+          phase: "",
+          programme_id: "",
+          axe_strategique: "",
+          priorite: "P3",
+          cdp_nom: "Dir. Com",
+          avancement: 0,
+          budget: { year: y, amountK: 0, investK: 0, fonctK: 0 },
+          charges: { unite: "jours", cdp: 0, mco: 0, total: 0 },
+          charge_estimee_jours: 0,
+          _last_pivot_update_at: now
+        }
+      ],
+      pivotsById: {}
+    },
+    capacite: {
+      periode: { debut: `${y}-01-01`, fin: `${y}-12-31` },
+      total_jours: 1200,
+      run_hors_projet_jours: 720,
+      capacite_projet_jours: 480,
+      teams: [],
+      notes: "Jeu de démonstration : 1 200 j de potentiel dont 60 % de RUN/MCO.",
+      detail_hors_projet: {
+        run_mco_jours: 450,
+        reglementaire_jours: 80,
+        ssi_jours: 90,
+        transverse_jours: 70,
+        autres_jours: 30,
+        commentaire: "Estimation démo"
+      }
+    },
+    strategie_courante: {
+      id: "STRAT-COURANTE",
+      nom: `Scénario Arbitrage ${y} (Démo)`,
+      selection: {
+        projets_lances: ["FIN-2027-01", "SSI-2027-01", "USA-2027-01"],
+        projets_synthese: ["FIN-2027-01", "SSI-2027-01"]
+      },
+      chronologie: {},
+      textes: {
+        pros: "• Sécurisation du socle financier et cybersécurité\n• Amélioration directe du service aux familles",
+        cons: "• Marge résiduelle limitée : tout nouveau projet P1 nécessitera un report"
+      },
+      date_creation: now
+    }
+  };
+}
+
+function loadDemoData(){
+  const demo = buildDemoGovernance();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(demo));
+  broadcastGovUpdated();
+  renderAll();
+  toast("Jeu de démo chargé 🧪 (effaçable en 1 clic)");
+}
+
+function clearDemoData(){
+  if(!confirm("Vider le jeu de démonstration et repartir sur une gouvernance vierge ?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem("dnsigov.portfolio");
+  localStorage.removeItem("dnsigov.capacity");
+  localStorage.removeItem("dnsigov.capacity.summary");
+  broadcastGovUpdated();
+  renderAll();
+  toast("Base vidée — prêt à démarrer à zéro ✅");
+}
+
+/* =============================
+   Dessin Camembert Capacité
+============================== */
+function drawCapacityPie(cPot, cHP, cProj){
+  const canvas = $("pieCapacite");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.44;
+
+  ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2);
+  ctx.fillStyle = "rgba(59,130,246,0.12)"; ctx.fill();
+
+  let start = -Math.PI/2;
+  const parts = [ {v: cHP, c: "#f59e0b"}, {v: cProj, c: "#10b981"} ];
+  const totalPie = cPot > 0 ? cPot : 1;
+  for(const p of parts){
+    const angle = (p.v/totalPie) * Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,radius,start,start+angle);
+    ctx.fillStyle = p.c; ctx.fill(); start += angle;
+  }
+
+  ctx.beginPath(); ctx.arc(cx,cy,radius*0.60,0,Math.PI*2);
+  ctx.fillStyle = "#f8fafc"; ctx.fill();
+
+  ctx.fillStyle = "#0f172a";
+  ctx.textAlign = "center";
+  ctx.font = "800 11px system-ui, sans-serif";
+  ctx.fillText("Réserve", cx, cy - 5);
+  ctx.fillStyle = cProj > 0 ? "#16a34a" : "#64748b";
+  ctx.font = "900 15px ui-monospace, monospace";
+  ctx.fillText(`${cProj.toLocaleString("fr-FR")} j`, cx, cy + 14);
+}
+
+/* =============================
+   Mise à jour du Guide 4 étapes
+============================== */
+function updateGuideUI(stats){
+  const { activeProgsCount, projetsCount, orphansCount, cPot, cProj, engagedCount, starsCount, isDemo, isEmpty } = stats;
+
+  $("onboardingWrap").style.display = isEmpty ? "block" : "none";
+  $("btnClearDemo").style.display = isDemo ? "inline-flex" : "none";
+
+  const done1 = activeProgsCount > 0;
+  const done2 = projetsCount > 0;
+  const done3 = cPot > 0;
+  const done4 = engagedCount > 0;
+
+  const doneCount = [done1, done2, done3, done4].filter(Boolean).length;
+  const pill = $("guideProgressPill");
+  pill.textContent = `${doneCount} / 4 étapes prêtes`;
+  pill.classList.toggle("done", doneCount === 4);
+
+  // Déterminer la première étape non complétée
+  let nextIdx = 0;
+  if(!done1) nextIdx = 1;
+  else if(!done2) nextIdx = 2;
+  else if(!done3) nextIdx = 3;
+  else if(!done4) nextIdx = 4;
+
+  const nextHints = {
+    1: "👉 Prochaine action : créez au moins un Programme stratégique (Étape 1).",
+    2: "👉 Prochaine action : captez votre première demande / projet dans le Portefeuille (Étape 2).",
+    3: "👉 Prochaine action : déclarez votre Capacité DNSI en jours (Étape 3).",
+    4: "👉 Prochaine action : engagez vos projets dans un Scénario d'arbitrage (Étape 4).",
+    0: starsCount === 0
+      ? "✅ Les 4 piliers sont alimentés ! Pensez à cocher ⭐ sur vos projets phares dans Stratégie pour enrichir le tableau CODIR."
+      : "✅ Votre gouvernance est complète et prête pour présentation CODIR ou export PDF A3."
+  };
+  $("guideNextHint").textContent = nextHints[nextIdx];
+
+  // Helper état carte étape
+  function setStep(idx, stateClass, statusText, metricText, ctaLabel){
+    const card = $(`stepCard${idx}`);
+    card.className = "step-card" + (stateClass ? " " + stateClass : "");
+    $(`stepStatus${idx}`).textContent = statusText;
+    $(`stepMetric${idx}`).textContent = metricText;
+    if(ctaLabel) $(`stepCta${idx}`).textContent = ctaLabel;
+  }
+
+  // Étape 1
+  setStep(
+    1,
+    nextIdx === 1 ? "is-next" : (done1 ? "is-done" : ""),
+    nextIdx === 1 ? "👉 Prochaine étape" : (done1 ? "✅ Prêt" : "À faire"),
+    `${activeProgsCount} programme${activeProgsCount > 1 ? "s" : ""} actif${activeProgsCount > 1 ? "s" : ""}`,
+    done1 ? "➕ Ajouter un programme" : "➕ Créer un programme"
+  );
+
+  // Étape 2
+  const step2Cls = nextIdx === 2 ? "is-next" : (!done2 ? "" : (orphansCount > 0 ? "is-warn" : "is-done"));
+  const step2Status = nextIdx === 2 ? "👉 Prochaine étape" : (!done2 ? "À faire" : (orphansCount > 0 ? `⚠️ ${orphansCount} hors pgm` : "✅ Prêt"));
+  setStep(
+    2,
+    step2Cls,
+    step2Status,
+    `${projetsCount} projet${projetsCount > 1 ? "s" : ""}${orphansCount > 0 ? ` (${orphansCount} à rattacher)` : ""}`,
+    "➕ Nouvelle demande"
+  );
+
+  // Étape 3
+  setStep(
+    3,
+    nextIdx === 3 ? "is-next" : (done3 ? "is-done" : ""),
+    nextIdx === 3 ? "👉 Prochaine étape" : (done3 ? "✅ Prêt" : "À faire"),
+    done3 ? `Potentiel ${cPot.toLocaleString("fr-FR")} j • Réserve ${cProj.toLocaleString("fr-FR")} j` : "Capacité non définie (0 j)",
+    done3 ? "⚙️ Ajuster la capacité" : "⚙️ Définir la capacité"
+  );
+
+  // Étape 4
+  const step4Cls = nextIdx === 4 ? "is-next" : (!done4 ? "" : (starsCount === 0 ? "is-warn" : "is-done"));
+  const step4Status = nextIdx === 4 ? "👉 Prochaine étape" : (!done4 ? "À faire" : (starsCount === 0 ? "⚠️ Cocher ⭐" : "✅ Prêt CODIR"));
+  setStep(
+    4,
+    step4Cls,
+    step4Status,
+    done4 ? `${engagedCount} engagé${engagedCount > 1 ? "s" : ""} • ${starsCount} favori${starsCount > 1 ? "s" : ""} ⭐` : "Aucun projet engagé",
+    done4 ? "🧠 Ouvrir le scénario" : "🧠 Arbitrer le scénario"
+  );
+}
+
+/* =============================
+   Rendu Global
+============================== */
 function renderAll(){
   const GOV = loadGov();
   $("subDate").textContent = `Gouvernance DNSI • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
 
-  if(!GOV){
-    $("chipSync").textContent = "Aucune donnée locale";
-    $("dynamicProgrammesContainer").innerHTML = `<div class="empty-note">Aucune gouvernance chargée en mémoire.<br/>Ouvre <b>1. Programmes</b> ou importe un fichier <b>Gouvernance.json</b>.</div>`;
-    return;
-  }
-
-  const last = GOV?.meta?.lastUpdatedAt || GOV?.meta?.dernier_enregistrement;
-  $("chipSync").textContent = last
-    ? `Dernière MAJ : ${new Date(last).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`
-    : "Source : Gouvernance.json";
-
-  const projets = Array.isArray(GOV.portefeuille?.projets) ? GOV.portefeuille.projets : [];
+  const projets = Array.isArray(GOV?.portefeuille?.projets) ? GOV.portefeuille.projets : [];
   const programmes = getProgrammesList(GOV);
+  const activeProgs = programmes.filter(p => p.statut !== "cloture" && p.statut !== "inactif");
   const validProgIds = new Set(programmes.map(p => String(p.id)));
-  const strat = GOV.strategie_courante || {};
-  const cap = GOV.capacite || {};
+  const strat = GOV?.strategie_courante || {};
+  const cap = GOV?.capacite || {};
   const selectionIds = new Set((strat.selection?.projets_lances || []).map(String));
   const pdfIds = new Set((strat.selection?.projets_synthese || []).map(String));
+
+  const cPot = safeNum(cap.total_jours);
+  const cHP = safeNum(cap.run_hors_projet_jours);
+  const cProj = Math.max(0, cPot - cHP);
+
+  const isEmpty = !GOV || (programmes.length === 0 && projets.length === 0 && cPot === 0);
+
+  if(!GOV){
+    $("chipSync").textContent = "Aucune donnée locale";
+  } else {
+    const last = GOV?.meta?.lastUpdatedAt || GOV?.meta?.dernier_enregistrement;
+    const demoSuffix = GOV?.meta?.isDemo ? " • 🧪 Démo" : "";
+    $("chipSync").textContent = last
+      ? `Dernière MAJ : ${new Date(last).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}${demoSuffix}`
+      : `Source : Gouvernance.json${demoSuffix}`;
+  }
 
   /* =========================================================
      QUADRANT 1 : PROGRAMMES & ALIGNEMENT STRATÉGIQUE
@@ -552,11 +1279,19 @@ function renderAll(){
     }
   }
 
-  const activeProgs = programmes.filter(p => p.statut !== "cloture" && p.statut !== "inactif");
   const container = $("dynamicProgrammesContainer");
 
   if(activeProgs.length === 0){
-    container.innerHTML = `<div class="empty-note">Aucun programme actif défini dans le Support <b>1. Programmes</b>.</div>`;
+    container.innerHTML = `
+      <div class="empty-note">
+        <b>Aucun programme actif défini pour le moment.</b><br/>
+        Créez votre premier programme pour structurer vos projets par grand axe stratégique.
+        <div class="empty-actions no-print">
+          <a class="step-cta primary" href="Gouvernance - 1. Programmes.html?action=new">➕ Créer un programme</a>
+          <button class="step-cta" type="button" onclick="$('btnImport').click()">📥 Importer (.json)</button>
+        </div>
+      </div>
+    `;
   } else {
     let html = activeProgs.map((prg, idx) => {
       const load = progLoads[String(prg.id)] || 0;
@@ -597,9 +1332,12 @@ function renderAll(){
     }
 
     if(engagedProjects.length === 0){
-      html += `<div style="margin-top:12px; font-size:11.5px; color:var(--muted); font-style:italic;">
-        ℹ️ Aucun projet engagé dans le scénario actif (Support 4) — les jauges se rempliront dès la sélection de projets.
-      </div>`;
+      html += `
+        <div class="inline-cta-bar no-print">
+          <span>ℹ️ Aucun projet engagé dans le scénario actif — les jauges se rempliront dès la sélection.</span>
+          <a class="panel-link" href="Gouvernance - 4. Strategie.html">Sélectionner dans Stratégie ➔</a>
+        </div>
+      `;
     }
 
     container.innerHTML = html;
@@ -646,46 +1384,40 @@ function renderAll(){
     <span style="color:#64748b">P4 : ${prioCount.P4}</span>
   `;
 
+  const pfHint = $("pfInlineHint");
+  if(projets.length === 0){
+    pfHint.style.display = "flex";
+    pfHint.innerHTML = `
+      <span>💡 Votre portefeuille est encore vide.</span>
+      <a class="panel-link primary" href="Gouvernance - 2. Portefeuille.html?action=new">➕ Capter une 1ère demande</a>
+    `;
+  } else if(nbOrphans > 0){
+    pfHint.style.display = "flex";
+    pfHint.innerHTML = `
+      <span style="color:#9a3412; font-weight:700;">⚠️ ${nbOrphans} demande(s)/projet(s) sans programme rattaché.</span>
+      <a class="panel-link" href="Gouvernance - 1. Programmes.html">Rattacher via Programmes ➔</a>
+    `;
+  } else {
+    pfHint.style.display = "none";
+  }
+
   /* =========================================================
      QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS)
   ========================================================= */
-  const cPot = safeNum(cap.total_jours);
-  const cHP = safeNum(cap.run_hors_projet_jours);
-  const cProj = Math.max(0, cPot - cHP);
-
   $("legPot").textContent = `${cPot.toLocaleString("fr-FR")} j`;
   $("legHP").textContent = `${cHP.toLocaleString("fr-FR")} j`;
   $("legRem").textContent = `${cProj.toLocaleString("fr-FR")} j`;
+  drawCapacityPie(cPot, cHP, cProj);
 
-  const canvas = $("pieCapacite");
-  if(canvas){
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0,0,w,h);
-    const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.44;
-
-    ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2);
-    ctx.fillStyle = "rgba(59,130,246,0.12)"; ctx.fill();
-
-    let start = -Math.PI/2;
-    const parts = [ {v: cHP, c: "#f59e0b"}, {v: cProj, c: "#10b981"} ];
-    const totalPie = cPot > 0 ? cPot : 1;
-    for(const p of parts){
-      const angle = (p.v/totalPie) * Math.PI*2;
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,radius,start,start+angle);
-      ctx.fillStyle = p.c; ctx.fill(); start += angle;
-    }
-
-    ctx.beginPath(); ctx.arc(cx,cy,radius*0.60,0,Math.PI*2);
-    ctx.fillStyle = "#f8fafc"; ctx.fill();
-
-    ctx.fillStyle = "#0f172a";
-    ctx.textAlign = "center";
-    ctx.font = "800 11px system-ui, sans-serif";
-    ctx.fillText("Réserve", cx, cy - 5);
-    ctx.fillStyle = "#16a34a";
-    ctx.font = "900 15px ui-monospace, monospace";
-    ctx.fillText(`${cProj.toLocaleString("fr-FR")} j`, cx, cy + 14);
+  const capHint = $("capInlineHint");
+  if(cPot === 0){
+    capHint.style.display = "flex";
+    capHint.innerHTML = `
+      <span>⚙️ Capacité non renseignée : le scénario ne peut pas encore calculer votre marge.</span>
+      <a class="panel-link primary" href="Gouvernance - 3. Capacite.html?action=edit">Définir la capacité ➔</a>
+    `;
+  } else {
+    capHint.style.display = "none";
   }
 
   /* =========================================================
@@ -749,9 +1481,31 @@ function renderAll(){
       `;
     }).join("");
   } else {
-    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
+    tBody.innerHTML = `
+      <tr>
+        <td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">
+          Aucun projet mis en avant pour le moment.
+          <div class="empty-actions no-print" style="margin-top:8px;">
+            <a class="panel-link" href="Gouvernance - 4. Strategie.html">⭐ Choisir les projets phares dans Stratégie ➔</a>
+          </div>
+        </td>
+      </tr>
+    `;
   }
   $("stratCount").textContent = engagedProjects.length;
+
+  /* Mise à jour du parcours guidé en 4 étapes */
+  updateGuideUI({
+    activeProgsCount: activeProgs.length,
+    projetsCount: projets.length,
+    orphansCount: nbOrphans,
+    cPot,
+    cProj,
+    engagedCount: engagedProjects.length,
+    starsCount: pdfProjects.length,
+    isDemo: !!GOV?.meta?.isDemo,
+    isEmpty
+  });
 }
 
 /* =============================
@@ -776,11 +1530,7 @@ async function importGov(file){
     const parsed = JSON.parse(await file.text());
     if(!parsed || typeof parsed !== "object"){ alert("JSON invalide."); return; }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-    try{
-      const bc = new BroadcastChannel("dnsi-gouvernance");
-      bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "synthese" });
-      bc.close();
-    }catch(e){}
+    broadcastGovUpdated();
     renderAll();
     toast("Gouvernance importée ✅");
   }catch(e){
@@ -789,7 +1539,26 @@ async function importGov(file){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  applyGuideMode(isGuideEnabled());
   renderAll();
+
+  $("btnToggleGuide").addEventListener("click", () => {
+    const next = !isGuideEnabled();
+    applyGuideMode(next);
+    toast(next ? "Mode Guide activé 🧭" : "Vue CODIR épurée activée 📊");
+  });
+
+  $("btnHideGuideInline").addEventListener("click", () => {
+    applyGuideMode(false);
+    toast("Vue CODIR épurée activée (réactivable via Mode Guide)");
+  });
+
+  $("btnObImport").addEventListener("click", () => {
+    $("fileInput").value = "";
+    $("fileInput").click();
+  });
+  $("btnObDemo").addEventListener("click", loadDemoData);
+  $("btnClearDemo").addEventListener("click", clearDemoData);
 
   $("btnRefresh").addEventListener("click", () => {
     renderAll();
@@ -809,9 +1578,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if(ev?.data?.type === "GOUVERNANCE_UPDATED") renderAll();
     };
   }catch(e){}
+
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
-}
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
 });
 </script>
 </body>
