@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gouvernance — Portefeuille projets (PPM V2.6)</title>
+  <title>Gouvernance — Portefeuille projets (PPM V2.7)</title>
+  <meta name="theme-color" content="#C10F1A"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <link rel="icon" type="image/png" href="./icon.png"/>
+  <link rel="apple-touch-icon" href="./icon.png"/>
   <style>
     :root{
       --lille-red:#C10F1A;
@@ -46,7 +50,7 @@
     }
     .topbar-row{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
-      max-width:1380px; margin:0 auto;
+      max-width:1380px; margin:0 auto; flex-wrap:wrap;
     }
     .brand{
       display:flex; align-items:center; gap:12px; min-width:0;
@@ -444,12 +448,13 @@
       <div class="brand">
         <div class="badge">DNSI</div>
         <div class="titles">
-          <div class="h1">Portefeuille projets — PPM V2.6</div>
-          <div class="sub" id="govName">Gouvernance ➔ Programme ➔ Projet / Idée</div>
+          <div class="h1">Portefeuille projets — PPM V2.7</div>
+          <div class="sub" id="govName">Gouvernance ➔ Programme ➔ Projet / Idée (Pont Supports Projet)</div>
         </div>
       </div>
       <div class="actions">
         <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="btn" id="btnExportGov">⬇️ Exporter (.json)</button>
         <button class="btn" id="btnPdf">🧾 PDF</button>
         <button class="btn" id="btnSaveToGov" style="background:rgba(0,0,0,.25); border-color:transparent;">💾 Enregistrer localement</button>
       </div>
@@ -500,12 +505,16 @@
         <div class="entry-icon-2">🛂</div>
         <div>
           <h2>Suivi des Projets Lancés</h2>
-          <p>Mise à jour du portefeuille via les JSON des CDP. Contrôle automatique de fraîcheur.</p>
+          <p>Mise à jour du portefeuille via les JSON des CDP. Contrôle automatique de fraîcheur et mémorisation des pivots complets.</p>
         </div>
         <div class="entry-kpis">
           <div class="ekpi">
             <div class="val" id="kpiPivots" style="color:#166534">0</div>
             <div class="lab">Projets pilotés (JSON)</div>
+          </div>
+          <div class="ekpi">
+            <div class="val" id="kpiPivotsStored" style="color:#0369a1">0</div>
+            <div class="lab">Pivots détaillés liés</div>
           </div>
         </div>
         <button class="entry-btn" id="btnLoadPivots">⬆️ Auditer & Charger JSON</button>
@@ -517,7 +526,7 @@
       <div class="panel-head">
         <div>
           <div class="panel-title">Référentiel des Demandes et Projets</div>
-          <div class="panel-sub">Workflow : Idée ➔ Qualification PMO (Programme + Chiffrage) ➔ Pré-Cadrage ➔ Projet Lancé</div>
+          <div class="panel-sub">Workflow : Idée ➔ Qualification PMO (Programme + Chiffrage) ➔ Pré-Cadrage ➔ Projet Lancé ➔ 🚀 Supports Projet</div>
         </div>
         <div class="chip" id="chipCount" style="background:#f1f5f9; border:none;">—</div>
       </div>
@@ -567,7 +576,7 @@
             <tbody id="tbody"></tbody>
           </table>
         </div>
-        <div style="text-align:center; color:var(--muted); font-size:12px; margin-top:12px;">Portefeuille projets — PPM V2.6 (Rattachement Programmes & Détection Hors Programme)</div>
+        <div style="text-align:center; color:var(--muted); font-size:12px; margin-top:12px;">Portefeuille projets — PPM V2.7 (Pont contextualisé vers Gestion-supports-projet- & Douane 4 pôles SIGF)</div>
       </div>
     </section>
   </main>
@@ -718,7 +727,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">🛂 Rapport d'Audit & Chargement JSON</div>
-          <div class="small">Bilan de l'intégration des fichiers JSON de vos chefs de projets</div>
+          <div class="small">Bilan de l'intégration des fichiers JSON de vos chefs de projets (pivots complets conservés pour le pont)</div>
         </div>
         <button class="btn2 ghost" onclick="el('modalIntegration').style.display='none'">✕</button>
       </div>
@@ -743,8 +752,8 @@
   </div>
 
   <script>
-    const APP_VERSION = "V2.6";
-    const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Support-Projets/";
+    const APP_VERSION = "V2.7";
+    const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Gestion-supports-projet-/";
     const STORAGE_KEY = "GOUVERNANCE_JSON";
 
     function nowISO(){ return new Date().toISOString(); }
@@ -819,8 +828,8 @@
 
       const invK = Number(p?.budget?.investK ?? p?.budget?.amountK ?? p?.budget?.k ?? 0);
       const fonctK = Number(p?.budget?.fonctK ?? 0);
+      const av = Math.max(0, Math.min(100, Number(p.avancement ?? p.avancement_pct ?? p.progress?.percent ?? 0) || 0));
 
-      // Unification programme_id / axe_strategique
       const progId = String(p.programme_id ?? p.axe_strategique ?? "").trim();
 
       return {
@@ -836,6 +845,8 @@
         description_besoin: p.description_besoin || "",
         priorite, prio: priorite,
         cdp_nom: String(p.cdp_nom || p.manager || p.chef_de_projet || "").trim(),
+        avancement: av,
+        avancement_pct: av,
         budget: { year: Number(p?.budget?.year ?? 2026), amountK: invK, investK: invK, fonctK },
         charges: { unite: "jours", cdp, mco, total: tot },
         charge_estimee_jours: tot,
@@ -846,10 +857,13 @@
     function normalizeGovernance(j){
       if(!j || typeof j !== "object") return null;
       const g = JSON.parse(JSON.stringify(j));
-      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.2", nom: "Gouvernance DNSI" };
+      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.3", nom: "Gouvernance DNSI" };
       g.portefeuille = g.portefeuille || {};
       const rawProjs = Array.isArray(g.portefeuille.projets) ? g.portefeuille.projets : [];
       g.portefeuille.projets = rawProjs.map(normalizeProjectRecord).filter(Boolean);
+      g.portefeuille.pivotsById = (g.portefeuille.pivotsById && typeof g.portefeuille.pivotsById === "object")
+        ? g.portefeuille.pivotsById
+        : {};
       g.programmes = Array.isArray(g.programmes) ? g.programmes : (Array.isArray(g.politiques) ? g.politiques : []);
       return g;
     }
@@ -857,7 +871,7 @@
     function loadGov(){
       const raw = localStorage.getItem(STORAGE_KEY);
       if(raw) return normalizeGovernance(safeJsonParse(raw));
-      return normalizeGovernance({ portefeuille: { projets: [] }, programmes: [] });
+      return normalizeGovernance({ portefeuille: { projets: [], pivotsById: {} }, programmes: [] });
     }
 
     function notifyUpdate(){
@@ -872,6 +886,9 @@
       g.meta.lastUpdatedAt = nowISO();
       g.meta.dernier_enregistrement = g.meta.lastUpdatedAt;
       g.portefeuille.projets = (g.portefeuille.projets || []).map(normalizeProjectRecord);
+      g.portefeuille.pivotsById = (g.portefeuille.pivotsById && typeof g.portefeuille.pivotsById === "object")
+        ? g.portefeuille.pivotsById
+        : {};
       localStorage.setItem(STORAGE_KEY, JSON.stringify(g));
       localStorage.setItem("dnsigov.portfolio", JSON.stringify({
         projects: g.portefeuille.projets.map(p => ({
@@ -943,6 +960,7 @@
 
     function render(){
       const allProjects = GOV.portefeuille.projets || [];
+      const pivotsMap = GOV.portefeuille.pivotsById || {};
       const programmes = getProgrammesList(GOV);
 
       const last = GOV?.meta?.lastUpdatedAt ? new Date(GOV.meta.lastUpdatedAt) : null;
@@ -968,13 +986,15 @@
       el("chipCount").textContent = `${projects.length} / ${allProjects.length} demande(s)`;
 
       // KPIs
-      let nbIdees = 0, nbPivots = 0, nbOrphans = 0;
+      let nbIdees = 0, nbPivots = 0, nbOrphans = 0, nbStoredPivots = 0;
       for(const p of allProjects){
         if(p.has_pivot) nbPivots++; else nbIdees++;
         if(!resolveProgramme(p.programme_id)) nbOrphans++;
+        if(pivotsMap[String(p.id)]) nbStoredPivots++;
       }
       el("kpiIdees").textContent = nbIdees;
       el("kpiPivots").textContent = nbPivots;
+      el("kpiPivotsStored").textContent = nbStoredPivots;
       el("kpiOrphans").textContent = nbOrphans;
       el("kpiOrphans").style.color = nbOrphans > 0 ? "#c2410c" : "#16a34a";
 
@@ -995,6 +1015,7 @@
         const mcoVal = Number(p?.charges?.mco ?? 0);
         const totVal = cdpVal + mcoVal;
         const statusVal = String(p.status || "idee");
+        const hasFullPivot = !!pivotsMap[String(p.id)];
 
         let freshnessHtml = `<span class="small" style="color:#94a3b8">À affecter</span>`;
         if (p.has_pivot) {
@@ -1009,7 +1030,10 @@
 
         let actHtml = "";
         if(p.has_pivot) {
-          actHtml = `<button class="iconbtn action" data-act="open" data-id="${encodeURIComponent(p.id)}">🚀 Ouvrir</button>
+          const openTitle = hasFullPivot
+            ? "Ouvrir dans Gestion-supports-projet (pivot complet synchronisé)"
+            : "Ouvrir dans Gestion-supports-projet (pré-rempli depuis le Portefeuille ou chargé depuis GitHub)";
+          actHtml = `<button class="iconbtn action" data-act="open" data-id="${encodeURIComponent(p.id)}" title="${escapeHtml(openTitle)}">🚀 Ouvrir</button>
                      <button class="iconbtn" data-act="qualify" data-id="${encodeURIComponent(p.id)}" title="Modifier programme / priorité">🎯</button>`;
         } else if(statusVal === "idee") {
           actHtml = `<button class="iconbtn primary" data-act="qualify" data-id="${encodeURIComponent(p.id)}">🎯 Qualifier PMO</button>`;
@@ -1026,18 +1050,23 @@
           chargeHtml = `<div><b>Tot: ${totVal} j</b></div><div class="small">CDP:${cdpVal} MCO:${mcoVal}</div>`;
         }
 
+        const phaseTxt = p.has_pivot
+          ? `<b>${escapeHtml(p.phase || "Lancé")}</b>${p.avancement ? `<div class="small">Av. ${p.avancement}%</div>` : ""}`
+          : (statusVal==="idee" ? "Intention métier" : "Pré-Cadré");
+
         tr.innerHTML = `
           <td class="col-id mono" style="font-weight:900; color:var(--lille-red);">${escapeHtml(p.id || "")}</td>
           <td class="col-proj wrap">
             <b style="font-size:13px;">${escapeHtml(p.nom || "")}</b>
             <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:5px;">
               ${statusBadge(p.has_pivot, statusVal)}
+              ${hasFullPivot ? `<span class="badge" style="border-color:#93c5fd; background:#eff6ff; color:#1d4ed8;" title="Pivot complet présent en mémoire">🔗 Pivot</span>` : ""}
               ${programmeBadge(p)}
             </div>
           </td>
           <td class="col-dir">${escapeHtml(p.direction) || "—"}</td>
           <td class="col-cdp">${freshnessHtml}</td>
-          <td class="col-stat">${p.has_pivot ? `<b>${escapeHtml(p.phase || "Lancé")}</b>` : (statusVal==="idee" ? "Intention métier" : "Pré-Cadré")}</td>
+          <td class="col-stat">${phaseTxt}</td>
           <td class="col-prio">${(statusVal!=="idee" || p.has_pivot) ? prioBadge(p) : "—"}</td>
           <td class="col-bud">${budgetHtml}</td>
           <td class="charge-td">${chargeHtml}</td>
@@ -1054,10 +1083,14 @@
           if(act === "remove") {
             if(confirm(`Supprimer définitivement la demande ${id} ?`)){
               GOV.portefeuille.projets = GOV.portefeuille.projets.filter(x => String(x.id) !== id);
+              if(GOV.portefeuille.pivotsById) delete GOV.portefeuille.pivotsById[id];
               saveGov(GOV); render(); toast("Supprimé.");
             }
           }
-          else if(act === "open") window.open(`${SUPPORT_PROJECT_URL}?id=${encodeURIComponent(id)}`, '_blank');
+          else if(act === "open") {
+            saveGov(GOV);
+            window.open(`${SUPPORT_PROJECT_URL}?id=${encodeURIComponent(id)}&from=ppm`, '_blank');
+          }
           else if(act === "init") initializeProjectJson(id);
           else if(act === "qualify") openModalQualif(id);
         });
@@ -1125,7 +1158,6 @@
       };
       el("qDisplayOrigine").textContent = originesLabels[proj.origine_besoin] || proj.origine_besoin || "Non défini";
 
-      // Population dynamique des Programmes (+ Hors programme)
       const programmes = getProgrammesList(GOV).filter(p => p.statut !== "cloture" && p.statut !== "inactif");
       const selectProg = el("qProg");
       selectProg.innerHTML =
@@ -1170,7 +1202,7 @@
     };
 
     /* =============================
-       Action 3 : Génération du JSON Projet
+       Action 3 : Génération du JSON Projet (Format Pivot V1.1 compatible SIGF)
     ============================== */
     function initializeProjectJson(projectId) {
       const proj = GOV.portefeuille.projets.find(p => String(p.id) === String(projectId));
@@ -1180,10 +1212,12 @@
       const descInit = proj.description_besoin ? `Besoin métier : ${proj.description_besoin}` : "Projet initialisé par le PMO.";
 
       const pivotTemplate = {
+        version: "1.1",
         project: {
           id: proj.id,
           title: proj.nom,
           domain: proj.direction,
+          directionPorteuse: proj.direction,
           programmeId: prg ? prg.id : "",
           programmeTitle: prg ? prg.titre : "Hors programme",
           phaseCourante: "Cadrage",
@@ -1191,11 +1225,20 @@
           owner: "",
           description: descInit,
           actors: { directeurProjet: "", expertMetier: proj.cdp_nom || "", moe: "", prestataire: "" },
+          meteo: {
+            situation: "soleil_nuages", tendance: "stable", color: "orange",
+            resume: descInit,
+            actionsRealisees: ["Qualification stratégique PMO validée"],
+            actionsEnCours: ["Cadrage détaillé et lancement du projet"],
+            pointsAttention: [],
+            statutPlanning: "Vert", statutPerimetre: "Vert", statutRessources: "Vert"
+          },
           progress: { percent: 0, label: "Initialisation" },
           updatedAt: nowISO()
         },
         budget: {
           year: proj.budget?.year || 2027, currency: "EUR",
+          amount: Math.round((proj.budget?.investK || 0) * 1000),
           amountK: proj.budget?.investK || 0, fonctK: proj.budget?.fonctK || 0,
           comment: "Budget évalué en phase de qualification PMO"
         },
@@ -1204,18 +1247,18 @@
           totalEstimated: proj.charges?.total || 0,
           assumption: "Chiffrage macro initial PMO",
           teams: [
-            { code: "CDP", label: "Chefs de Projet / Études", estimated: proj.charges?.cdp || 0 },
-            { code: "MCO", label: "Infrastructures / MCO", estimated: proj.charges?.mco || 0 }
+            { code: "ETUDES", label: "Études / Pilotage", estimated: proj.charges?.cdp || 0 },
+            { code: "PIIA", label: "PIIA / Données / Interfaces", estimated: 0 },
+            { code: "TIRS", label: "TIRS / Infra / Réseau", estimated: proj.charges?.mco || 0 },
+            { code: "SSI", label: "SSI", estimated: 0 }
           ]
         },
-        meteo: {
-          situation: "soleil_nuages", tendance: "stable", color: "orange",
-          resume: descInit,
-          actionsRealisees: ["Qualification stratégique PMO validée"],
-          actionsEnCours: ["Cadrage détaillé et lancement du projet"],
-          pointsAttention: []
-        },
         phases: [],
+        actors: [],
+        raci: { version: "2.3", matrix: [] },
+        leaves: [],
+        planningDetailed: { timeWindow: { start: "", end: "" }, phases: [], actions: [], links: [], globalConflicts: [] },
+        feuilleDeRoute: { title: proj.nom, phases: [], actions: [] },
         config: { sentinelleActive: false }
       };
 
@@ -1231,12 +1274,13 @@
     }
 
     /* =============================
-       Entrée 2 : Audit & Chargement JSON CDP
+       Entrée 2 : Audit & Chargement JSON CDP (Douane 4 pôles + pivotsById)
     ============================== */
     async function handlePivots(files){
       const arr = Array.from(files || []);
       if(!arr.length) return;
       const projects = GOV.portefeuille.projets;
+      GOV.portefeuille.pivotsById = GOV.portefeuille.pivotsById || {};
       const seen = new Set();
       const report = { updated: [], created: [], missing: [] };
 
@@ -1252,46 +1296,60 @@
 
           seen.add(id);
           const name = proj.title || proj.nom || proj.name || f.name;
-          const cdp = proj.manager || proj.chef_de_projet || proj.cdp || proj.owner || proj.actors?.directeurProjet || "";
+          const cdp = proj.actors?.moe || proj.manager || proj.chef_de_projet || proj.cdp || proj.owner || proj.actors?.directeurProjet || "";
           const pDate = proj.updatedAt || proj.date || nowISO();
           const progFromPivot = String(proj.programmeId || "").trim();
+          const avPct = Math.max(0, Math.min(100, Number(proj?.progress?.percent ?? j?.progress?.percent ?? 0) || 0));
 
-          let cdpJ=0, mcoJ=0;
+          // Agrégation complète des pôles (format SIGF : ETUDES+PIIA -> CDP ; TIRS+SSI -> MCO)
+          let cdpJ = 0, mcoJ = 0;
           const cpObj = j.chargesProjet || proj.chargesProjet;
-          if(cpObj && Array.isArray(cpObj.teams)){
-            const tCdp = cpObj.teams.find(t=>t.code==="CDP" || t.code==="ETUDES");
-            const tMco = cpObj.teams.find(t=>t.code==="MCO" || t.code==="INFRA" || t.code==="TIRS");
-            if(tCdp) cdpJ = Number(tCdp.estimated||0);
-            if(tMco) mcoJ = Number(tMco.estimated||0);
+          if(cpObj && Array.isArray(cpObj.teams) && cpObj.teams.length > 0){
+            for(const t of cpObj.teams){
+              const code = String(t.code || "").toUpperCase();
+              const est = Number(t.estimated ?? t.estimation ?? t.jours ?? 0) || 0;
+              if(["MCO", "INFRA", "TIRS", "SSI"].includes(code)) mcoJ += est;
+              else cdpJ += est;
+            }
           } else {
-            cdpJ = Number(proj.charge || proj.charge_estimee_jours || 0);
+            cdpJ = Number(proj.charge || proj.charge_estimee_jours || 0) || 0;
           }
 
           const bObj = j.budget || proj.budget || {};
-          const bInv = Number(bObj.investK ?? bObj.amountK ?? 0);
-          const bFct = Number(bObj.fonctK ?? 0);
+          const bInv = Number(bObj.investK ?? bObj.amountK ?? (bObj.amount != null ? Math.round(Number(bObj.amount)/1000) : 0)) || 0;
+          const bFct = Number(bObj.fonctK ?? 0) || 0;
+
+          // Mémorisation du pivot complet pour le pont contextualisé vers Gestion-supports-projet-
+          GOV.portefeuille.pivotsById[id] = j;
 
           const existing = projects.find(x => String(x.id) === id);
           if(existing){
             existing.nom = name;
+            existing.name = name;
             existing.cdp_nom = cdp || existing.cdp_nom;
             existing.has_pivot = true;
+            existing.hasPivot = true;
+            existing.status = "cadrage_valide";
             existing.phase = proj.phaseCourante || existing.phase;
+            existing.avancement = avPct;
+            existing.avancement_pct = avPct;
             existing._last_pivot_update_at = pDate;
             if(progFromPivot && !existing.programme_id){
               existing.programme_id = progFromPivot;
               existing.axe_strategique = progFromPivot;
             }
             existing.charges = { unite:"jours", cdp:cdpJ, mco:mcoJ, total:cdpJ+mcoJ };
-            existing.budget = { year: bObj.year || existing.budget?.year || 2026, investK: bInv, fonctK: bFct, amountK: bInv };
+            existing.charge_estimee_jours = cdpJ + mcoJ;
+            existing.budget = { year: bObj.year || existing.budget?.year || 2026, investK: bInv, fonctK: bFct || existing.budget?.fonctK || 0, amountK: bInv };
             report.updated.push(existing);
           }else{
             const newP = normalizeProjectRecord({
               id, nom: name, cdp_nom: cdp, has_pivot: true, phase: proj.phaseCourante || "Lancé",
-              direction: proj.domain || "",
+              direction: proj.domain || proj.directionPorteuse || "",
               programme_id: progFromPivot,
-              _last_pivot_update_at: pDate, charges: { cdp:cdpJ, mco:mcoJ },
-              budget: { investK: bInv, fonctK: bFct }
+              avancement: avPct,
+              _last_pivot_update_at: pDate, charges: { cdp:cdpJ, mco:mcoJ, total: cdpJ+mcoJ },
+              budget: { year: bObj.year || 2026, investK: bInv, fonctK: bFct }
             });
             projects.push(newP);
             report.created.push(newP);
@@ -1316,7 +1374,7 @@
         let warnStr = "";
         if(days > 30) warnStr = `<span style="color:#ef4444; font-weight:800;">(⚠️ Périmé : ${days}j)</span>`;
         else if (p.charges.total === 0) warnStr = `<span style="color:#f59e0b; font-weight:800;">(⚠️ Charge à 0)</span>`;
-        return `<div class="report-item"><b>${escapeHtml(p.id)}</b> - ${escapeHtml(p.nom)} <br/><span class="small">CDP : <b>${escapeHtml(p.cdp_nom||"Non Renseigné")}</b> • Maj ${new Date(p._last_pivot_update_at).toLocaleDateString('fr-FR')} ${warnStr}</span></div>`;
+        return `<div class="report-item"><b>${escapeHtml(p.id)}</b> - ${escapeHtml(p.nom)} <br/><span class="small">CDP : <b>${escapeHtml(p.cdp_nom||"Non Renseigné")}</b> • Av. ${p.avancement||0}% • Charge ${p.charges.total}j • Maj ${new Date(p._last_pivot_update_at).toLocaleDateString('fr-FR')} ${warnStr}</span></div>`;
       }).join("") || "<div class='small'>Aucun fichier traité.</div>";
 
       el("intMissingCount").textContent = rep.missing.length;
@@ -1326,12 +1384,28 @@
     }
 
     /* =============================
+       Export JSON Gouvernance
+    ============================== */
+    function downloadGovJson(){
+      saveGov(GOV);
+      const blob = new Blob([JSON.stringify(GOV, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "Gouvernance.json";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+      toast("Fichier Gouvernance.json téléchargé ✅");
+    }
+
+    /* =============================
        Wiring & Synchro Temps Réel
     ============================== */
     el("btnOpenDemande").onclick = openModalIdee;
     el("btnLoadPivots").onclick = () => { el("filePivots").value = ""; el("filePivots").click(); };
     el("filePivots").onchange = (e) => handlePivots(e.target.files);
     el("btnPdf").onclick = () => window.print();
+    el("btnExportGov").onclick = downloadGovJson;
     el("btnRefresh").onclick = () => { GOV = loadGov(); render(); toast("Portefeuille réactualisé 🔄"); };
     el("btnSaveToGov").onclick = () => { saveGov(GOV); toast("Gouvernance locale sauvegardée ✅"); };
 
@@ -1363,7 +1437,21 @@
       };
     }catch(e){}
 
+    // Boot + Ouverture directe ?action=new depuis 0. Synthèse V2.7 + PWA
     render();
+    try{
+      const params = new URLSearchParams(window.location.search);
+      if(params.get("action") === "new"){
+        openModalIdee();
+        if(history && history.replaceState){
+          history.replaceState({}, "", window.location.pathname);
+        }
+      }
+    }catch(e){}
+
+    if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
   </script>
 </body>
 </html>
