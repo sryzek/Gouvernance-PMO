@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gouvernance — Programmes & Objectifs (V1.2)</title>
+  <title>Gouvernance — Programmes & Objectifs (V1.3)</title>
   <meta name="theme-color" content="#C10F1A"/>
   <link rel="manifest" href="./manifest.json"/>
   <link rel="icon" type="image/png" href="./icon.png"/>
@@ -34,17 +34,149 @@
       font-size:13px;
     }
 
-    /* Impression PDF */
-    @page{ size:A4 landscape; margin:10mm; }
+    /* Titres réservés à l'impression PDF */
+    .print-only-title{display:none;}
+
+    /* Impression PDF — Dossier A4 Paysage (Page 1 : Gantt, Page 2 : Cartes) */
+    @page{ size:A4 landscape; margin:8mm; }
     @media print{
-      *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-      body{background:#fff !important;}
-      .topbar{position:static; box-shadow:none;}
-      .no-print, .ppm-nav, .filter-bar, .actions, .card-actions, .orphan-btn, .toast, .modal-backdrop, .view-switch, .zoom-controls{display:none !important;}
-      .main{max-width:100%; margin:0; padding:8px 0;}
-      .prg-card, .kpi-box, .orphan-banner, .gantt-row{break-inside:avoid; page-break-inside:avoid; box-shadow:none;}
-      .gantt-wrap, .cards-zoom-wrap{overflow:visible !important; box-shadow:none;}
-      .gantt-inner, #viewCardsContainer{zoom:1 !important;}
+      *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;}
+      html, body{background:#fff !important; height:auto !important; font-size:11px !important;}
+
+      /* Masquer les éléments d'interface non utiles sur papier */
+      .no-print, .ppm-nav, .hero, .filter-bar, .actions, .card-actions, .orphan-btn, .toast, .modal-backdrop, .view-switch, .zoom-controls, .prg-footer{
+        display:none !important;
+      }
+
+      /* Bandeau supérieur compact */
+      .topbar{
+        position:static !important;
+        box-shadow:none !important;
+        border-radius:10px !important;
+        padding:7px 14px !important;
+        margin-bottom:6px !important;
+      }
+      .brand .badge{width:30px !important; height:30px !important; font-size:11px !important; border-radius:8px !important;}
+      .brand .h1{font-size:14px !important;}
+      .brand .sub{font-size:10.5px !important;}
+
+      /* Conteneur principal serré */
+      .main{max-width:100% !important; width:100% !important; margin:0 !important; padding:0 !important; gap:8px !important;}
+
+      /* Titres de sections PDF */
+      .print-only-title{
+        display:block !important;
+        font-size:12px !important;
+        font-weight:900 !important;
+        text-transform:uppercase !important;
+        letter-spacing:.4px !important;
+        color:var(--ink) !important;
+        border-bottom:2px solid var(--lille-red) !important;
+        padding-bottom:3px !important;
+        margin:2px 0 4px !important;
+      }
+
+      /* KPIs toujours en 4 colonnes compactes */
+      .kpi-strip{
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:8px !important;
+      }
+      .kpi-box{
+        padding:6px 10px !important;
+        border-radius:10px !important;
+        box-shadow:none !important;
+        break-inside:avoid; page-break-inside:avoid;
+      }
+      .kpi-label{font-size:9.5px !important;}
+      .kpi-val{font-size:16px !important; margin-top:2px !important;}
+      .kpi-val.to-estimate{font-size:13px !important;}
+      .kpi-sub{font-size:9.5px !important; margin-top:2px !important;}
+
+      /* Radar hors programme compact */
+      .orphan-banner{
+        padding:6px 12px !important;
+        border-radius:10px !important;
+        break-inside:avoid; page-break-inside:avoid;
+      }
+      .orphan-title{font-size:11.5px !important;}
+      .orphan-sub{font-size:10px !important; margin-top:1px !important;}
+
+      /* PAGE 1 : GANTT PLURI-ANNUEL SANS DEBORDEMENT HORIZONTAL */
+      #viewGanttContainer{
+        display:block !important;
+        overflow:visible !important;
+        box-shadow:none !important;
+        border-radius:10px !important;
+        border:1px solid #cbd5e1 !important;
+      }
+      .gantt-inner{
+        min-width:0 !important;
+        width:100% !important;
+        zoom:1 !important;
+      }
+      .gantt-head, .gantt-row{
+        grid-template-columns: 245px 1fr !important;
+      }
+      .gantt-row{break-inside:avoid; page-break-inside:avoid;}
+      .gantt-head-left{padding:6px 10px !important; font-size:9.5px !important;}
+      .gantt-year-cell{font-size:10.5px !important; padding:3px 2px !important;}
+      .gantt-q-cell{font-size:9px !important; padding:3px 1px !important;}
+      .gantt-left{padding:6px 8px !important; gap:3px !important;}
+      .gantt-ico{width:22px !important; height:22px !important; font-size:13px !important; border-radius:6px !important;}
+      .gantt-code-line{font-size:9px !important;}
+      .gantt-name{
+        font-size:11px !important;
+        white-space:normal !important;
+        line-height:1.15 !important;
+      }
+      .gantt-counters{gap:4px !important;}
+      .g-pill{font-size:9px !important; padding:1px 6px !important;}
+      .gantt-track{min-height:46px !important; padding:6px 0 !important;}
+      .gantt-bar{height:24px !important; border-radius:7px !important; box-shadow:none !important;}
+      .gantt-bar-label{font-size:9.5px !important; padding:0 6px !important;}
+      .gantt-bar-continu{height:24px !important; font-size:9.5px !important; padding:0 8px !important; border-radius:7px !important;}
+      .gantt-bar-unplanned{font-size:9.5px !important; padding:3px 8px !important;}
+
+      /* PAGE 2 : FICHES CARTES DETAILLEES EN GRILLE 3 COLONNES */
+      #viewCardsWrap{
+        display:block !important;
+        overflow:visible !important;
+        page-break-before:always !important;
+        break-before:page !important;
+      }
+      #viewCardsContainer{
+        zoom:1 !important;
+        display:grid !important;
+        grid-template-columns:repeat(3, 1fr) !important;
+        gap:10px !important;
+        margin-top:6px !important;
+      }
+      .prg-card{
+        border-radius:12px !important;
+        box-shadow:none !important;
+        border:1px solid #cbd5e1 !important;
+        break-inside:avoid; page-break-inside:avoid;
+      }
+      .prg-accent{height:5px !important;}
+      .prg-body{padding:10px 12px !important; gap:6px !important;}
+      .prg-ident{gap:8px !important;}
+      .prg-icon{width:32px !important; height:32px !important; font-size:16px !important; border-radius:8px !important;}
+      .prg-code{font-size:9.5px !important;}
+      .prg-title{font-size:12.5px !important;}
+      .status-pill{font-size:9.5px !important; padding:2px 7px !important;}
+      .prg-meta{gap:4px !important;}
+      .meta-tag{font-size:9.5px !important; padding:2px 6px !important;}
+      .prg-desc{font-size:10px !important; padding:6px 8px !important; line-height:1.3 !important;}
+      .prg-counts{font-size:10px !important; padding:5px 8px !important;}
+      .prg-stats{gap:6px !important;}
+      .stat-box{padding:6px 8px !important; border-radius:8px !important;}
+      .stat-lbl{font-size:9px !important;}
+      .stat-num{font-size:13px !important; margin-top:2px !important;}
+      .stat-num.to-estimate{font-size:11px !important;}
+      .stat-sub{font-size:9px !important;}
+      .gauge-track{height:5px !important; margin-top:4px !important;}
+
+      .footer-ver{font-size:9.5px !important; margin-top:6px !important;}
     }
 
     /* Top bar */
@@ -868,15 +1000,15 @@
       <div class="brand">
         <div class="badge">DNSI</div>
         <div>
-          <div class="h1">Programmes & Objectifs — PPM V1.2</div>
-          <div class="sub">Gouvernance ➔ Programme ➔ Projet / Idée</div>
+          <div class="h1">Programmes & Objectifs — PPM V1.3</div>
+          <div class="sub" id="subDate">Gouvernance ➔ Programme ➔ Projet / Idée</div>
         </div>
       </div>
       <div class="actions">
         <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
         <button class="btn" id="btnImport">📥 Importer (.json)</button>
         <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
-        <button class="btn dark" id="btnPdf">🖨️ Export PDF</button>
+        <button class="btn dark" id="btnPdf" title="Exporter le dossier complet (Page 1 : Gantt, Page 2 : Cartes)">🖨️ Export PDF (2 pages)</button>
         <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
       </div>
     </div>
@@ -973,15 +1105,19 @@
       </div>
     </section>
 
+    <!-- TITRE SECTION PDF PAGE 1 -->
+    <div class="print-only-title">📊 1. Feuille de route pluri-annuelle des programmes (Gantt)</div>
+
     <!-- CONTENEUR VUE GANTT (PINCH-TO-ZOOM) -->
     <section id="viewGanttContainer" class="gantt-wrap"></section>
 
-    <!-- CONTENEUR VUE CARTES (PINCH-TO-ZOOM) -->
+    <!-- CONTENEUR VUE CARTES (PINCH-TO-ZOOM — PAGE 2 EN PDF) -->
     <section id="viewCardsWrap" class="cards-zoom-wrap" style="display:none;">
+      <div class="print-only-title">🗂️ 2. Fiches détaillées des programmes</div>
       <div id="viewCardsContainer" class="grid-programmes"></div>
     </section>
 
-    <div class="footer-ver">Gouvernance DNSI — Support 1 : Programmes & Objectifs (V1.2) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+    <div class="footer-ver">Gouvernance DNSI — Support 1 : Programmes & Objectifs (V1.3) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
   </main>
 
   <!-- MODALE CREATION / EDITION PROGRAMME -->
@@ -1164,7 +1300,7 @@
     /* =============================
        Constantes & Utilitaires
     ============================== */
-    const APP_VERSION = "V1.2";
+    const APP_VERSION = "V1.3";
     const STORAGE_KEY = "GOUVERNANCE_JSON";
     const SWATCHES = ["#C10F1A", "#8b5cf6", "#2563eb", "#0891b2", "#16a34a", "#f59e0b", "#ea580c", "#475569"];
     const EMOJIS = [
@@ -1748,11 +1884,14 @@
 
       el("chipVisibleCount").textContent = `${visible.length} / ${programmes.length} programme(s)`;
 
-      if(currentViewMode === "gantt"){
-        renderGantt(visible, byProg);
-      } else {
-        renderCards(visible, byProg);
+      const subDateEl = el("subDate");
+      if(subDateEl){
+        subDateEl.textContent = `Gouvernance ➔ Programme ➔ Projet / Idée • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
       }
+
+      // Toujours alimenter les 2 vues pour que l'export PDF (Page 1 Gantt + Page 2 Cartes) soit toujours complet
+      renderGantt(visible, byProg);
+      renderCards(visible, byProg);
       applyZoomToDom();
     }
 
@@ -2376,7 +2515,13 @@
     el("btnNewProgramme").onclick = openModalProgramme;
     el("btnSaveProgramme").onclick = saveProgramme;
     el("btnShowOrphans").onclick = openOrphansModal;
-    el("btnPdf").onclick = () => window.print();
+    el("btnPdf").onclick = () => {
+      const inner = el("viewGanttContainer")?.querySelector(".gantt-inner");
+      if(inner) inner.style.zoom = 1;
+      const cards = el("viewCardsContainer");
+      if(cards) cards.style.zoom = 1;
+      window.print();
+    };
     el("btnSaveJson").onclick = downloadGovJson;
     el("btnImport").onclick = () => { el("fileInput").value = ""; el("fileInput").click(); };
     el("fileInput").onchange = e => importGovJson(e.target.files?.[0]);
