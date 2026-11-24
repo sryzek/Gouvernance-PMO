@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gouvernance — Programmes & Objectifs (V1.1)</title>
+  <title>Gouvernance — Programmes & Objectifs (V1.2)</title>
+  <meta name="theme-color" content="#C10F1A"/>
+  <link rel="manifest" href="./manifest.json"/>
+  <link rel="icon" type="image/png" href="./icon.png"/>
+  <link rel="apple-touch-icon" href="./icon.png"/>
   <style>
     :root{
       --lille-red:#C10F1A;
@@ -36,10 +40,11 @@
       *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
       body{background:#fff !important;}
       .topbar{position:static; box-shadow:none;}
-      .no-print, .ppm-nav, .filter-bar, .actions, .card-actions, .orphan-btn, .toast, .modal-backdrop, .view-switch{display:none !important;}
+      .no-print, .ppm-nav, .filter-bar, .actions, .card-actions, .orphan-btn, .toast, .modal-backdrop, .view-switch, .zoom-controls{display:none !important;}
       .main{max-width:100%; margin:0; padding:8px 0;}
       .prg-card, .kpi-box, .orphan-banner, .gantt-row{break-inside:avoid; page-break-inside:avoid; box-shadow:none;}
-      .gantt-wrap{overflow:visible !important; box-shadow:none;}
+      .gantt-wrap, .cards-zoom-wrap{overflow:visible !important; box-shadow:none;}
+      .gantt-inner, #viewCardsContainer{zoom:1 !important;}
     }
 
     /* Top bar */
@@ -202,7 +207,7 @@
     }
     .orphan-btn:hover{background:#ffedd5;}
 
-    /* Barre de filtres + Switch Vue */
+    /* Barre de filtres + Zoom + Switch Vue */
     .filter-bar{
       display:flex;
       align-items:center;
@@ -215,7 +220,7 @@
       padding:10px 14px;
     }
     .filter-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1;}
-    .filter-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+    .filter-right{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
     .filter-bar input, .filter-bar select{
       padding:8px 12px;
       border:1px solid var(--border);
@@ -227,6 +232,51 @@
     }
     .filter-bar input{min-width:220px; flex:1; max-width:340px;}
     .filter-bar input:focus, .filter-bar select:focus{border-color:#94a3b8; background:#fff;}
+
+    /* Contrôles Zoom (tactile + boutons rapides) */
+    .zoom-controls{
+      display:inline-flex;
+      align-items:center;
+      background:#f1f5f9;
+      padding:3px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      gap:2px;
+    }
+    .zoom-btn, .zoom-pct, .zoom-fit-btn{
+      border:none;
+      background:transparent;
+      color:var(--ink);
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .15s ease, color .15s ease;
+    }
+    .zoom-btn{
+      width:26px; height:26px;
+      font-size:15px; line-height:1;
+    }
+    .zoom-pct{
+      min-width:44px; height:26px;
+      padding:0 6px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size:11.5px;
+      color:var(--muted);
+    }
+    .zoom-fit-btn{
+      height:26px;
+      padding:0 10px;
+      font-size:11.5px;
+      background:#fff;
+      border:1px solid var(--border);
+      margin-left:2px;
+    }
+    .zoom-btn:hover, .zoom-pct:hover{background:#e2e8f0; color:var(--ink);}
+    .zoom-fit-btn:hover{background:#0f172a; color:#fff; border-color:#0f172a;}
 
     .view-switch{
       display:inline-flex;
@@ -263,6 +313,8 @@
       border-radius:18px;
       box-shadow:var(--shadow);
       overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-x pan-y;
     }
     .gantt-inner{
       min-width:1050px;
@@ -471,8 +523,14 @@
     }
 
     /* =============================
-       VUE CARTES
+       VUE CARTES (WRAPPER TACTILE)
     ============================== */
+    .cards-zoom-wrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-x pan-y;
+      width:100%;
+    }
     .grid-programmes{
       display:grid;
       grid-template-columns:repeat(auto-fill, minmax(380px, 1fr));
@@ -624,6 +682,27 @@
       display:flex; justify-content:flex-end; gap:10px;
     }
 
+    /* Encart d'aide rapide création programme */
+    .modal-guide-box{
+      padding:10px 13px;
+      border-radius:12px;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      border-left:4px solid #2563eb;
+      color:#1e3a8a;
+      font-size:12px;
+      line-height:1.45;
+      margin-bottom:14px;
+    }
+    .modal-guide-box code{
+      background:rgba(37,99,235,.10);
+      padding:1px 5px;
+      border-radius:5px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight:800;
+      font-size:11px;
+    }
+
     /* Aperçu badge en direct dans la modale */
     .preview-strip{
       display:flex;
@@ -635,6 +714,7 @@
       background:#f8fafc;
       border:1px solid var(--border);
       margin-bottom:16px;
+      flex-wrap:wrap;
     }
     .preview-badge{
       display:inline-flex;
@@ -788,7 +868,7 @@
       <div class="brand">
         <div class="badge">DNSI</div>
         <div>
-          <div class="h1">Programmes & Objectifs — PPM V1.1</div>
+          <div class="h1">Programmes & Objectifs — PPM V1.2</div>
           <div class="sub">Gouvernance ➔ Programme ➔ Projet / Idée</div>
         </div>
       </div>
@@ -865,7 +945,7 @@
       <button class="orphan-btn" id="btnShowOrphans" style="display:none;">👁️ Voir & Rattacher les orphelins</button>
     </section>
 
-    <!-- FILTRES + SWITCH VUE -->
+    <!-- FILTRES + ZOOM + SWITCH VUE -->
     <section class="filter-bar">
       <div class="filter-left">
         <input type="text" id="fltSearch" placeholder="🔍 Filtrer par ID, code, nom, direction, sponsor, pilote..."/>
@@ -878,6 +958,14 @@
       </div>
       <div class="filter-right">
         <span class="chip" id="chipVisibleCount">0 programme</span>
+
+        <div class="zoom-controls no-print" title="Zoom / Dézoom (ou pincement à 2 doigts sur écran tactile)">
+          <button type="button" class="zoom-btn" id="btnZoomOut" title="Dézoomer (−10 %)">−</button>
+          <button type="button" class="zoom-pct" id="btnZoomReset" title="Revenir à 100 %">100%</button>
+          <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoomer (+10 %)">+</button>
+          <button type="button" class="zoom-fit-btn" id="btnZoomFit" title="Ajuster la largeur à l'écran">⊡ Ajuster</button>
+        </div>
+
         <div class="view-switch">
           <button class="view-btn active" id="btnViewGantt" onclick="setViewMode('gantt')">📊 Vue Gantt</button>
           <button class="view-btn" id="btnViewCards" onclick="setViewMode('cards')">🗂️ Vue Cartes</button>
@@ -885,13 +973,15 @@
       </div>
     </section>
 
-    <!-- CONTENEUR VUE GANTT -->
+    <!-- CONTENEUR VUE GANTT (PINCH-TO-ZOOM) -->
     <section id="viewGanttContainer" class="gantt-wrap"></section>
 
-    <!-- CONTENEUR VUE CARTES -->
-    <section id="viewCardsContainer" class="grid-programmes" style="display:none;"></section>
+    <!-- CONTENEUR VUE CARTES (PINCH-TO-ZOOM) -->
+    <section id="viewCardsWrap" class="cards-zoom-wrap" style="display:none;">
+      <div id="viewCardsContainer" class="grid-programmes"></div>
+    </section>
 
-    <div class="footer-ver">Gouvernance DNSI — Support 1 : Programmes & Objectifs (V1.1) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+    <div class="footer-ver">Gouvernance DNSI — Support 1 : Programmes & Objectifs (V1.2) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
   </main>
 
   <!-- MODALE CREATION / EDITION PROGRAMME -->
@@ -905,6 +995,12 @@
         <button class="btn2 ghost" onclick="closeModalProgramme()">✕</button>
       </div>
       <div class="modal-body">
+        <!-- Encart d'aide rapide novice -->
+        <div class="modal-guide-box" id="modalGuideBox">
+          <b>💡 Démarrage rapide :</b> seuls le <b>Nom du programme</b> et son <b>Objectif / Finalité</b> sont obligatoires.
+          Le code court (ex. <code>FIN</code>, <code>CYBER</code>, <code>USAGER</code>), les dates Gantt et les enveloppes macro sont facultatifs — vous pourrez les compléter plus tard (le programme démarre en statut <b>« À estimer »</b>).
+        </div>
+
         <!-- Aperçu temps réel -->
         <div class="preview-strip">
           <span style="font-size:12px; font-weight:800; color:var(--muted);">Aperçu du badge Programme :</span>
@@ -1068,13 +1164,15 @@
     /* =============================
        Constantes & Utilitaires
     ============================== */
-    const APP_VERSION = "V1.1";
+    const APP_VERSION = "V1.2";
     const STORAGE_KEY = "GOUVERNANCE_JSON";
     const SWATCHES = ["#C10F1A", "#8b5cf6", "#2563eb", "#0891b2", "#16a34a", "#f59e0b", "#ea580c", "#475569"];
     const EMOJIS = [
       "🏛️", "🛡️", "⚖️", "💶", "🚀", "🔧", "🌱", "🏗️", "🏫", "👥",
       "📊", "📱", "💻", "🏥", "🎭", "🚌", "⚡", "🔐", "📁", "🎯"
     ];
+    const ZOOM_MIN = 0.35;
+    const ZOOM_MAX = 2.0;
 
     const el = id => document.getElementById(id);
     const nowISO = () => new Date().toISOString();
@@ -1086,6 +1184,7 @@
 
     let currentViewMode = "gantt"; // "gantt" | "cards"
     let editingExistingId = null;
+    const zoomByView = { gantt: 1, cards: 1 };
 
     function toast(msg){
       const d = document.createElement("div");
@@ -1094,6 +1193,111 @@
       document.body.appendChild(d);
       setTimeout(() => d.remove(), 2600);
     }
+
+    /* =============================
+       Gestion du Zoom (Tactile & Boutons)
+    ============================== */
+    function clampZoom(val){
+      return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(val * 100) / 100));
+    }
+
+    function getCurrentZoom(){
+      return zoomByView[currentViewMode] || 1;
+    }
+
+    function applyZoomToDom(){
+      const z = getCurrentZoom();
+      const pctBtn = el("btnZoomReset");
+      if(pctBtn) pctBtn.textContent = `${Math.round(z * 100)}%`;
+
+      if(currentViewMode === "gantt"){
+        const inner = el("viewGanttContainer")?.querySelector(".gantt-inner");
+        if(inner) inner.style.zoom = z;
+      } else {
+        const cards = el("viewCardsContainer");
+        if(cards) cards.style.zoom = z;
+      }
+    }
+
+    function setZoom(val){
+      zoomByView[currentViewMode] = clampZoom(val);
+      applyZoomToDom();
+    }
+
+    function fitZoomToScreen(){
+      if(currentViewMode === "gantt"){
+        const wrap = el("viewGanttContainer");
+        const inner = wrap?.querySelector(".gantt-inner");
+        if(!wrap || !inner) return;
+
+        inner.style.zoom = 1;
+        const naturalW = Math.max(1050, inner.scrollWidth || 1050);
+        const availW = Math.max(280, wrap.clientWidth - 4);
+        const fit = clampZoom(Math.min(1, availW / naturalW));
+        zoomByView.gantt = fit;
+        applyZoomToDom();
+        toast(`Gantt ajusté à l'écran (${Math.round(fit * 100)}%)`);
+      } else {
+        const wrap = el("viewCardsWrap");
+        const availW = wrap ? wrap.clientWidth : window.innerWidth;
+        const cur = getCurrentZoom();
+        const target = (cur < 0.98) ? 1 : (availW < 780 ? 0.65 : 0.85);
+        setZoom(target);
+        toast(`Vue Cartes : ${Math.round(getCurrentZoom() * 100)}%`);
+      }
+    }
+
+    function setupPinchToZoom(){
+      const zones = [
+        { el: el("viewGanttContainer"), mode: "gantt" },
+        { el: el("viewCardsWrap"), mode: "cards" }
+      ];
+
+      zones.forEach(({ el: zone, mode }) => {
+        if(!zone) return;
+        let startDist = 0;
+        let startZoom = 1;
+
+        zone.addEventListener("touchstart", e => {
+          if(e.touches.length === 2){
+            startDist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            startZoom = zoomByView[mode] || 1;
+          }
+        }, { passive: true });
+
+        zone.addEventListener("touchmove", e => {
+          if(e.touches.length === 2 && startDist > 0){
+            e.preventDefault();
+            const currDist = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            const nextZoom = clampZoom(startZoom * (currDist / startDist));
+            zoomByView[mode] = nextZoom;
+            applyZoomToDom();
+          }
+        }, { passive: false });
+
+        const endPinch = e => {
+          if(e.touches.length < 2) startDist = 0;
+        };
+        zone.addEventListener("touchend", endPinch, { passive: true });
+        zone.addEventListener("touchcancel", endPinch, { passive: true });
+      });
+    }
+
+    window.addEventListener("beforeprint", () => {
+      const inner = el("viewGanttContainer")?.querySelector(".gantt-inner");
+      if(inner) inner.style.zoom = 1;
+      const cards = el("viewCardsContainer");
+      if(cards) cards.style.zoom = 1;
+    });
+    window.addEventListener("afterprint", () => {
+      applyZoomToDom();
+    });
 
     function generateNextProgramId(programmes){
       let maxN = 0;
@@ -1219,7 +1423,7 @@
 
     function normalizeGovernance(raw){
       const g = (raw && typeof raw === "object") ? JSON.parse(JSON.stringify(raw)) : {};
-      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.2", nom: "Gouvernance DNSI" };
+      g.meta = g.meta || { schema: "gouvernance-dnsi", version: "3.3", nom: "Gouvernance DNSI" };
       g.portefeuille = g.portefeuille || { projets: [] };
       if(!Array.isArray(g.portefeuille.projets)) g.portefeuille.projets = [];
 
@@ -1397,7 +1601,6 @@
           pct: null
         };
       }
-      // Les deux > 0
       const pct = Math.round((conso / cible) * 100);
       const state = pct > 100 ? "over" : pct >= 85 ? "warn" : "ok";
       return {
@@ -1426,7 +1629,7 @@
       el("btnViewGantt").classList.toggle("active", mode === "gantt");
       el("btnViewCards").classList.toggle("active", mode === "cards");
       el("viewGanttContainer").style.display = mode === "gantt" ? "block" : "none";
-      el("viewCardsContainer").style.display = mode === "cards" ? "grid" : "none";
+      el("viewCardsWrap").style.display = mode === "cards" ? "block" : "none";
       render();
     }
 
@@ -1550,6 +1753,7 @@
       } else {
         renderCards(visible, byProg);
       }
+      applyZoomToDom();
     }
 
     /* =============================
@@ -1577,7 +1781,7 @@
       const years = [];
       for(let y = minY; y <= maxY; y++) years.push(y);
       const totalQ = years.length * 4;
-      const minQIdx = minY * 4; // T1 de minY
+      const minQIdx = minY * 4;
 
       const yearsHeaderHtml = years.map(y => `<div class="gantt-year-cell">${y}</div>`).join("");
       const quartersHeaderHtml = years.map(y =>
@@ -1596,7 +1800,6 @@
         const stDot = prg.statut === "actif" ? "🟢" : prg.statut === "en_preparation" ? "🔵" : "⚪";
         const codeTag = prg.code ? `${prg.id} · ${escapeHtml(prg.code)}` : prg.id;
 
-        // Calcul de la barre temporelle
         let barHtml = "";
         if(prg.continu){
           barHtml = `
@@ -1670,8 +1873,9 @@
         `;
       }).join("");
 
+      const z = zoomByView.gantt || 1;
       wrap.innerHTML = `
-        <div class="gantt-inner">
+        <div class="gantt-inner" style="zoom:${z};">
           <div class="gantt-head">
             <div class="gantt-head-left">
               <span>Programme & Compteurs</span>
@@ -1693,6 +1897,7 @@
     function renderCards(visible, byProg){
       const grid = el("viewCardsContainer");
       grid.innerHTML = "";
+      grid.style.zoom = zoomByView.cards || 1;
 
       if(visible.length === 0){
         grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--muted); background:#fff; border-radius:16px; border:1px solid var(--border);">
@@ -1882,8 +2087,10 @@
       toggleContinuFields();
       renderEmojiGrid("🎯");
       renderColorPalette(SWATCHES[2]);
+      el("modalGuideBox").style.display = "block";
       el("modalPrgTitle").textContent = `➕ Créer un Programme (${nextId})`;
       el("modalProgramme").style.display = "flex";
+      setTimeout(() => el("fTitre")?.focus(), 40);
     }
 
     function closeModalProgramme(){
@@ -1914,6 +2121,7 @@
       toggleContinuFields();
       renderEmojiGrid(prg.icone || "🎯");
       renderColorPalette(prg.couleur || SWATCHES[2]);
+      el("modalGuideBox").style.display = "none";
       el("modalPrgTitle").textContent = `✏️ Modifier : ${prg.id}`;
       el("modalProgramme").style.display = "flex";
     }
@@ -2163,6 +2371,7 @@
        Câblage & Démarrage
     ============================== */
     populateYearSelects();
+    setupPinchToZoom();
 
     el("btnNewProgramme").onclick = openModalProgramme;
     el("btnSaveProgramme").onclick = saveProgramme;
@@ -2172,6 +2381,12 @@
     el("btnImport").onclick = () => { el("fileInput").value = ""; el("fileInput").click(); };
     el("fileInput").onchange = e => importGovJson(e.target.files?.[0]);
     el("btnRefresh").onclick = () => { GOV = loadGov(); render(); toast("Données réactualisées 🔄"); };
+
+    // Boutons Zoom rapides
+    el("btnZoomOut").onclick = () => setZoom(getCurrentZoom() - 0.10);
+    el("btnZoomIn").onclick = () => setZoom(getCurrentZoom() + 0.10);
+    el("btnZoomReset").onclick = () => { setZoom(1); toast("Zoom réinitialisé à 100 %"); };
+    el("btnZoomFit").onclick = fitZoomToScreen;
 
     el("fltSearch").addEventListener("input", render);
     el("fltStatut").addEventListener("change", render);
@@ -2197,9 +2412,22 @@
       };
     }catch(e){}
 
-    // Boot
+    // Boot + Ouverture directe ?action=new depuis 0. Synthèse V2.7 + PWA
     saveGov(GOV, true);
     render();
+    try{
+      const params = new URLSearchParams(window.location.search);
+      if(params.get("action") === "new"){
+        openModalProgramme();
+        if(history && history.replaceState){
+          history.replaceState({}, "", window.location.pathname);
+        }
+      }
+    }catch(e){}
+
+    if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
   </script>
 </body>
 </html>
