@@ -1,505 +1,753 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gouvernance — Capacité DNSI (V3.2)</title>
-<style>
-:root{
-  --brand:#C00000;
-  --text:#222;
-  --muted:#666;
-  --border:#e8e8e8;
-  --card:#fff;
-  --bg:#f6f7fb;
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gouvernance — Capacité DNSI (V3.4)</title>
+  <meta name="theme-color" content="#C10F1A" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/png" href="./icon.png" />
+  <link rel="apple-touch-icon" href="./icon.png" />
+  <style>
+    :root{
+      --lille-red:#C10F1A;
+      --lille-red-2:#a50d16;
+      --ink:#0f172a;
+      --muted:#64748b;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --border:#e2e8f0;
+      --shadow:0 10px 24px rgba(15,23,42,.06);
+      --r:16px;
 
-  --ok:#1BAE70;
-  --warn:#F59E0B;
-  --bad:#E11D48;
+      --ok:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
 
-  --potBlue:#2563eb;
-  --hpOrange:#f59e0b;
-  --remGreen:#16a34a;
+      --potBlue:#3b82f6;
+      --hpOrange:#f59e0b;
+      --remGreen:#10b981;
 
-  --ghost:#9aa3af;
-}
+      --ghost:#94a3b8;
+    }
 
-*{box-sizing:border-box;}
-html,body{
-  margin:0; padding:0;
-  font-family:Calibri,Arial,sans-serif;
-  color:var(--text);
-  background:var(--bg);
-  font-size:13px;
-}
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      padding:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
+      font-size:13px;
+    }
 
-@page{ size:A3 landscape; margin:10mm; }
-@media print{
-  *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-  html,body{background:#fff !important;}
-  .no-print,.page-ver{display:none !important;}
-  .wrap{max-width:none !important; margin:0 !important; padding:0 !important;}
-  .bar{box-shadow:none !important;}
-  .card{break-inside:avoid; page-break-inside:avoid;}
-}
+    /* Impression PDF A4 Paysage (1 page propre) */
+    @page{ size:A4 landscape; margin:8mm; }
+    @media print{
+      *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;}
+      html, body{background:#fff !important; height:auto !important; font-size:11px !important;}
+      .no-print, .ppm-nav, .actions, .control-bar, .zoom-controls, .toast, .editor-backdrop{
+        display:none !important;
+      }
+      .topbar{
+        position:static !important;
+        box-shadow:none !important;
+        border-radius:10px !important;
+        padding:8px 14px !important;
+        margin-bottom:8px !important;
+      }
+      .brand .badge{width:30px !important; height:30px !important; font-size:11px !important;}
+      .brand .h1{font-size:15px !important;}
+      .brand .sub{font-size:10.5px !important;}
+      .main{max-width:100% !important; width:100% !important; margin:0 !important; padding:0 !important; gap:8px !important;}
+      .zoom-wrap{overflow:visible !important;}
+      #zoomContent{zoom:1 !important; min-width:0 !important; width:100% !important;}
+      .grid{grid-template-columns: 1.25fr .75fr !important; gap:10px !important;}
+      .cap-grid{grid-template-columns: 205px 1fr !important; gap:10px !important;}
+      .card{
+        box-shadow:none !important;
+        border:1px solid #cbd5e1 !important;
+        padding:10px 12px !important;
+        border-radius:12px !important;
+        break-inside:avoid; page-break-inside:avoid;
+      }
+      .pie-container{width:190px !important; height:190px !important;}
+      .rules-box{
+        margin-top:8px !important;
+        padding:8px 12px !important;
+        font-size:10.5px !important;
+        break-inside:avoid; page-break-inside:avoid;
+      }
+      .footer-ver{font-size:9.5px !important; margin-top:6px !important;}
+    }
 
-.wrap{max-width:1200px;margin:0 auto;padding:10px 12px 26px;}
+    /* Top bar uniforme avec les autres supports */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background:var(--lille-red);
+      color:#fff;
+      padding:12px 16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.18);
+    }
+    .topbar-row{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      max-width:1380px; margin:0 auto; flex-wrap:wrap;
+    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+    .brand .badge{
+      width:38px; height:38px; border-radius:10px;
+      background:rgba(255,255,255,.16);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; font-size:13px; color:#fff; border:none;
+    }
+    .brand .h1{font-weight:900; font-size:16px; line-height:1.15;}
+    .brand .sub{font-size:12px; opacity:.92;}
+    .actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+    .btn{
+      border:1px solid rgba(255,255,255,.35);
+      background:transparent;
+      color:#fff;
+      padding:7px 12px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex; align-items:center; gap:6px;
+      transition:all .15s ease;
+    }
+    .btn:hover{background:rgba(255,255,255,.14);}
+    .btn:active{transform:translateY(1px);}
+    .btn.primary{background:#fff; color:var(--lille-red); border-color:#fff;}
+    .btn.primary:hover{background:#f1f5f9;}
+    .btn.dark{background:#0f172a; border-color:#0f172a; color:#fff;}
+    .btn.dark:hover{background:#1e293b;}
+    #fileInput{display:none;}
 
-.bar{
-  background:var(--brand);
-  color:#fff;
-  border-radius:18px;
-  padding:10px 14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.25);
-  margin-bottom:8px;
-  position:relative;
-}
-.bar::before{
-  content:"";
-  position:absolute; inset:0;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,.25);
-  pointer-events:none;
-}
-.bar-inner{position:relative; min-height:52px; display:flex; align-items:center; justify-content:center;}
-.title{text-align:center}
-.title .date{font-weight:800;font-size:14px;letter-spacing:.2px;margin-bottom:2px;}
-.title .name{font-weight:900;font-size:28px;line-height:1.1;margin:0 auto;}
-.title .meta-line{margin-top:2px;font-size:13px;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.bar .ver{position:absolute; right:12px; top:8px; font-size:10px; opacity:.9; font-weight:800;}
+    /* Navigation 5 Piliers */
+    .ppm-nav{
+      background:#fff;
+      border-bottom:1px solid var(--border);
+      padding:8px 16px;
+    }
+    .ppm-nav-row{
+      max-width:1380px; margin:0 auto;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; flex-wrap:wrap;
+    }
+    .ppm-links{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+    .ppm-link{
+      text-decoration:none;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--ink);
+      background:#f1f5f9;
+      border:1px solid var(--border);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .ppm-link:hover{background:#e2e8f0;}
+    .ppm-link.active{
+      background:rgba(193,15,26,.10);
+      color:var(--lille-red);
+      border-color:rgba(193,15,26,.30);
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid var(--border); background:#f8fafc;
+      font-size:11px; font-weight:800; color:var(--muted);
+    }
 
-.toolbar{
-  display:flex; flex-wrap:wrap;
-  gap:8px; align-items:center;
-  margin:6px 0 6px;
-}
-.btn{
-  border:none;border-radius:999px;
-  padding:7px 12px;
-  font-size:12px;
-  cursor:pointer;
-  background:var(--brand); color:#fff;
-  box-shadow:0 3px 8px rgba(0,0,0,.18);
-  display:inline-flex; align-items:center; gap:6px;
-}
-.btn.secondary{background:#e5e7eb;color:#111827;box-shadow:none;}
-.btn:hover{filter:brightness(1.05)}
-.btn:active{transform:translateY(1px)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:none;}
-#fileInput{display:none}
+    /* Main Layout */
+    .main{
+      max-width:1380px;
+      margin:14px auto 28px;
+      padding:0 14px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
 
-.help{font-size:11px;margin-bottom:8px;color:var(--muted);}
+    /* Barre contextuelle + Contrôles Zoom */
+    .control-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:9px 14px;
+    }
+    .help{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+    .zoom-controls{
+      display:inline-flex;
+      align-items:center;
+      background:#f1f5f9;
+      padding:3px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      gap:2px;
+      flex-shrink:0;
+    }
+    .zoom-btn, .zoom-pct, .zoom-fit-btn{
+      border:none;
+      background:transparent;
+      color:var(--ink);
+      border-radius:999px;
+      font-weight:800;
+      font-size:12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition:background .15s ease, color .15s ease;
+    }
+    .zoom-btn{width:26px; height:26px; font-size:15px; line-height:1;}
+    .zoom-pct{
+      min-width:44px; height:26px; padding:0 6px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size:11.5px; color:var(--muted);
+    }
+    .zoom-fit-btn{
+      height:26px; padding:0 10px; font-size:11.5px;
+      background:#fff; border:1px solid var(--border); margin-left:2px;
+    }
+    .zoom-btn:hover, .zoom-pct:hover{background:#e2e8f0; color:var(--ink);}
+    .zoom-fit-btn:hover{background:#0f172a; color:#fff; border-color:#0f172a;}
 
-.grid{
-  display:grid;
-  grid-template-columns: 1.25fr .75fr;
-  gap:12px;
-  align-items:start;
-}
-@media(max-width:1100px){ .grid{grid-template-columns:1fr;} }
+    /* Zone tactile Pinch-to-Zoom */
+    .zoom-wrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      touch-action:pan-x pan-y;
+      width:100%;
+    }
+    #zoomContent{
+      width:100%;
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:12px;
-  box-shadow:0 6px 16px rgba(0,0,0,.04);
-}
-.sect{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
-  gap:10px;
-  margin-bottom:10px;
-}
-.sect > div{font-weight:950;text-transform:uppercase;letter-spacing:.5px;font-size:12px;}
-.sect small{color:var(--muted);font-size:12px;}
+    /* Grille principale 2 colonnes */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media(max-width:1024px){ .grid{grid-template-columns:1fr;} }
 
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.pill{
-  display:inline-flex;align-items:center;gap:8px;
-  border:1px solid var(--border);
-  background:#f8fafc;
-  border-radius:999px;
-  padding:4px 10px;
-  font-size:12px;
-}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}
-.ghost{color:var(--ghost);font-style:italic;}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px 18px;
+      box-shadow:var(--shadow);
+    }
+    .sect{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .sect > div{
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.45px;
+      font-size:12.5px;
+      color:var(--ink);
+    }
+    .sect small{color:var(--muted); font-size:11.5px; font-weight:600;}
 
-.hr{height:1px;background:var(--border);margin:10px 0;}
+    .row{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      border:1px solid var(--border);
+      background:#f8fafc;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:12px;
+    }
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .ghost{color:var(--ghost); font-style:italic;}
+    .hr{height:1px; background:var(--border); margin:12px 0;}
 
-.cap-grid{display:grid;grid-template-columns: 300px 1fr;gap:12px;align-items:stretch;}
-@media(max-width:900px){ .cap-grid{grid-template-columns:1fr;} }
+    /* Donut & Légende (identique à 0. Synthèse) */
+    .cap-grid{
+      display:grid;
+      grid-template-columns: 230px 1fr;
+      gap:18px;
+      align-items:center;
+      margin-top:14px;
+    }
+    @media(max-width:680px){ .cap-grid{grid-template-columns:1fr;} }
 
-.pie-card{
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:10px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:260px;
-  background:linear-gradient(180deg,#fff,#fafbff);
-}
-.legend{display:flex;flex-direction:column;gap:10px;}
-.item{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px 12px;
-  background:#fff;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-.left{display:flex;align-items:center;gap:10px;min-width:0;}
-.dot{width:14px;height:14px;border-radius:4px;border:1px solid rgba(0,0,0,.12);}
-.dot.pot{background:var(--potBlue);}
-.dot.hp{background:var(--hpOrange);}
-.dot.rem{background:var(--remGreen);}
+    .pie-container{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f8fafc;
+      border-radius:50%;
+      border:1px solid var(--border);
+      padding:8px;
+      box-shadow:inset 0 4px 12px rgba(0,0,0,.04);
+      width:210px;
+      height:210px;
+      margin:0 auto;
+    }
 
-.title2{font-weight:950;}
-.sub2{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
-.val{font-weight:950;font-size:16px;}
+    .legend{display:flex; flex-direction:column; gap:10px;}
+    .cap-item{
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:11px 13px;
+      background:#fff;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .cap-item.pot{border-left:4px solid var(--potBlue);}
+    .cap-item.hp{border-left:4px solid var(--hpOrange);}
+    .cap-item.rem{border-left:4px solid var(--remGreen);}
+    .title2{font-weight:900; font-size:13.5px;}
+    .sub2{font-size:11.5px; color:var(--muted); margin-top:2px;}
+    .val{font-weight:900; font-size:17px; white-space:nowrap;}
+    .val.rem-val{color:var(--ok);}
 
-.kv2{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-top:6px;}
-.kv2 .k{color:var(--muted);font-size:12px;}
-.note{font-size:12px;color:var(--muted);line-height:1.35;}
+    .kv2{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-top:7px;
+      padding-bottom:5px;
+      border-bottom:1px solid #f1f5f9;
+    }
+    .kv2:last-of-type{border-bottom:none;}
+    .kv2 .k{color:var(--muted); font-size:12.5px;}
+    .note{font-size:12px; color:var(--muted); line-height:1.45;}
 
-.alert{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px 12px;
-  background:#fff;
-}
-.alert.ok{border-color:#86efac;background:#ecfdf5;}
-.alert.warn{border-color:#fdba74;background:#fff7ed;}
-.alert.bad{border-color:#fca5a5;background:#fef2f2;}
-.alert .h{font-weight:950;margin-bottom:4px;}
+    .alert{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 14px;
+      background:#f8fafc;
+    }
+    .alert.ok{border-color:#bbf7d0; background:#f0fdf4;}
+    .alert.warn{border-color:#fde68a; background:#fffbeb;}
+    .alert.bad{border-color:#fecaca; background:#fef2f2;}
+    .alert .h{font-weight:900; font-size:14px; margin-bottom:4px;}
 
-.badge{
-  display:inline-flex;align-items:center;gap:6px;
-  border-radius:999px;
-  padding:3px 10px;
-  font-size:12px;
-  font-weight:900;
-  border:1px solid var(--border);
-  background:#f8fafc;
-}
-.badge.ok{border-color:#86efac;background:#ecfdf5;color:#166534;}
-.badge.warn{border-color:#fdba74;background:#fff7ed;color:#9a3412;}
-.badge.bad{border-color:#fca5a5;background:#fef2f2;color:#991b1b;}
+    .badge-coh{
+      display:inline-flex; align-items:center; gap:6px;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:11.5px;
+      font-weight:900;
+      border:1px solid var(--border);
+      background:#f8fafc;
+    }
+    .badge-coh.ok{border-color:#86efac; background:#ecfdf5; color:#166534;}
+    .badge-coh.warn{border-color:#fdba74; background:#fff7ed; color:#9a3412;}
+    .badge-coh.bad{border-color:#fca5a5; background:#fef2f2; color:#991b1b;}
 
-.page-ver{position:fixed; right:8px; bottom:4px; font-size:10px; color:#999;}
+    /* Règles de lecture */
+    .rules-box{
+      margin-top:14px;
+      padding:12px 16px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-left:4px solid var(--lille-red);
+      border-radius:12px;
+      font-size:12.5px;
+      line-height:1.45;
+      color:#334155;
+    }
+    .rules-box ul{margin:6px 0 0 18px; padding:0;}
+    .rules-box li{margin-bottom:2px;}
 
-/* ===== Editor modal ===== */
-.editor-backdrop{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.35);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-.editor{
-  width:min(1100px, 92vw);
-  max-height:86vh;
-  overflow:auto;
-  background:#fff;
-  border-radius:18px;
-  border:1px solid #e5e7eb;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-  padding:16px;
-}
-.editor-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
-.editor-title{font-weight:950;font-size:16px;margin:0;}
-.editor-sub{font-size:12px;color:var(--muted);margin-top:4px;}
-.editor-foot{
-  position:sticky; bottom:0;
-  background:linear-gradient(180deg, rgba(255,255,255,0), #fff 45%);
-  padding-top:12px;
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:10px;
-}
-.form{
-  margin-top:12px;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px 12px;
-}
-@media(max-width:900px){ .form{grid-template-columns:1fr;} }
-.field label{display:block;font-weight:900;font-size:12px;margin-bottom:4px;}
-.field input, .field textarea{
-  width:100%;
-  border:1px solid #d1d5db;
-  border-radius:12px;
-  padding:8px 10px;
-  font-size:12px;
-  outline:none;
-  background:#f9fafb;
-  font-family:inherit;
-}
-.field textarea{min-height:70px;resize:vertical;}
-.field input:focus, .field textarea:focus{
-  border-color:#c7d2fe;
-  box-shadow:0 0 0 3px rgba(99,102,241,.15);
-  background:#fff;
-}
-.sectionbox{
-  border:1px solid rgba(17,24,39,.08);
-  border-radius:16px;
-  padding:12px;
-  background:linear-gradient(180deg,#fff,#fafbff);
-  margin-top:12px;
-}
-.sectionbox .h{font-weight:950;text-transform:uppercase;letter-spacing:.5px;font-size:12px;margin-bottom:10px;}
-.smallhint{font-size:11px;color:#6b7280;margin-top:3px;}
-</style>
+    .footer-ver{
+      text-align:center; color:var(--muted); font-size:11.5px; margin-top:4px;
+    }
+
+    /* ===== Editor Modal ===== */
+    .editor-backdrop{
+      position:fixed; inset:0;
+      background:rgba(15,23,42,.58);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:14px;
+      z-index:9999;
+    }
+    .editor{
+      width:min(980px, 100%);
+      max-height:90vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:18px;
+      border:1px solid var(--border);
+      box-shadow:0 24px 60px rgba(0,0,0,.28);
+      padding:18px 20px;
+    }
+    .editor-head{
+      display:flex; justify-content:space-between; gap:12px; align-items:flex-start;
+      padding-bottom:12px; border-bottom:1px solid var(--border);
+    }
+    .editor-title{font-weight:900; font-size:16px; margin:0;}
+    .editor-sub{font-size:12px; color:var(--muted); margin-top:4px;}
+    .editor-foot{
+      position:sticky; bottom:-18px;
+      background:linear-gradient(180deg, rgba(255,255,255,0), #fff 35%);
+      padding:14px 0 4px;
+      display:flex; justify-content:flex-end; gap:10px;
+      margin-top:12px;
+    }
+    .btn2{
+      padding:9px 16px; border-radius:999px; font-weight:900; font-size:13px;
+      cursor:pointer; border:1px solid var(--border); background:#fff; color:var(--ink);
+    }
+    .btn2:hover{background:#f1f5f9;}
+    .btn2.primary{background:var(--lille-red); color:#fff; border-color:var(--lille-red);}
+    .btn2.primary:hover{background:var(--lille-red-2);}
+    .btn2:disabled{opacity:.45; cursor:not-allowed;}
+
+    .form{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px 14px;
+    }
+    @media(max-width:780px){ .form{grid-template-columns:1fr;} }
+    .field label{display:block; font-weight:800; font-size:12px; color:var(--muted); margin-bottom:4px;}
+    .field input, .field textarea{
+      width:100%;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:9px 11px;
+      font-size:13px;
+      outline:none;
+      background:#f8fafc;
+      font-family:inherit;
+    }
+    .field textarea{min-height:68px; resize:vertical;}
+    .field input:focus, .field textarea:focus{
+      border-color:#94a3b8;
+      box-shadow:0 0 0 3px rgba(148,163,184,.16);
+      background:#fff;
+    }
+    .sectionbox{
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      background:#fff;
+      margin-top:12px;
+    }
+    .sectionbox .h{
+      font-weight:900; text-transform:uppercase; letter-spacing:.45px;
+      font-size:12px; margin-bottom:8px; color:var(--ink);
+      padding-bottom:6px; border-bottom:1px solid #f1f5f9;
+    }
+    .smallhint{font-size:11px; color:var(--muted); margin-top:4px;}
+
+    .toast{
+      position:fixed; left:16px; bottom:16px;
+      background:#0f172a; color:#fff;
+      padding:10px 16px; border-radius:999px;
+      font-size:12.5px; font-weight:800;
+      z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.22);
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap" id="printRoot">
-  <div class="bar">
-    <div class="bar-inner">
-      <div class="title">
-        <div class="date">CAPACITÉ DNSI — <span id="today">—</span></div>
-        <div class="name">Gouvernance DNSI — Capacité</div>
-        <div class="meta-line">Hors-projet (maintenance) • Réserve projets (résultat) • Contrôles cohérence</div>
+  <!-- TOPBAR UNIFORME -->
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <div class="badge">DNSI</div>
+        <div>
+          <div class="h1">Capacité DNSI — PPM V3.4</div>
+          <div class="sub" id="subDate">Hors-projet (maintenance) • Réserve projets (résultat) • Contrôles cohérence</div>
+        </div>
+      </div>
+      <div class="actions no-print">
+        <button class="btn primary" id="btnEdit">✏️ Modifier</button>
+        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="btn" id="btnLoad">📥 Importer (.json)</button>
+        <button class="btn" id="btnSave">💾 Sauvegarder (.json)</button>
+        <button class="btn dark" id="btnPdf">🖨️ Export PDF</button>
+        <input id="fileInput" type="file" accept="application/json,.json" />
       </div>
     </div>
-    <div class="ver" id="appVer">V3.2</div>
-  </div>
+  </header>
 
-  <div class="toolbar no-print">
-    <button class="btn" id="btnEdit">✏️ Modifier</button>
-    <button class="btn secondary" id="btnRefresh">🔄 Réactualiser</button>
-    <button class="btn secondary" id="btnSave">💾 Sauvegarder (.json)</button>
-    <button class="btn secondary" id="btnLoad">📥 Importer Gouvernance (.json)</button>
-    <button class="btn secondary" id="btnPdf">🖨️ Exporter PDF</button>
-    <input id="fileInput" type="file" accept="application/json" />
-  </div>
-
-  <div class="help no-print">
-    Ici : <b>cadre de capacité</b> (DNSI) + <b>contrôles de cohérence</b>. La <b>marge / arbitrage</b> est gérée dans <b>Stratégie</b>.
-  </div>
-
-  <div class="grid">
-    <!-- LEFT -->
-    <div class="card">
-      <div class="sect">
-        <div>Vision globale</div>
-        <small class="mono">Unité : jours</small>
+  <!-- NAVIGATION 5 PILIERS -->
+  <nav class="ppm-nav no-print">
+    <div class="ppm-nav-row">
+      <div class="ppm-links">
+        <a class="ppm-link" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
+        <a class="ppm-link" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes</a>
+        <a class="ppm-link" href="Gouvernance - 2. Portefeuille.html">📚 2. Portefeuille Projets</a>
+        <a class="ppm-link active" href="Gouvernance - 3. Capacite.html">⚙️ 3. Capacité DNSI</a>
+        <a class="ppm-link" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
       </div>
-
-      <div class="row" style="justify-content:space-between;">
-        <div class="row">
-          <span class="pill">Période : <span class="mono" id="period">—</span></span>
-          <span class="pill">Dernière maj : <span class="mono" id="updatedAt">—</span></span>
-        </div>
-        <div class="row">
-          <span class="badge" id="cohBadge">—</span>
-        </div>
-      </div>
-
-      <div class="cap-grid" style="margin-top:12px;">
-        <div class="pie-card">
-          <canvas id="pie" width="280" height="240" aria-label="Camembert capacité"></canvas>
-        </div>
-
-        <div class="legend">
-          <div class="item">
-            <div class="left">
-              <span class="dot pot"></span>
-              <div style="min-width:0">
-                <div class="title2">Potentiel total</div>
-                <div class="sub2">Réservoir théorique (ressources disponibles)</div>
-              </div>
-            </div>
-            <div class="val mono" id="vPot">—</div>
-          </div>
-
-          <div class="item">
-            <div class="left">
-              <span class="dot hp"></span>
-              <div style="min-width:0">
-                <div class="title2">Hors-projet</div>
-                <div class="sub2">RUN/MCO, SSI, réglementaire, transverse…</div>
-              </div>
-            </div>
-            <div class="val mono" id="vHP">—</div>
-          </div>
-
-          <div class="item">
-            <div class="left">
-              <span class="dot rem"></span>
-              <div style="min-width:0">
-                <div class="title2">Réserve projets</div>
-                <div class="sub2">Résultat : Potentiel − Hors-projet</div>
-              </div>
-            </div>
-            <div class="val mono" id="vRem">—</div>
-          </div>
-
-          <div class="note" style="margin-top:4px;">
-            ✅ La <b>réserve projets</b> alimente la <b>Stratégie</b>. <br/>
-            ⚠️ Ici, pas de “marge” : l’alerte sur dépassement est gérée par la Stratégie.
-          </div>
-        </div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="sect" style="margin-bottom:6px;">
-        <div>Contrôles de cohérence</div>
-        <small>bloquants au clic “Appliquer”</small>
-      </div>
-
-      <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="c1">—</div></div>
-      <div class="kv2"><div class="k">C2 — Σ détail hors-projet ≈ Hors-projet (si détaillé)</div><div class="mono" id="c2">—</div></div>
-      <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="c3">—</div></div>
-
-      <div class="hr"></div>
-
-      <div class="sect" style="margin-bottom:6px;">
-        <div>Lecture “maintenance”</div>
-        <small>signal (non bloquant)</small>
-      </div>
-
-      <div class="kv2"><div class="k">Part hors-projet</div><div class="mono" id="hpPct">—</div></div>
-      <div class="note" id="hpHint">—</div>
-    </div>
-
-    <!-- RIGHT -->
-    <div class="card">
-      <div class="sect">
-        <div>Lecture & explication</div>
-        <small>CODIR-friendly</small>
-      </div>
-
-      <div class="alert" id="alertBox">
-        <div class="h" id="alertTitle">—</div>
-        <div class="note" id="alertText">—</div>
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="sect" style="margin-bottom:6px;">
-        <div>Détails (hors-projet)</div>
-        <small class="ghost">optionnel</small>
-      </div>
-
-      <div class="kv2"><div class="k">RUN / MCO</div><div class="mono" id="dRun">—</div></div>
-      <div class="kv2"><div class="k">Réglementaire</div><div class="mono" id="dReg">—</div></div>
-      <div class="kv2"><div class="k">SSI</div><div class="mono" id="dSsi">—</div></div>
-      <div class="kv2"><div class="k">Transverse</div><div class="mono" id="dTrans">—</div></div>
-      <div class="kv2"><div class="k">Autres</div><div class="mono" id="dOther">—</div></div>
-
-      <div class="note" id="detailNote" style="margin-top:10px;">
-        Astuce : ces postes servent à expliquer le “hors-projet” et réduire les débats (“d’où sort ce chiffre ?”).
-      </div>
-
-      <div class="hr"></div>
-
-      <div class="sect" style="margin-bottom:6px;">
-        <div>Notes</div>
-        <small>DNSI</small>
-      </div>
-      <div class="note" id="notesBox">—</div>
-    </div>
-  </div>
-</div>
-
-<div class="page-ver">Capacité DNSI — V3.2 Popup</div>
-
-<!-- Editor Modal -->
-<div class="editor-backdrop no-print" id="editBackdrop" role="dialog" aria-modal="true">
-  <div class="editor">
-    <div class="editor-head">
       <div>
-        <h3 class="editor-title">Modifier la capacité (simple)</h3>
-        <div class="editor-sub">
-          Saisie DNSI : <b>Potentiel total</b> et <b>Hors-projet</b>. La <b>Réserve projets</b> est calculée automatiquement.
-        </div>
-      </div>
-      <button class="btn secondary" id="btnClose">✖ Fermer</button>
-    </div>
-
-    <div class="sectionbox">
-      <div class="h">Valeurs</div>
-      <div class="form">
-        <div class="field">
-          <label>Période — début</label>
-          <input id="eStart" type="date" />
-          <div class="smallhint">Optionnel, pour contextualiser (ex : année N+1).</div>
-        </div>
-        <div class="field">
-          <label>Période — fin</label>
-          <input id="eEnd" type="date" />
-        </div>
-
-        <div class="field">
-          <label>Potentiel total (jours)</label>
-          <input id="ePot" type="number" min="0" step="1" />
-          <div class="smallhint">Ressources disponibles sur la période (saisie / estimation).</div>
-        </div>
-
-        <div class="field">
-          <label>Hors-projet total (jours)</label>
-          <input id="eHP" type="number" min="0" step="1" />
-          <div class="smallhint">RUN/MCO + SSI + réglementaire + transverse + autres.</div>
-        </div>
-
-        <div class="field" style="grid-column:1/-1;">
-          <label>Notes (DNSI)</label>
-          <textarea id="eNotes"></textarea>
-          <div class="smallhint">Explications / hypothèses (texte libre).</div>
-        </div>
+        <span class="chip" id="chipSync">Synchronisation : —</span>
       </div>
     </div>
+  </nav>
 
-    <div class="sectionbox">
-      <div class="h">Détail du hors-projet (optionnel)</div>
-      <div class="form">
-        <div class="field"><label>RUN / MCO</label><input id="eRun" type="number" min="0" step="1" /></div>
-        <div class="field"><label>Réglementaire</label><input id="eReg" type="number" min="0" step="1" /></div>
-        <div class="field"><label>SSI</label><input id="eSsi" type="number" min="0" step="1" /></div>
-        <div class="field"><label>Transverse</label><input id="eTrans" type="number" min="0" step="1" /></div>
-        <div class="field"><label>Autres</label><input id="eOther" type="number" min="0" step="1" /></div>
-        <div class="field" style="grid-column:1/-1;">
-          <label>Commentaire hors-projet</label>
-          <textarea id="eHPNote"></textarea>
+  <main class="main" id="printRoot">
+
+    <!-- BARRE CONTEXTUELLE + CONTROLES ZOOM -->
+    <section class="control-bar no-print">
+      <div class="help">
+        Ici : <b>cadre de capacité</b> (DNSI) + <b>contrôles de cohérence</b>. La <b>marge / arbitrage</b> est gérée dans <b>4. Stratégie</b>.
+      </div>
+      <div class="zoom-controls" title="Zoom / Dézoom (ou pincement à 2 doigts sur écran tactile)">
+        <button type="button" class="zoom-btn" id="btnZoomOut" title="Dézoomer (−10 %)">−</button>
+        <button type="button" class="zoom-pct" id="btnZoomReset" title="Revenir à 100 %">100%</button>
+        <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoomer (+10 %)">+</button>
+        <button type="button" class="zoom-fit-btn" id="btnZoomFit" title="Ajuster l'affichage à l'écran">⊡ Ajuster</button>
+      </div>
+    </section>
+
+    <!-- ZONE PINCH-TO-ZOOM -->
+    <div class="zoom-wrap" id="zoomZone">
+      <div id="zoomContent">
+
+        <div class="grid">
+          <!-- COLONNE GAUCHE : VISION GLOBALE & DONUT -->
+          <section class="card">
+            <div class="sect">
+              <div>⚙️ Vision globale de la capacité</div>
+              <small class="mono">Unité : jours</small>
+            </div>
+
+            <div class="row" style="justify-content:space-between;">
+              <div class="row">
+                <span class="pill">Période : <span class="mono" id="period">—</span></span>
+                <span class="pill">Dernière maj : <span class="mono" id="updatedAt">—</span></span>
+              </div>
+              <div class="row">
+                <span class="badge-coh" id="cohBadge">—</span>
+              </div>
+            </div>
+
+            <div class="cap-grid">
+              <div class="pie-container">
+                <canvas id="pie" width="190" height="190" aria-label="Anneau capacité projets"></canvas>
+              </div>
+
+              <div class="legend">
+                <div class="cap-item pot">
+                  <div style="min-width:0;">
+                    <div class="title2">Potentiel total</div>
+                    <div class="sub2">Capacité humaine brute DNSI (ressources disponibles)</div>
+                  </div>
+                  <div class="val mono" id="vPot">—</div>
+                </div>
+
+                <div class="cap-item hp">
+                  <div style="min-width:0;">
+                    <div class="title2">Hors-projet (MCO / RUN)</div>
+                    <div class="sub2">RUN/MCO, SSI, réglementaire, transverse…</div>
+                  </div>
+                  <div class="val mono" id="vHP">—</div>
+                </div>
+
+                <div class="cap-item rem">
+                  <div style="min-width:0;">
+                    <div class="title2">Réserve projets</div>
+                    <div class="sub2">Résultat : Potentiel − Hors-projet</div>
+                  </div>
+                  <div class="val mono rem-val" id="vRem">—</div>
+                </div>
+
+                <div class="note" style="margin-top:2px;">
+                  ✅ La <b>réserve projets</b> alimente automatiquement <b>0. Synthèse</b> et <b>4. Stratégie</b>.<br/>
+                  ⚠️ Ici, pas de « marge » : l’alerte sur dépassement est gérée par la Stratégie.
+                </div>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="sect" style="margin-bottom:6px;">
+              <div>Contrôles de cohérence</div>
+              <small>bloquants au clic « Appliquer »</small>
+            </div>
+
+            <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="c1">—</div></div>
+            <div class="kv2"><div class="k">C2 — Σ détail hors-projet ≈ Hors-projet (si détaillé)</div><div class="mono" id="c2">—</div></div>
+            <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="c3">—</div></div>
+
+            <div class="hr"></div>
+
+            <div class="sect" style="margin-bottom:6px;">
+              <div>Lecture « maintenance »</div>
+              <small>signal (non bloquant)</small>
+            </div>
+
+            <div class="kv2"><div class="k">Part hors-projet</div><div class="mono" style="font-weight:900;" id="hpPct">—</div></div>
+            <div class="note" id="hpHint" style="margin-top:4px;">—</div>
+          </section>
+
+          <!-- COLONNE DROITE : LECTURE CODIR & DETAILS -->
+          <section class="card">
+            <div class="sect">
+              <div>Lecture & explication</div>
+              <small>CODIR-friendly</small>
+            </div>
+
+            <div class="alert" id="alertBox">
+              <div class="h" id="alertTitle">—</div>
+              <div class="note" id="alertText">—</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="sect" style="margin-bottom:6px;">
+              <div>Détails (hors-projet)</div>
+              <small class="ghost">optionnel</small>
+            </div>
+
+            <div class="kv2"><div class="k">RUN / MCO</div><div class="mono" id="dRun">—</div></div>
+            <div class="kv2"><div class="k">Réglementaire</div><div class="mono" id="dReg">—</div></div>
+            <div class="kv2"><div class="k">SSI</div><div class="mono" id="dSsi">—</div></div>
+            <div class="kv2"><div class="k">Transverse</div><div class="mono" id="dTrans">—</div></div>
+            <div class="kv2"><div class="k">Autres</div><div class="mono" id="dOther">—</div></div>
+
+            <div class="note" id="detailNote" style="margin-top:10px;">
+              Astuce : ces postes servent à expliquer le « hors-projet » et réduire les débats (« d’où sort ce chiffre ? »).
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="sect" style="margin-bottom:6px;">
+              <div>Notes</div>
+              <small>DNSI</small>
+            </div>
+            <div class="note" id="notesBox">—</div>
+          </section>
+        </div>
+
+        <!-- REGLES DE LECTURE CAPACITE DNSI -->
+        <section class="rules-box">
+          <strong>ℹ️ Règles de lecture – Capacité DNSI</strong>
+          <ul>
+            <li>La capacité est <strong>déclarative</strong> (choix managérial).</li>
+            <li>La <strong>maintenance / RUN</strong> est une <strong>contrainte prioritaire</strong>.</li>
+            <li>Le reste correspond à la <strong>capacité mobilisable projets</strong>.</li>
+            <li>Les alertes signalent des <strong>tensions ou incohérences</strong>, sans bloquer.</li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="footer-ver">Gouvernance DNSI — Support 3 : Capacité DNSI (V3.4) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  </main>
+
+  <!-- Editor Modal -->
+  <div class="editor-backdrop no-print" id="editBackdrop" role="dialog" aria-modal="true">
+    <div class="editor">
+      <div class="editor-head">
+        <div>
+          <h3 class="editor-title">✏️ Modifier la capacité DNSI</h3>
+          <div class="editor-sub">
+            Saisie DNSI : <b>Potentiel total</b> et <b>Hors-projet</b>. La <b>Réserve projets</b> est calculée automatiquement.
+          </div>
+        </div>
+        <button class="btn2" id="btnClose">✖ Fermer</button>
+      </div>
+
+      <div class="sectionbox">
+        <div class="h">1. Valeurs globales</div>
+        <div class="form">
+          <div class="field">
+            <label>Période — début</label>
+            <input id="eStart" type="date" />
+            <div class="smallhint">Optionnel, pour contextualiser (ex : année N+1).</div>
+          </div>
+          <div class="field">
+            <label>Période — fin</label>
+            <input id="eEnd" type="date" />
+          </div>
+
+          <div class="field">
+            <label>Potentiel total (jours)</label>
+            <input id="ePot" type="number" min="0" step="1" />
+            <div class="smallhint">Ressources disponibles sur la période (saisie / estimation).</div>
+          </div>
+
+          <div class="field">
+            <label>Hors-projet total (jours)</label>
+            <input id="eHP" type="number" min="0" step="1" />
+            <div class="smallhint">RUN/MCO + SSI + réglementaire + transverse + autres.</div>
+          </div>
+
+          <div class="field" style="grid-column:1/-1;">
+            <label>Notes (DNSI)</label>
+            <textarea id="eNotes"></textarea>
+            <div class="smallhint">Explications / hypothèses (texte libre).</div>
+          </div>
         </div>
       </div>
-      <div class="smallhint">
-        Contrôle : si tu renseignes le détail, on vérifie <b>Σ détail ≈ hors-projet total</b> (tolérance ±2 jours).
+
+      <div class="sectionbox">
+        <div class="h">2. Détail du hors-projet (optionnel)</div>
+        <div class="form">
+          <div class="field"><label>RUN / MCO (jours)</label><input id="eRun" type="number" min="0" step="1" /></div>
+          <div class="field"><label>Réglementaire (jours)</label><input id="eReg" type="number" min="0" step="1" /></div>
+          <div class="field"><label>SSI (jours)</label><input id="eSsi" type="number" min="0" step="1" /></div>
+          <div class="field"><label>Transverse (jours)</label><input id="eTrans" type="number" min="0" step="1" /></div>
+          <div class="field"><label>Autres (jours)</label><input id="eOther" type="number" min="0" step="1" /></div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Commentaire hors-projet</label>
+            <textarea id="eHPNote"></textarea>
+          </div>
+        </div>
+        <div class="smallhint">
+          Contrôle : si tu renseignes le détail, on vérifie <b>Σ détail ≈ hors-projet total</b> (tolérance ±2 jours).
+        </div>
       </div>
-    </div>
 
-    <!-- Contrôles (info en live, mais blocage au clic Appliquer) -->
-    <div class="sectionbox">
-      <div class="h">Contrôles (info)</div>
-      <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="mC1">—</div></div>
-      <div class="kv2"><div class="k">C2 — Σ détail ≈ Hors-projet (si détaillé)</div><div class="mono" id="mC2">—</div></div>
-      <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="mC3">—</div></div>
-      <div class="note" id="mCMsg">—</div>
-    </div>
+      <!-- Contrôles (info en live, mais blocage au clic Appliquer) -->
+      <div class="sectionbox">
+        <div class="h">3. Contrôles de cohérence (info en direct)</div>
+        <div class="kv2"><div class="k">C1 — Hors-projet ≤ Potentiel</div><div class="mono" id="mC1">—</div></div>
+        <div class="kv2"><div class="k">C2 — Σ détail ≈ Hors-projet (si détaillé)</div><div class="mono" id="mC2">—</div></div>
+        <div class="kv2"><div class="k">C3 — Valeurs non négatives</div><div class="mono" id="mC3">—</div></div>
+        <div class="note" id="mCMsg" style="margin-top:6px;">—</div>
+      </div>
 
-    <div class="editor-foot">
-      <button class="btn secondary" id="btnCancel">Annuler</button>
-      <button class="btn" id="btnApply">Appliquer</button>
+      <div class="editor-foot">
+        <button class="btn2" id="btnCancel">Annuler</button>
+        <button class="btn2 primary" id="btnApply">Appliquer</button>
+      </div>
     </div>
   </div>
-</div>
 
 <script>
 /* =========================
    Keys & version
 ========================= */
-const APP_VERSION = "V3.2";
+const APP_VERSION = "V3.4";
 const STORAGE_KEY = "GOUVERNANCE_JSON";
+const ZOOM_MIN = 0.35;
+const ZOOM_MAX = 2.0;
+
+let currentZoom = 1;
 
 /* =========================
    Utils
@@ -517,29 +765,111 @@ function safeNum(n, fallback=0){
   return Number.isFinite(v) ? v : fallback;
 }
 function clampMin0(n){ return Math.max(0, safeNum(n,0)); }
-function getCss(varName){
-  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+function toast(msg){
+  const d = document.createElement("div");
+  d.className = "toast";
+  d.textContent = msg;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 2600);
 }
 
 /* =========================
-   Model
+   Gestion du Zoom (Tactile & Boutons)
+========================= */
+function clampZoom(val){
+  return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(val * 100) / 100));
+}
+
+function applyZoomToDom(){
+  const pctBtn = el("btnZoomReset");
+  if(pctBtn) pctBtn.textContent = `${Math.round(currentZoom * 100)}%`;
+  const content = el("zoomContent");
+  if(content) content.style.zoom = currentZoom;
+}
+
+function setZoom(val){
+  currentZoom = clampZoom(val);
+  applyZoomToDom();
+}
+
+function fitZoomToScreen(){
+  const zone = el("zoomZone");
+  const availW = zone ? zone.clientWidth : window.innerWidth;
+  if(currentZoom < 0.98){
+    setZoom(1);
+    toast("Zoom réinitialisé à 100 %");
+    return;
+  }
+  const target = availW < 520 ? 0.65 : availW < 920 ? 0.80 : 0.85;
+  setZoom(target);
+  toast(`Affichage ajusté (${Math.round(currentZoom * 100)}%)`);
+}
+
+function setupPinchToZoom(){
+  const zone = el("zoomZone");
+  if(!zone) return;
+  let startDist = 0;
+  let startZoom = 1;
+
+  zone.addEventListener("touchstart", e => {
+    if(e.touches.length === 2){
+      startDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      startZoom = currentZoom;
+    }
+  }, { passive: true });
+
+  zone.addEventListener("touchmove", e => {
+    if(e.touches.length === 2 && startDist > 0){
+      e.preventDefault();
+      const currDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      currentZoom = clampZoom(startZoom * (currDist / startDist));
+      applyZoomToDom();
+    }
+  }, { passive: false });
+
+  const endPinch = e => {
+    if(e.touches.length < 2) startDist = 0;
+  };
+  zone.addEventListener("touchend", endPinch, { passive: true });
+  zone.addEventListener("touchcancel", endPinch, { passive: true });
+}
+
+window.addEventListener("beforeprint", () => {
+  const content = el("zoomContent");
+  if(content) content.style.zoom = 1;
+});
+window.addEventListener("afterprint", () => {
+  applyZoomToDom();
+});
+
+/* =========================
+   Model (préserve tous les autres piliers)
 ========================= */
 function defaultGov(){
   const year = new Date().getFullYear() + 1;
   return {
     meta: {
       schema: "gouvernance-dnsi",
-      version: "3.2",
+      version: "3.4",
       perimetre: "DNSI",
       annee_cible: year,
-      dernier_enregistrement: ""
+      dernier_enregistrement: "",
+      lastUpdatedAt: ""
     },
-    portefeuille: { projets: [] },
+    programmes: [],
+    portefeuille: { projets: [], pivotsById: {} },
     capacite: {
       periode: { debut: `${year}-01-01`, fin: `${year}-12-31` },
       total_jours: 0,
       run_hors_projet_jours: 0,
       capacite_projet_jours: 0,
+      teams: [],
       notes: "",
       detail_hors_projet: {
         run_mco_jours: 0,
@@ -554,7 +884,7 @@ function defaultGov(){
       id: "STRAT-COURANTE",
       nom: "Stratégie — Brouillon",
       hypotheses: { delta_jours: 0, commentaire: "" },
-      selection: { projets_lances: [], projets_decales: [] },
+      selection: { projets_lances: [], projets_decales: [], projets_synthese: [] },
       calcul: { charge_retenue_jours: 0, charge_totale_jours: 0, ecart_capacite_jours: 0, verdict: "a_completer" },
       date_creation: nowISO()
     }
@@ -563,21 +893,24 @@ function defaultGov(){
 
 function normalizeGovernance(raw){
   if (!raw || typeof raw !== "object") return null;
-  if (raw?.meta?.schema !== "gouvernance-dnsi") return null;
 
   const base = defaultGov();
   const out = {
     ...base,
     ...raw,
-    meta: { ...base.meta, ...(raw.meta||{}) },
-    portefeuille: { ...base.portefeuille, ...(raw.portefeuille||{}) },
-    capacite: { ...base.capacite, ...(raw.capacite||{}) },
-    strategie_courante: { ...base.strategie_courante, ...(raw.strategie_courante||{}) }
+    meta: { ...base.meta, ...(raw.meta || {}), schema: "gouvernance-dnsi" },
+    portefeuille: { ...base.portefeuille, ...(raw.portefeuille || {}) },
+    capacite: { ...base.capacite, ...(raw.capacite || {}) },
+    strategie_courante: { ...base.strategie_courante, ...(raw.strategie_courante || {}) }
   };
-  out.capacite.detail_hors_projet = { ...base.capacite.detail_hors_projet, ...(out.capacite.detail_hors_projet||{}) };
+  if (Array.isArray(raw.programmes)) out.programmes = raw.programmes;
+  if (Array.isArray(raw.politiques)) out.politiques = raw.politiques;
+  if (raw.portefeuille && raw.portefeuille.pivotsById) out.portefeuille.pivotsById = raw.portefeuille.pivotsById;
+  if (raw.capacite && Array.isArray(raw.capacite.teams)) out.capacite.teams = raw.capacite.teams;
 
+  out.capacite.detail_hors_projet = { ...base.capacite.detail_hors_projet, ...(out.capacite.detail_hors_projet || {}) };
   out.capacite.capacite_projet_jours = Math.max(0,
-    safeNum(out.capacite.total_jours,0) - safeNum(out.capacite.run_hors_projet_jours,0)
+    safeNum(out.capacite.total_jours, 0) - safeNum(out.capacite.run_hors_projet_jours, 0)
   );
   return out;
 }
@@ -590,7 +923,7 @@ function loadGov(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const obj = JSON.parse(raw);
-    return (obj?.meta?.schema === "gouvernance-dnsi") ? obj : null;
+    return (obj && typeof obj === "object") ? obj : null;
   }catch{ return null; }
 }
 function saveGov(obj){
@@ -613,15 +946,14 @@ async function readJsonFile(file){
 }
 
 /* =========================
-   Exports for Fiche gouvernance
-   (clé lue par la fiche) :contentReference[oaicite:1]{index=1}
+   Exports for Fiche gouvernance & Stratégie
 ========================= */
-function writeSupportExports(GOV){
-  const cap = GOV.capacite || {};
-  const pot = safeNum(cap.total_jours,0);
-  const hp  = safeNum(cap.run_hors_projet_jours,0);
+function writeSupportExports(G){
+  const cap = G.capacite || {};
+  const pot = safeNum(cap.total_jours, 0);
+  const hp  = safeNum(cap.run_hors_projet_jours, 0);
   const rem = Math.max(0, pot - hp);
-  const updatedAt = GOV?.meta?.dernier_enregistrement || nowISO();
+  const updatedAt = G?.meta?.dernier_enregistrement || nowISO();
 
   const full = {
     version: APP_VERSION,
@@ -649,74 +981,66 @@ function writeSupportExports(GOV){
 }
 
 /* =========================
-   Broadcast (file:// friendly best effort)
+   Broadcast (BroadcastChannel + postMessage)
 ========================= */
 function broadcastUpdate(){
+  try{
+    const bc = new BroadcastChannel("dnsi-gouvernance");
+    bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "capacite" });
+    bc.close();
+  }catch{}
   try{ window.opener?.postMessage({ type:"capacity-updated" }, "*"); }catch{}
   try{ window.postMessage({ type:"capacity-updated" }, "*"); }catch{}
-  try{ window.opener?.postMessage({ type:"GOUVERNANCE_UPDATED", payload: GOV }, "*"); }catch{}
-  try{ window.postMessage({ type:"GOUVERNANCE_UPDATED", payload: GOV }, "*"); }catch{}
+  try{ window.opener?.postMessage({ type:"GOUVERNANCE_UPDATED", source:"capacite", payload: GOV }, "*"); }catch{}
 }
 
 /* =========================
-   Pie
+   Donut Capacité (identique à 0. Synthese.html)
 ========================= */
 function drawPie({pot, hp, rem}){
-  const c = el("pie");
-  if(!c) return;
-  const ctx = c.getContext("2d");
-  const w = c.width, h = c.height;
-  ctx.clearRect(0,0,w,h);
+  const canvas = el("pie");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  const cx = w/2, cy = h/2, radius = Math.min(w, h) * 0.44;
 
-  const total = pot > 0 ? pot : 1;
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(59,130,246,0.12)";
+  ctx.fill();
+
+  let start = -Math.PI / 2;
   const parts = [
-    { label:"Hors-projet", value: Math.max(0, hp), color: getCss("--hpOrange") },
-    { label:"Réserve", value: Math.max(0, rem), color: getCss("--remGreen") },
+    { v: Math.max(0, hp), c: "#f59e0b" },
+    { v: Math.max(0, rem), c: "#10b981" }
   ];
-
-  const cx = w/2, cy = h/2;
-  const radius = Math.min(w,h) * 0.38;
-
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius+10, 0, Math.PI*2);
-  ctx.fillStyle = "rgba(0,0,0,.04)";
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.moveTo(cx,cy);
-  ctx.arc(cx,cy,radius,0,Math.PI*2);
-  ctx.closePath();
-  ctx.fillStyle = getCss("--potBlue");
-  ctx.globalAlpha = 0.15;
-  ctx.fill();
-  ctx.globalAlpha = 1;
-
-  let start = -Math.PI/2;
+  const totalPie = pot > 0 ? pot : 1;
   for(const p of parts){
-    const angle = (p.value/total) * (Math.PI*2);
+    if(p.v <= 0) continue;
+    const angle = (p.v / totalPie) * Math.PI * 2;
     ctx.beginPath();
-    ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,radius,start,start+angle);
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, start, start + angle);
     ctx.closePath();
-    ctx.fillStyle = p.color;
+    ctx.fillStyle = p.c;
     ctx.fill();
     start += angle;
   }
 
+  // Cœur évidé (anneau)
   ctx.beginPath();
-  ctx.arc(cx,cy,radius,0,Math.PI*2);
-  ctx.strokeStyle = "rgba(17,24,39,.18)";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.arc(cx, cy, radius * 0.60, 0, Math.PI * 2);
+  ctx.fillStyle = "#f8fafc";
+  ctx.fill();
 
-  ctx.font = "950 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-  ctx.fillStyle = "rgba(17,24,39,.82)";
+  ctx.fillStyle = "#0f172a";
   ctx.textAlign = "center";
-  ctx.fillText("Potentiel total", cx, cy - 4);
-
-  ctx.font = "950 16px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
-  ctx.fillStyle = getCss("--potBlue");
-  ctx.fillText(`${(pot||0).toLocaleString("fr-FR")} j`, cx, cy + 18);
+  ctx.font = "800 11px system-ui, sans-serif";
+  ctx.fillText("Réserve", cx, cy - 5);
+  ctx.fillStyle = rem > 0 ? "#16a34a" : "#64748b";
+  ctx.font = "900 15px ui-monospace, monospace";
+  ctx.fillText(`${Math.max(0, rem).toLocaleString("fr-FR")} j`, cx, cy + 14);
 }
 
 /* =========================
@@ -729,13 +1053,13 @@ function computeCoherence(cap){
 
   const d = cap.detail_hors_projet || {};
   const detailSum =
-    safeNum(d.run_mco_jours,0) +
-    safeNum(d.reglementaire_jours,0) +
-    safeNum(d.ssi_jours,0) +
-    safeNum(d.transverse_jours,0) +
-    safeNum(d.autres_jours,0);
+    safeNum(d.run_mco_jours, 0) +
+    safeNum(d.reglementaire_jours, 0) +
+    safeNum(d.ssi_jours, 0) +
+    safeNum(d.transverse_jours, 0) +
+    safeNum(d.autres_jours, 0);
 
-  const hasDetail = detailSum > 0 || String(d.commentaire||"").trim().length > 0;
+  const hasDetail = detailSum > 0 || String(d.commentaire || "").trim().length > 0;
 
   const c3ok = (pot >= 0 && hp >= 0);
   const c1ok = (hp <= pot);
@@ -755,28 +1079,40 @@ function computeCoherence(cap){
 }
 
 function setBadge(badgeEl, state, text){
-  badgeEl.className = "badge " + (state === "ok" ? "ok" : state === "warn" ? "warn" : "bad");
+  badgeEl.className = "badge-coh " + (state === "ok" ? "ok" : state === "warn" ? "warn" : "bad");
   badgeEl.textContent = text;
 }
 
 /* =========================
    Render (lecture uniquement)
 ========================= */
-function render(GOV){
-  const cap = GOV.capacite || {};
+function render(G){
+  const cap = G.capacite || {};
   const coh = computeCoherence(cap);
 
   cap.capacite_projet_jours = coh.rem;
 
+  el("subDate").textContent = `Hors-projet (maintenance) • Réserve projets (résultat) • Édition du ${todayFr()}`;
+
+  const lastIso = G?.meta?.lastUpdatedAt || G?.meta?.dernier_enregistrement || "";
+  if(lastIso){
+    const dt = new Date(lastIso);
+    const shortTime = isNaN(dt.getTime()) ? lastIso : dt.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"});
+    el("chipSync").textContent = `Dernière MAJ : ${shortTime}`;
+    el("updatedAt").textContent = isNaN(dt.getTime()) ? lastIso : dt.toLocaleString("fr-FR", {dateStyle:"short", timeStyle:"short"});
+  } else {
+    el("chipSync").textContent = "Source : Gouvernance.json";
+    el("updatedAt").textContent = "—";
+  }
+
   const p = cap.periode || {};
   el("period").textContent = (p.debut && p.fin) ? `${p.debut} → ${p.fin}` : "—";
-  el("updatedAt").textContent = (GOV?.meta?.dernier_enregistrement) ? GOV.meta.dernier_enregistrement : "—";
 
   el("vPot").textContent = fmtJ(coh.pot);
   el("vHP").textContent  = fmtJ(coh.hp);
   el("vRem").textContent = fmtJ(coh.rem);
 
-  drawPie({pot:coh.pot, hp:coh.hp, rem:coh.rem});
+  drawPie({ pot: coh.pot, hp: coh.hp, rem: coh.rem });
 
   el("c1").textContent = coh.c1ok ? "✅ OK" : "⛔ KO (hors-projet > potentiel)";
   el("c2").textContent = (!coh.hasDetail) ? "—" : (coh.c2ok ? "✅ OK" : "⚠️ Écart (détail ≠ total)");
@@ -799,7 +1135,7 @@ function render(GOV){
   el("hpPct").textContent = (coh.pot > 0) ? `${hpPct}%` : "—";
   const hint =
     (coh.pot === 0) ? "Renseigne d’abord le potentiel total." :
-    (hpPct >= 80) ? "Signal fort : maintenance/hors-projet très élevée. À investiguer (RUN/MCO, réglementaire, SSI…).":
+    (hpPct >= 80) ? "Signal fort : maintenance/hors-projet très élevée. À investiguer (RUN/MCO, réglementaire, SSI…)." :
     (hpPct >= 60) ? "Signal : maintenance/hors-projet importante. Utile pour piloter et expliquer la charge de fonctionnement." :
     "Lecture : niveau de maintenance/hors-projet raisonnable au regard du potentiel.";
   el("hpHint").textContent = hint;
@@ -812,13 +1148,16 @@ function render(GOV){
   el("dOther").textContent = fmtJ(d.autres_jours);
 
   el("notesBox").textContent = cap.notes ? cap.notes : "—";
+  applyZoomToDom();
 }
 
 /* =========================
    Commit (écritures storage)
 ========================= */
 function commitChanges(){
-  GOV.meta.dernier_enregistrement = nowISO();
+  const ts = nowISO();
+  GOV.meta.dernier_enregistrement = ts;
+  GOV.meta.lastUpdatedAt = ts;
   saveGov(GOV);
   writeSupportExports(GOV);
   broadcastUpdate();
@@ -841,7 +1180,7 @@ function getModalState(){
     clampMin0(el("eTrans").value) +
     clampMin0(el("eOther").value);
 
-  const hasDetail = dSum > 0 || String(el("eHPNote").value||"").trim().length > 0;
+  const hasDetail = dSum > 0 || String(el("eHPNote").value || "").trim().length > 0;
 
   const errs = [];
   if (hp > pot) errs.push(`C1 — Hors-projet (${hp} j) > Potentiel (${pot} j).`);
@@ -851,9 +1190,9 @@ function getModalState(){
 
   const c1ok = errs.find(e => e.startsWith("C1")) ? false : true;
   const c2ok = errs.find(e => e.startsWith("C2")) ? false : true;
-  const c3ok = true; // clampMin0 empêche négatif
+  const c3ok = true;
 
-  return {pot, hp, dSum, hasDetail, errs, c1ok, c2ok, c3ok};
+  return { pot, hp, dSum, hasDetail, errs, c1ok, c2ok, c3ok };
 }
 
 function modalCheckInfo(){
@@ -868,11 +1207,9 @@ function modalCheckInfo(){
   else if (st.hasDetail && !st.c2ok) msg = "Le détail hors-projet doit retomber sur le total (tolérance ±2 j).";
   el("mCMsg").textContent = msg;
 
-  // IMPORTANT : on NE grise plus le bouton pendant la saisie
   el("btnApply").disabled = false;
 }
 
-/* Popup bloquant */
 function showBlockingPopup(errors){
   alert(
 `❌ Impossible d'appliquer : incohérences détectées
@@ -896,16 +1233,16 @@ function openEditor(G){
   el("eStart").value = cap?.periode?.debut || "";
   el("eEnd").value   = cap?.periode?.fin || "";
 
-  el("ePot").value = safeNum(cap.total_jours,0);
-  el("eHP").value  = safeNum(cap.run_hors_projet_jours,0);
+  el("ePot").value = safeNum(cap.total_jours, 0);
+  el("eHP").value  = safeNum(cap.run_hors_projet_jours, 0);
   el("eNotes").value = cap.notes || "";
 
   const d = cap.detail_hors_projet || {};
-  el("eRun").value = safeNum(d.run_mco_jours,0);
-  el("eReg").value = safeNum(d.reglementaire_jours,0);
-  el("eSsi").value = safeNum(d.ssi_jours,0);
-  el("eTrans").value = safeNum(d.transverse_jours,0);
-  el("eOther").value = safeNum(d.autres_jours,0);
+  el("eRun").value = safeNum(d.run_mco_jours, 0);
+  el("eReg").value = safeNum(d.reglementaire_jours, 0);
+  el("eSsi").value = safeNum(d.ssi_jours, 0);
+  el("eTrans").value = safeNum(d.transverse_jours, 0);
+  el("eOther").value = safeNum(d.autres_jours, 0);
   el("eHPNote").value = d.commentaire || "";
 
   el("editBackdrop").style.display = "flex";
@@ -922,11 +1259,10 @@ function cancelEditor(){
 }
 
 function applyEditor(){
-  // BLOQUANT : on vérifie ici
   const st = getModalState();
   if (st.errs.length > 0){
     showBlockingPopup(st.errs);
-    return; // rien n'est enregistré
+    return;
   }
 
   const cap = GOV.capacite || {};
@@ -953,25 +1289,30 @@ function applyEditor(){
   editorSnapshot = null;
   closeEditor();
 
-  // commit => maj fiche gouvernance + exports
   commitChanges();
+  toast("Capacité mise à jour ✅");
 }
 
 /* =========================
    Refresh
 ========================= */
-function refreshAll(){
+function refreshAll(silent=true){
   const obj = loadGov();
   GOV = obj ? normalizeGovernance(obj) : defaultGov();
   render(GOV);
+  if(!silent) toast("Capacité réactualisée 🔄");
 }
 
 /* =========================
    UI wiring
 ========================= */
 function wireUI(){
-  el("btnPdf").addEventListener("click", () => window.print());
-  el("btnRefresh").addEventListener("click", refreshAll);
+  el("btnPdf").addEventListener("click", () => {
+    const content = el("zoomContent");
+    if(content) content.style.zoom = 1;
+    window.print();
+  });
+  el("btnRefresh").addEventListener("click", () => refreshAll(false));
   el("btnEdit").addEventListener("click", () => openEditor(GOV));
 
   el("btnClose").addEventListener("click", closeEditor);
@@ -979,8 +1320,14 @@ function wireUI(){
   el("editBackdrop").addEventListener("click", (e) => { if (e.target === el("editBackdrop")) closeEditor(); });
   el("btnApply").addEventListener("click", applyEditor);
 
+  // Boutons Zoom rapides
+  el("btnZoomOut").addEventListener("click", () => setZoom(currentZoom - 0.10));
+  el("btnZoomIn").addEventListener("click", () => setZoom(currentZoom + 0.10));
+  el("btnZoomReset").addEventListener("click", () => { setZoom(1); toast("Zoom réinitialisé à 100 %"); });
+  el("btnZoomFit").addEventListener("click", fitZoomToScreen);
+
   // Live info (non bloquant)
-  ["ePot","eHP","eRun","eReg","eSsi","eTrans","eOther","eHPNote"].forEach(id=>{
+  ["ePot","eHP","eRun","eReg","eSsi","eTrans","eOther","eHPNote"].forEach(id => {
     el(id).addEventListener("input", modalCheckInfo);
   });
 
@@ -988,9 +1335,13 @@ function wireUI(){
     if (!GOV) return;
     commitChanges();
     downloadJSON("Gouvernance.json", GOV);
+    toast("Gouvernance.json téléchargé ✅");
   });
 
-  el("btnLoad").addEventListener("click", () => el("fileInput").click());
+  el("btnLoad").addEventListener("click", () => {
+    el("fileInput").value = "";
+    el("fileInput").click();
+  });
   el("fileInput").addEventListener("change", async () => {
     const f = el("fileInput").files?.[0];
     if (!f) return;
@@ -1000,6 +1351,7 @@ function wireUI(){
       if (!obj){ alert("Format invalide : fichier gouvernance non reconnu."); return; }
       GOV = obj;
       commitChanges();
+      toast("Gouvernance importée ✅");
     }catch{
       alert("Erreur : JSON invalide.");
     } finally {
@@ -1010,46 +1362,51 @@ function wireUI(){
   window.addEventListener("storage", (ev) => {
     const k = ev?.key;
     if (k === STORAGE_KEY || k === "dnsigov.capacity" || k === "dnsigov.capacity.summary"){
-      refreshAll();
+      refreshAll(true);
     }
   });
   window.addEventListener("message", (ev) => {
     const d = ev?.data;
     if (!d || typeof d !== "object") return;
+    if (d.source === "capacite") return;
     if (d.type === "strategie-updated" || d.type === "GOUVERNANCE_UPDATED" || d.type === "capacity-updated"){
-      refreshAll();
+      refreshAll(true);
     }
   });
+  try{
+    const bc = new BroadcastChannel("dnsi-gouvernance");
+    bc.onmessage = (ev) => {
+      if(ev?.data?.type === "GOUVERNANCE_UPDATED" && ev?.data?.source !== "capacite"){
+        refreshAll(true);
+      }
+    };
+  }catch{}
 }
 
 /* =========================
    Boot
 ========================= */
 (function boot(){
-  el("today").textContent = todayFr();
   GOV = normalizeGovernance(loadGov()) || defaultGov();
+  setupPinchToZoom();
   wireUI();
   render(GOV);
+
+  // Ouverture automatique depuis 0. Synthèse V2.7 (?action=edit)
+  try{
+    const params = new URLSearchParams(window.location.search);
+    if(params.get("action") === "edit"){
+      openEditor(GOV);
+      if(history && history.replaceState){
+        history.replaceState({}, "", window.location.pathname);
+      }
+    }
+  }catch{}
+
+  if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  }
 })();
 </script>
-
-<!-- REGLES DE LECTURE CAPACITE DNSI -->
-<div style="
-  margin-top:16px;
-  padding:12px 14px;
-  background:#f5f5f5;
-  border-left:4px solid #cc0000;
-  font-size:13px;
-  line-height:1.4;
-">
-  <strong>ℹ️ Règles de lecture – Capacité DNSI</strong>
-  <ul style="margin:8px 0 0 18px; padding:0;">
-    <li>La capacité est <strong>déclarative</strong> (choix managérial).</li>
-    <li>La <strong>maintenance / RUN</strong> est une <strong>contrainte prioritaire</strong>.</li>
-    <li>Le reste correspond à la <strong>capacité mobilisable projets</strong>.</li>
-    <li>Les alertes signalent des <strong>tensions ou incohérences</strong>, sans bloquer.</li>
-  </ul>
-</div>
-
 </body>
 </html>
