@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Gouvernance — Portefeuille projets (PPM V2.9)</title>
+  <title>Gouvernance — Portefeuille projets (PPM V3.0)</title>
   <meta name="theme-color" content="#C10F1A"/>
   <link rel="manifest" href="./manifest.json"/>
   <link rel="icon" type="image/png" href="./icon.png"/>
@@ -45,9 +45,22 @@
       .brand .badge{width:30px !important; height:30px !important; font-size:11px !important;}
       .brand .h1{font-size:14px !important;}
       .brand .sub{font-size:10.5px !important;}
-      .no-print, .ppm-nav, .split-entries, .filter-bar, .actions, .zoom-controls, .toast, .modal-backdrop{
+      .no-print, .ppm-nav, .hero-compact, .guide-drawer, .filter-bar, .actions, .zoom-controls, .toast, .modal-backdrop{
         display:none !important;
       }
+      .kpi-strip{
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:8px !important;
+      }
+      .kpi-box{
+        padding:6px 10px !important;
+        border-radius:10px !important;
+        box-shadow:none !important;
+        border:1px solid #cbd5e1 !important;
+      }
+      .kpi-label{font-size:9px !important;}
+      .kpi-val{font-size:16px !important; margin-top:2px !important;}
+      .kpi-sub{font-size:9px !important; margin-top:2px !important;}
       .main{max-width:100% !important; margin:0 !important; padding:0 !important; gap:8px !important;}
       .panel{box-shadow:none !important; border:1px solid #cbd5e1 !important; border-radius:10px !important;}
       .panel-head{padding:8px 10px !important;}
@@ -176,91 +189,182 @@
       gap:14px;
     }
 
-    /* LES 2 ENTREES */
-    .split-entries{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-    }
-    @media (max-width: 900px){
-      .split-entries{grid-template-columns: 1fr;}
-    }
-    .entry-card{
-      border-radius:20px;
-      padding:20px;
+    /* BANDEAU D'ACTION COMPACT (aligné sur 1. Programmes) */
+    .hero-compact{
+      background:#fff;
       border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px 16px;
+      box-shadow:0 4px 14px rgba(15,23,42,.05);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .hero-compact-text{min-width:240px; flex:1;}
+    .hero-compact-text h2{
+      margin:0 0 3px 0;
+      font-size:17px;
+      font-weight:900;
+      color:var(--ink);
+    }
+    .hero-compact-text p{
+      margin:0;
+      font-size:12.5px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+    .hero-compact-actions{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .hero-btn{
+      border:1px solid var(--border);
+      border-radius:11px;
+      padding:9px 14px;
+      font-size:12.5px;
+      font-weight:900;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      transition:transform .1s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+    }
+    .hero-btn:active{transform:scale(0.98);}
+    .hero-btn.dark{
+      background:#0f172a;
+      color:#fff;
+      border-color:#0f172a;
+      box-shadow:0 3px 10px rgba(15,23,42,.18);
+    }
+    .hero-btn.dark:hover{background:#1e293b;}
+    .hero-btn.green{
+      background:#16a34a;
+      color:#fff;
+      border-color:#16a34a;
+      box-shadow:0 3px 10px rgba(22,163,74,.18);
+    }
+    .hero-btn.green:hover{background:#15803d;}
+    .hero-btn.help{
+      background:#f8fafc;
+      color:#334155;
+      border-color:#cbd5e1;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+    }
+    .hero-btn.help:hover, .hero-btn.help.open{
+      background:#eff6ff;
+      color:#1d4ed8;
+      border-color:#93c5fd;
+    }
+
+    /* MODE D'EMPLOI DEPLIABLE (replié par défaut) */
+    .guide-drawer{
+      display:none;
+      background:#eff6ff;
+      border:1px solid #bfdbfe;
+      border-left:4px solid #2563eb;
+      border-radius:14px;
+      padding:12px 16px;
+      color:#1e3a8a;
+    }
+    .guide-drawer.open{display:block;}
+    .guide-steps{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width: 820px){
+      .guide-steps{grid-template-columns:1fr;}
+    }
+    .guide-step{
+      background:rgba(255,255,255,.78);
+      border:1px solid #dbeafe;
+      border-radius:10px;
+      padding:9px 11px;
+      font-size:12px;
+      line-height:1.4;
+    }
+    .guide-step strong{
+      display:block;
+      font-size:12.5px;
+      color:#0f172a;
+      margin-bottom:3px;
+    }
+
+    /* REGLETTE DE 4 COMPTEURS CLIQUABLES (raccourcis directs vers la liste) */
+    .kpi-strip{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 900px){ .kpi-strip{grid-template-columns:repeat(2, 1fr);} }
+    @media (max-width: 500px){ .kpi-strip{grid-template-columns:1fr;} }
+    .kpi-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 14px;
+      box-shadow:0 3px 10px rgba(15,23,42,.04);
+      cursor:pointer;
+      text-align:left;
+      font-family:inherit;
+      transition:transform .12s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
-      position:relative;
-      overflow:hidden;
-      box-shadow:var(--shadow);
     }
-    .entry-card h2{
-      margin:0 0 6px 0;
-      font-size:18px;
-      font-weight:900;
-      position:relative;
-      z-index:2;
+    .kpi-box:hover{
+      transform:translateY(-1px);
+      border-color:#94a3b8;
+      box-shadow:0 6px 14px rgba(15,23,42,.08);
     }
-    .entry-card p{
-      margin:0 0 18px 0;
-      font-size:12.5px;
+    .kpi-box.kpi-active{
+      border-color:var(--lille-red);
+      background:#fff7f7;
+      box-shadow:0 0 0 2px rgba(193,15,26,.16);
+    }
+    .kpi-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:6px;
+    }
+    .kpi-label{
+      font-size:11px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.4px;
       color:var(--muted);
-      line-height:1.4;
-      position:relative;
-      z-index:2;
     }
-    .entry-btn{
-      padding:13px 20px;
-      border-radius:12px;
-      border:none;
-      font-size:14px;
+    .kpi-pill-hint{
+      font-size:10px;
+      font-weight:800;
+      color:var(--muted);
+      background:#f1f5f9;
+      padding:1px 6px;
+      border-radius:999px;
+    }
+    .kpi-box.kpi-active .kpi-pill-hint{
+      background:var(--lille-red);
+      color:#fff;
+    }
+    .kpi-val{
+      font-size:22px;
       font-weight:900;
-      cursor:pointer;
-      text-align:center;
-      transition:transform 0.1s;
-      position:relative;
-      z-index:2;
-      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+      margin-top:4px;
+      line-height:1.1;
     }
-    .entry-btn:active{transform:scale(0.98);}
-
-    .entry-idee{
-      background:linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-      border-color:#d1d5db;
+    .kpi-sub{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:3px;
     }
-    .entry-idee h2{color:#0f172a;}
-    .entry-idee .entry-btn{background:#0f172a; color:#fff;}
-    .entry-idee .entry-btn:hover{background:#1e293b;}
-    .entry-icon-1{
-      position:absolute; right:-10px; top:-20px; font-size:120px; opacity:0.04; z-index:1; transform:rotate(15deg);
-    }
-
-    .entry-douane{
-      background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      border-color:#bbf7d0;
-    }
-    .entry-douane h2{color:#14532d;}
-    .entry-douane p{color:#166534;}
-    .entry-douane .entry-btn{background:#16a34a; color:#fff;}
-    .entry-douane .entry-btn:hover{background:#15803d;}
-    .entry-icon-2{
-      position:absolute; right:10px; top:-10px; font-size:100px; opacity:0.06; z-index:1;
-    }
-
-    .entry-kpis{
-      display:flex; gap:12px; margin-bottom:14px; position:relative; z-index:2;
-    }
-    .ekpi{
-      background:rgba(255,255,255,0.78);
-      padding:8px 12px;
-      border-radius:10px;
-      border:1px solid rgba(0,0,0,0.05);
-      flex:1;
-    }
-    .ekpi .val{font-size:20px; font-weight:900;}
-    .ekpi .lab{font-size:11px; font-weight:800; text-transform:uppercase; color:var(--muted); margin-top:2px;}
 
     /* Table Panel */
     .panel{
@@ -616,7 +720,7 @@
       <div class="brand">
         <div class="badge">DNSI</div>
         <div class="titles">
-          <div class="h1">Portefeuille projets — PPM V2.9</div>
+          <div class="h1">Portefeuille projets — PPM V3.0</div>
           <div class="sub" id="govName">Gouvernance ➔ Programme ➔ Projet / Idée (Pont Supports Projet)</div>
         </div>
       </div>
@@ -648,47 +752,75 @@
 
   <main class="main">
 
-    <div class="split-entries no-print">
-      <!-- CAPTER DEMANDE (Temps 1) -->
-      <div class="entry-card entry-idee">
-        <div class="entry-icon-1">💡</div>
-        <div>
-          <h2>Capter une Demande / Idée</h2>
-          <p>Collecte des besoins métiers. Saisie ultra-rapide des intentions sans chiffrage initial.</p>
-        </div>
-        <div class="entry-kpis">
-          <div class="ekpi">
-            <div class="val" id="kpiIdees" style="color:#0f172a">0</div>
-            <div class="lab">À qualifier / Pré-cadrages</div>
-          </div>
-          <div class="ekpi">
-            <div class="val" id="kpiOrphans" style="color:#c2410c">0</div>
-            <div class="lab">Hors programme</div>
-          </div>
-        </div>
-        <button class="entry-btn" id="btnOpenDemande">➕ Nouvelle Demande</button>
+    <!-- BANDEAU D'ACTION COMPACT -->
+    <section class="hero-compact no-print">
+      <div class="hero-compact-text">
+        <h2>Portefeuille Projets</h2>
+        <p>Déclarez un nouveau besoin, importez les fichiers des chefs de projet, ou cliquez sur une ligne ci-dessous pour la piloter.</p>
       </div>
+      <div class="hero-compact-actions">
+        <button type="button" class="hero-btn dark" id="btnOpenDemande">➕ Déclarer un besoin</button>
+        <button type="button" class="hero-btn green" id="btnLoadPivots">📂 Importer fiches CDP (.json)</button>
+        <button type="button" class="hero-btn help" id="btnToggleGuide" aria-expanded="false">❓ Mode d'emploi</button>
+      </div>
+    </section>
 
-      <!-- SUIVI PROJETS LANCES (JSON CP) -->
-      <div class="entry-card entry-douane">
-        <div class="entry-icon-2">🛂</div>
-        <div>
-          <h2>Suivi des Projets Lancés</h2>
-          <p>Mise à jour du portefeuille via les JSON des CDP. Contrôle automatique de fraîcheur et mémorisation des pivots complets.</p>
+    <!-- MODE D'EMPLOI 3 ETAPES (replié par défaut) -->
+    <section class="guide-drawer no-print" id="guideDrawer">
+      <div class="guide-steps">
+        <div class="guide-step">
+          <strong>1. 💡 Déclarer un besoin</strong>
+          Cliquez sur <b>« Déclarer un besoin »</b> pour enregistrer une intention métier rapide, sans chiffrage initial.
         </div>
-        <div class="entry-kpis">
-          <div class="ekpi">
-            <div class="val" id="kpiPivots" style="color:#166534">0</div>
-            <div class="lab">Projets pilotés (JSON)</div>
-          </div>
-          <div class="ekpi">
-            <div class="val" id="kpiPivotsStored" style="color:#0369a1">0</div>
-            <div class="lab">Pivots détaillés liés</div>
-          </div>
+        <div class="guide-step">
+          <strong>2. 🎯 Qualifier &amp; piloter</strong>
+          Cliquez sur <b>n'importe quelle ligne</b> du tableau pour rattacher un programme, chiffrer (jours / k€), générer le kit JSON CDP ou supprimer.
         </div>
-        <button class="entry-btn" id="btnLoadPivots">⬆️ Auditer & Charger JSON</button>
+        <div class="guide-step">
+          <strong>3. 📂 Suivre les projets lancés</strong>
+          Cliquez sur <b>« Importer fiches CDP »</b> pour charger les <code>.json</code> reçus, puis cliquez sur le badge <b>ID ↗</b> à gauche pour ouvrir la fiche projet.
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- REGLETTE DE 4 COMPTEURS CLIQUABLES -->
+    <section class="kpi-strip">
+      <button type="button" class="kpi-box" id="kpiCardIdees" title="Filtrer sur les demandes à qualifier et pré-cadrages">
+        <div class="kpi-top">
+          <span class="kpi-label">💡 Demandes à qualifier</span>
+          <span class="kpi-pill-hint no-print" id="hintIdees">Filtrer</span>
+        </div>
+        <div class="kpi-val" id="kpiIdees" style="color:#0f172a">0</div>
+        <div class="kpi-sub">Idées &amp; pré-cadrages</div>
+      </button>
+
+      <button type="button" class="kpi-box" id="kpiCardPivots" title="Filtrer sur les projets lancés">
+        <div class="kpi-top">
+          <span class="kpi-label">✅ Projets lancés</span>
+          <span class="kpi-pill-hint no-print" id="hintPivots">Filtrer</span>
+        </div>
+        <div class="kpi-val" id="kpiPivots" style="color:#166534">0</div>
+        <div class="kpi-sub">dont <b id="kpiPivotsStored" style="color:#0369a1">0</b> fiche(s) complète(s) 🔗</div>
+      </button>
+
+      <button type="button" class="kpi-box" id="kpiCardOrphans" title="Filtrer sur les éléments sans programme">
+        <div class="kpi-top">
+          <span class="kpi-label">⚠️ Sans programme</span>
+          <span class="kpi-pill-hint no-print" id="hintOrphans">Filtrer</span>
+        </div>
+        <div class="kpi-val" id="kpiOrphans" style="color:#c2410c">0</div>
+        <div class="kpi-sub">À rattacher à un axe</div>
+      </button>
+
+      <button type="button" class="kpi-box" id="kpiCardEngaged" title="Filtrer sur les projets retenus dans le scénario Stratégie">
+        <div class="kpi-top">
+          <span class="kpi-label">⚡ Retenus en Stratégie</span>
+          <span class="kpi-pill-hint no-print" id="hintEngaged">Filtrer</span>
+        </div>
+        <div class="kpi-val" id="kpiEngaged" style="color:#1d4ed8">0</div>
+        <div class="kpi-sub">Engagés au scénario actif</div>
+      </button>
+    </section>
 
     <!-- REFERENTIEL PORTEFEUILLE -->
     <section class="panel">
@@ -757,7 +889,7 @@
             <tfoot id="tfootTotals"></tfoot>
           </table>
         </div>
-        <div class="footer-ver">Gouvernance DNSI — Support 2 : Portefeuille projets (PPM V2.9) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+        <div class="footer-ver">Gouvernance DNSI — Support 2 : Portefeuille projets (PPM V3.0) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
       </div>
     </section>
   </main>
@@ -948,7 +1080,7 @@
   </div>
 
   <script>
-    const APP_VERSION = "V2.9";
+    const APP_VERSION = "V3.0";
     const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Gestion-supports-projet-/";
     const STORAGE_KEY = "GOUVERNANCE_JSON";
     const ZOOM_MIN = 0.35;
@@ -1308,18 +1440,33 @@
 
       el("chipCount").textContent = `${projects.length} / ${allProjects.length} demande(s)`;
 
-      // KPIs globaux
-      let nbIdees = 0, nbPivots = 0, nbOrphans = 0, nbStoredPivots = 0;
+      // KPIs globaux + état actif des raccourcis
+      let nbIdees = 0, nbPivots = 0, nbOrphans = 0, nbStoredPivots = 0, nbEngagedAll = 0;
       for(const p of allProjects){
         if(p.has_pivot) nbPivots++; else nbIdees++;
         if(!resolveProgramme(p.programme_id)) nbOrphans++;
         if(pivotsMap[String(p.id)]) nbStoredPivots++;
+        if(stratSets.lances.has(String(p.id))) nbEngagedAll++;
       }
       el("kpiIdees").textContent = nbIdees;
       el("kpiPivots").textContent = nbPivots;
       el("kpiPivotsStored").textContent = nbStoredPivots;
       el("kpiOrphans").textContent = nbOrphans;
       el("kpiOrphans").style.color = nbOrphans > 0 ? "#c2410c" : "#16a34a";
+      el("kpiEngaged").textContent = nbEngagedAll;
+
+      const curPv = el("fltPivot").value;
+      const curPg = el("fltProg").value;
+      const syncKpiCard = (cardId, hintId, isActive) => {
+        const card = el(cardId);
+        const hint = el(hintId);
+        if(card) card.classList.toggle("kpi-active", isActive);
+        if(hint) hint.textContent = isActive ? "Actif ✕" : "Filtrer";
+      };
+      syncKpiCard("kpiCardIdees", "hintIdees", curPv === "without");
+      syncKpiCard("kpiCardPivots", "hintPivots", curPv === "with");
+      syncKpiCard("kpiCardOrphans", "hintOrphans", curPg === "__NONE__");
+      syncKpiCard("kpiCardEngaged", "hintEngaged", curPv === "engaged");
 
       const tb = el("tbody");
       const tf = el("tfootTotals");
@@ -1894,6 +2041,42 @@
     setupPinchToZoom();
 
     el("btnOpenDemande").onclick = openModalIdee;
+
+    // Mode d'emploi dépliable (replié par défaut)
+    el("btnToggleGuide").onclick = () => {
+      const drawer = el("guideDrawer");
+      const btn = el("btnToggleGuide");
+      const isOpen = drawer.classList.toggle("open");
+      btn.classList.toggle("open", isOpen);
+      btn.setAttribute("aria-expanded", String(isOpen));
+    };
+
+    // Raccourcis cliquables sur les 4 compteurs KPI
+    function toggleQuickFilter(type, value){
+      const fltPv = el("fltPivot");
+      const fltPg = el("fltProg");
+      if(type === "pivot"){
+        if(fltPv.value === value){
+          fltPv.value = "";
+        } else {
+          fltPv.value = value;
+          if(fltPg.value === "__NONE__") fltPg.value = "";
+        }
+      } else if(type === "prog"){
+        if(fltPg.value === value){
+          fltPg.value = "";
+        } else {
+          fltPg.value = value;
+          fltPv.value = "";
+        }
+      }
+      render();
+      el("tableWrap")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+    el("kpiCardIdees").onclick = () => toggleQuickFilter("pivot", "without");
+    el("kpiCardPivots").onclick = () => toggleQuickFilter("pivot", "with");
+    el("kpiCardOrphans").onclick = () => toggleQuickFilter("prog", "__NONE__");
+    el("kpiCardEngaged").onclick = () => toggleQuickFilter("pivot", "engaged");
     el("btnLoadPivots").onclick = () => { el("filePivots").value = ""; el("filePivots").click(); };
     el("filePivots").onchange = (e) => handlePivots(e.target.files);
     el("btnImportGov").onclick = () => { el("fileGovInput").value = ""; el("fileGovInput").click(); };
