@@ -1,61 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cockpit CODIR — Synthèse Gouvernance (V2.6)</title>
-<meta name="theme-color" content="#C10F1A" />
-<link rel="manifest" href="./manifest.json" />
-<link rel="icon" type="image/png" href="./icon.png" />
-<link rel="apple-touch-icon" href="./icon.png" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Gouvernance DNSI — Stratégie & Arbitrage (V3.0)</title>
+<meta name="theme-color" content="#C10F1A"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="icon" type="image/png" href="./icon.png"/>
+<link rel="apple-touch-icon" href="./icon.png"/>
 <style>
 :root{
   --brand:#C10F1A;
+  --brand-dark:#a50d16;
   --brand-light:rgba(193,15,26,0.08);
-  --text:#0f172a;
-  --muted:#64748b;
   --bg:#f6f7fb;
   --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
   --border:#e2e8f0;
+  --shadow:0 10px 24px rgba(15,23,42,.06);
 
-  --ok:#16a34a;
-  --warn:#f59e0b;
-  --bad:#ef4444;
+  /* Donut & Compteurs */
+  --hp:#f59e0b;       /* Hors-projet = orange */
+  --eng:#2563eb;      /* Engagé projets = bleu */
+  --rest:#10b981;     /* Restant projets = vert */
+  --over:#ef4444;     /* Dépassement = rouge */
 
-  --potBlue:#3b82f6;
-  --hpOrange:#f59e0b;
-  --remGreen:#10b981;
+  /* États scénario */
+  --sDraft:#8b5cf6;
+  --sOk:#16a34a;
+  --sOver:#f59e0b;
+  --sBad:#ef4444;
+
+  /* Fonds blocs */
+  --tintHp: rgba(245,158,11,.10);
+  --tintEng: rgba(37,99,235,.09);
+  --tintRest: rgba(16,185,129,.10);
+  --tintOver: rgba(239,68,68,.10);
+  --tintDnD: rgba(139,92,246,.05);
+
+  /* Gantt Prio Colors */
+  --gP1: rgba(239, 68, 68, 0.16);
+  --gP1Border: #ef4444;
+  --gP2: rgba(249, 115, 22, 0.16);
+  --gP2Border: #f97316;
+  --gP3: rgba(59, 130, 246, 0.16);
+  --gP3Border: #3b82f6;
+  --gP4: rgba(107, 114, 128, 0.16);
+  --gP4Border: #6b7280;
 }
 
-*{box-sizing:border-box;}
-
-html,body{
-  margin:0; padding:0;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  color:var(--text);
   background:var(--bg);
+  color:var(--text);
   font-size:13px;
 }
 
-/* Impression A3 Paysage CODIR */
-@page{ size:A3 landscape; margin:12mm; }
-@media print{
-  *{-webkit-print-color-adjust:exact; print-color-adjust:exact;}
-  html, body{background:#fff !important;}
-  .wrap{max-width:100%; padding:0; margin:0;}
-  .topbar{box-shadow:none; position:static; margin-bottom:10px;}
-  .toolbar, .ppm-nav, .no-print, .toast{display:none !important;}
-  .grid-2x2{gap:12px; padding:0;}
-  .panel{break-inside:avoid; page-break-inside:avoid; box-shadow:none; border:1px solid #cbd5e1;}
-}
-
-.wrap{
-  max-width:1400px;
-  margin:0 auto;
-  padding:0 0 28px;
-}
-
-/* Top bar */
+/* Topbar harmonisée */
 .topbar{
   position:sticky; top:0; z-index:50;
   background:var(--brand);
@@ -64,26 +69,21 @@ html,body{
   box-shadow:0 6px 18px rgba(0,0,0,.16);
 }
 .topbar-row{
+  max-width:1380px; margin:0 auto;
   display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-  max-width:1360px; margin:0 auto;
 }
-.brand-ui{
-  display:flex; align-items:center; gap:14px;
-}
-.brand-ui .badge{
+.brand-ui{display:flex; align-items:center; gap:12px; min-width:0;}
+.brand-ui .badge-logo{
   width:40px; height:40px; border-radius:11px;
   background:rgba(255,255,255,.16);
   display:flex; align-items:center; justify-content:center;
-  font-weight:900; font-size:13px;
-  color:#fff; border:none;
+  font-weight:900; font-size:13px; color:#fff; flex-shrink:0;
 }
-.brand-ui .h1{font-weight:900; font-size:17px; letter-spacing:.2px;}
-.brand-ui .sub{font-size:12px; opacity:.92;}
+.brand-ui .h1{font-weight:900; font-size:17px; letter-spacing:.2px; line-height:1.15;}
+.brand-ui .sub{font-size:12px; opacity:.92; margin-top:2px;}
 
-.toolbar{
-  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
-}
-.btn{
+.top-actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.tbtn{
   border:1px solid rgba(255,255,255,.32);
   background:transparent; color:#fff;
   padding:7px 13px; border-radius:999px;
@@ -91,19 +91,22 @@ html,body{
   transition:all .15s ease;
   display:inline-flex; align-items:center; gap:6px;
 }
-.btn:hover{background:rgba(255,255,255,.14);}
-.btn.action{background:#0f172a; border-color:#0f172a; color:#fff;}
-.btn.action:hover{background:#1e293b;}
+.tbtn:hover{background:rgba(255,255,255,.14);}
+.tbtn.primary{background:#fff; color:var(--brand); border-color:#fff;}
+.tbtn.primary:hover{background:#f1f5f9;}
+.tbtn.dark{background:#0f172a; border-color:#0f172a; color:#fff;}
+.tbtn.dark:hover{background:#1e293b;}
+.tbtn[disabled]{opacity:.5;cursor:not-allowed;}
 
 /* Navigation 5 Piliers */
 .ppm-nav{
   background:#fff;
   border-bottom:1px solid var(--border);
   padding:8px 20px;
-  margin-bottom:16px;
+  margin-bottom:12px;
 }
 .ppm-nav-row{
-  max-width:1360px; margin:0 auto;
+  max-width:1380px; margin:0 auto;
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
 }
 .ppm-links{display:flex; gap:8px; flex-wrap:wrap;}
@@ -126,693 +129,3025 @@ html,body{
   font-size:11px; font-weight:800; color:var(--muted);
 }
 
-/* Grille 4 Quadrants */
-.grid-2x2{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:16px;
-  padding:0 20px;
-}
-@media (max-width: 1024px){ .grid-2x2{grid-template-columns: 1fr;} }
+.wrap{max-width:1380px;margin:0 auto;padding:0 14px 28px;}
 
-.panel{
+/* Barre Multi-Scénarios (Variantes A/B/C) */
+.variants-bar{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:9px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+  box-shadow:0 4px 12px rgba(15,23,42,.04);
+}
+.variants-tabs{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  flex:1;
+}
+.variant-tab{
+  border:1px solid var(--border);
+  background:#f8fafc;
+  color:var(--text);
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:all .15s ease;
+}
+.variant-tab:hover{background:#e2e8f0;}
+.variant-tab.active{
+  background:#0f172a;
+  color:#fff;
+  border-color:#0f172a;
+  box-shadow:0 3px 10px rgba(15,23,42,.20);
+}
+.variant-tab .v-margin{
+  font-size:10.5px;
+  padding:1px 6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.variant-tab:not(.active) .v-margin{
+  background:#fff;
+  color:var(--muted);
+  border:1px solid var(--border);
+}
+.variants-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+/* Toolbar & Contrôles Zoom */
+.toolbar-bar{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:8px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.toolbar-left{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.zoom-controls{
+  display:inline-flex;
+  align-items:center;
+  background:#f1f5f9;
+  padding:3px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  gap:2px;
+  flex-shrink:0;
+}
+.zoom-btn, .zoom-pct, .zoom-fit-btn{
+  border:none;
+  background:transparent;
+  color:var(--text);
+  border-radius:999px;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .15s ease, color .15s ease;
+}
+.zoom-btn{width:26px; height:26px; font-size:15px; line-height:1;}
+.zoom-pct{
+  min-width:44px; height:26px; padding:0 6px;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size:11.5px; color:var(--muted);
+}
+.zoom-fit-btn{
+  height:26px; padding:0 10px; font-size:11.5px;
+  background:#fff; border:1px solid var(--border); margin-left:2px;
+}
+.zoom-btn:hover, .zoom-pct:hover{background:#e2e8f0; color:var(--text);}
+.zoom-fit-btn:hover{background:#0f172a; color:#fff; border-color:#0f172a;}
+
+.btn{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:6px 11px;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+  background:var(--card);
+  color:var(--text);
+  box-shadow:0 2px 6px rgba(15,23,42,.05);
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  transition:all .15s ease;
+}
+.btn:hover{background:#f8fafc;}
+.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand);}
+.btn.primary:hover{background:var(--brand-dark);}
+.btn.dark{background:#0f172a;color:#fff;border-color:#0f172a;}
+.btn.dark:hover{background:#1e293b;}
+.btn.danger{background:#fff;color:var(--brand);border:1px solid rgba(193,15,26,.35)}
+.btn.danger:hover{background:#fff1f2;}
+.btn.sm{padding:4px 9px;font-size:11px;}
+.btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+
+.hint{margin:4px 0 8px;color:var(--muted);font-size:12px;line-height:1.35}
+
+/* Zone tactile Pinch-to-Zoom */
+.zoom-wrap{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x pan-y;
+  width:100%;
+}
+#zoomContent{width:100%;}
+
+.grid{
+  margin-top:6px;
+  display:grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap:14px;
+  align-items:start;
+}
+@media(max-width:1100px){ .grid{grid-template-columns:1fr} }
+
+.card{
   background:var(--card);
   border:1px solid var(--border);
   border-radius:18px;
-  box-shadow:0 8px 24px rgba(15,23,42,.04);
-  display:flex; flex-direction:column;
+  box-shadow:var(--shadow);
+  padding:15px 16px;
 }
-.panel-head{
-  padding:15px 20px;
-  border-bottom:1px solid var(--border);
-  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-  background:linear-gradient(180deg, #fff, #f8fafc);
-  border-radius:18px 18px 0 0;
-}
-.panel-title{
-  font-weight:900; font-size:15px; color:var(--text);
-  display:flex; align-items:center; gap:8px;
-}
-.panel-sub{font-size:12px; color:var(--muted); margin-top:3px; font-weight:500;}
-.panel-link{
-  text-decoration:none;
-  font-size:11.5px; font-weight:800; color:var(--brand);
-  padding:4px 10px; border-radius:999px;
-  background:var(--brand-light); white-space:nowrap;
-}
-.panel-link:hover{background:rgba(193,15,26,.14);}
-.panel-body{padding:18px 20px; flex:1;}
-
-/* KPIs */
-.kpi-grid{
-  display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;
-}
-@media (max-width: 680px){ .kpi-grid{grid-template-columns:repeat(2, 1fr);} }
-.kpi-card{
-  border:1px solid var(--border); border-radius:12px; padding:11px 12px; background:#fff;
-  box-shadow:0 2px 8px rgba(0,0,0,.02);
-}
-.kpi-label{font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:.4px;}
-.kpi-val{font-size:22px; font-weight:900; color:var(--text); margin-top:6px; line-height:1;}
-.kpi-sub{font-size:11px; color:var(--muted); margin-top:5px;}
-
-/* Jauges Programmes */
-.axe-row{margin-bottom:13px;}
-.axe-row:last-child{margin-bottom:0;}
-.axe-head{
-  display:flex; justify-content:space-between; align-items:baseline; gap:8px;
-  font-size:13px; font-weight:800; margin-bottom:5px;
-}
-.axe-name{display:flex; align-items:center; gap:6px; min-width:0;}
-.axe-code{font-size:11px; color:var(--muted); font-weight:800;}
-.axe-val{font-weight:900; white-space:nowrap;}
-.axe-track{height:10px; background:#e2e8f0; border-radius:999px; overflow:hidden;}
-.axe-fill{height:100%; border-radius:999px; transition:width .3s ease;}
-
-/* Camembert Capacité */
-.cap-layout{
-  display:grid; grid-template-columns: 220px 1fr; gap:18px; align-items:center;
-}
-@media (max-width: 600px){ .cap-layout{grid-template-columns: 1fr;} }
-.pie-container{
-  display:flex; align-items:center; justify-content:center;
-  background:#f8fafc; border-radius:50%; border:1px solid var(--border);
-  padding:8px; box-shadow:inset 0 4px 12px rgba(0,0,0,.04);
-  width:210px; height:210px; margin:0 auto;
-}
-.cap-legend{display:flex; flex-direction:column; gap:10px;}
-.cap-item{
-  border:1px solid var(--border); border-radius:12px; padding:11px 13px;
-  display:flex; justify-content:space-between; align-items:center; background:#fff;
+.card h3{
+  margin:0 0 8px 0;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.45px;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
 }
 
-/* Stratégie / Arbitrage */
-.strat-box{
-  border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:14px;
+hr.sep{border:none;border-top:1px solid var(--border);margin:14px 0}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){ .row2{grid-template-columns:1fr} }
+
+.kv{display:grid;grid-template-columns:155px 1fr;gap:8px;padding:4px 0;font-size:13px;align-items:center;}
+.kv .k{color:var(--muted)}
+.kv .v{font-weight:900}
+.sc-input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:5px 8px;
+  font-weight:900;
+  font-size:13px;
+  font-family:inherit;
+  color:var(--text);
   background:#f8fafc;
 }
-.strat-ok{background:#f0fdf4; border-color:#bbf7d0;}
-.strat-warn{background:#fffbeb; border-color:#fde68a;}
-.strat-bad{background:#fef2f2; border-color:#fecaca;}
-.strat-title{font-weight:900; font-size:15.5px; display:flex; align-items:center; gap:8px;}
+.sc-input:focus{outline:none;border-color:#94a3b8;background:#fff;}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 
-/* Table Projets Synthèse */
-table{width:100%; border-collapse:collapse; margin-top:8px;}
-th{
-  text-align:left; font-size:10.5px; color:var(--muted);
-  text-transform:uppercase; padding-bottom:8px; border-bottom:1px solid var(--border);
-}
-td{
-  padding:9px 4px; border-bottom:1px solid #f1f5f9;
-  font-size:12.5px; vertical-align:middle;
-}
-.mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:11.5px;}
-
-.badge{
-  display:inline-flex; align-items:center; gap:4px;
-  padding:3px 8px; border-radius:999px;
-  font-size:11px; font-weight:800;
-  border:1px solid var(--border); background:#fff;
-}
-.b-orphan{border-color:#fdba74; background:#fff7ed; color:#9a3412;}
-.b-prio1{border-color:#fca5a5; background:#fef2f2; color:#b91c1c;}
-.b-prio2{border-color:#fdba74; background:#fff7ed; color:#c2410c;}
-.b-prio3{border-color:#93c5fd; background:#eff6ff; color:#1d4ed8;}
-.b-prio4{border-color:#cbd5e1; background:#f8fafc; color:#475569;}
-
-.empty-note{
-  padding:16px; border-radius:12px; background:#f8fafc;
-  border:1px dashed #cbd5e1; color:var(--muted);
-  font-size:12.5px; text-align:center; line-height:1.45;
-}
-
+/* Toast */
 .toast{
-  position:fixed; left:16px; bottom:16px;
-  background:#0f172a; color:#fff;
-  padding:10px 16px; border-radius:999px;
-  font-size:12.5px; font-weight:800;
-  z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.22);
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:9999;
+  min-width:260px;
+  max-width:480px;
+  padding:10px 14px;
+  border-radius:14px;
+  border:1px solid rgba(17,24,39,.12);
+  box-shadow:0 16px 40px rgba(0,0,0,.18);
+  background:#fff;
+  display:none;
 }
+.toast.show{display:block}
+.toast .t{font-weight:900}
+.toast .m{font-size:12px;color:rgba(17,24,39,.72);margin-top:2px}
+.toast.ok{border-left:8px solid var(--sOk)}
+.toast.warn{border-left:8px solid var(--sOver)}
+.toast.bad{border-left:8px solid var(--sBad)}
+.toast.draft{border-left:8px solid var(--sDraft)}
+
+/* Donut uniforme (identique à 0. Synthese & 3. Capacite) */
+.pieWrap{display:grid;grid-template-columns:225px 1fr;gap:16px;align-items:center;margin-top:10px;}
+@media(max-width:820px){ .pieWrap{grid-template-columns:1fr;} }
+.pieBox{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.pie-container{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f8fafc;
+  border-radius:50%;
+  border:1px solid var(--border);
+  padding:8px;
+  box-shadow:inset 0 4px 12px rgba(0,0,0,.04);
+  width:210px;
+  height:210px;
+  margin:0 auto;
+}
+canvas.donut-canvas{display:block;}
+
+/* Cartes compteurs capacité + budget */
+.miniCards{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;}
+@media(max-width:720px){ .miniCards{grid-template-columns:1fr} }
+.mini{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px 12px;
+  background:#fff;
+}
+.mini.hp{border-left:4px solid var(--hp); background:var(--tintHp);}
+.mini.eng{border-left:4px solid var(--eng); background:var(--tintEng);}
+.mini.rest{border-left:4px solid var(--rest); background:var(--tintRest);}
+.mini.over{border-left:4px solid var(--over); background:var(--tintOver);}
+.mini .lab{font-weight:900; font-size:12.5px;}
+.mini .sub{font-size:11px; color:rgba(15,23,42,.68); margin-top:2px;}
+.mini .val{font-weight:900; margin-top:5px; font-size:17px;}
+
+/* Consolidation Budgétaire du scénario */
+.budget-strip{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  margin-top:10px;
+}
+@media(max-width:600px){ .budget-strip{grid-template-columns:1fr;} }
+.budget-box{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:9px 12px;
+  background:#f8fafc;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.budget-box .b-lbl{font-size:11px; font-weight:800; color:var(--muted); text-transform:uppercase;}
+.budget-box .b-sub{font-size:11px; color:var(--muted); margin-top:2px;}
+.budget-box .b-val{font-size:16px; font-weight:900; color:var(--text); white-space:nowrap;}
+
+/* Simulateur What-If (delta_jours) */
+.whatif-box{
+  margin-top:12px;
+  padding:11px 13px;
+  border-radius:14px;
+  background:linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  border:1px solid #bfdbfe;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.whatif-title{font-weight:900; font-size:12.5px; color:#1e3a8a;}
+.whatif-sub{font-size:11px; color:#334155; margin-top:2px;}
+.whatif-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.wf-chip{
+  border:1px solid #93c5fd;
+  background:#fff;
+  color:#1d4ed8;
+  padding:4px 9px;
+  border-radius:999px;
+  font-weight:800;
+  font-size:11.5px;
+  cursor:pointer;
+}
+.wf-chip:hover{background:#dbeafe;}
+.wf-chip.active{background:#1d4ed8; color:#fff; border-color:#1d4ed8;}
+.wf-input{
+  width:82px;
+  padding:5px 8px;
+  border-radius:8px;
+  border:1px solid #93c5fd;
+  font-weight:900;
+  font-size:12px;
+  text-align:right;
+  background:#fff;
+}
+
+/* Badges */
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:#f1f5f9;
+  border:1px solid var(--border);
+  color:#0f172a;
+  border-radius:999px;
+  padding:3px 8px;
+  font-weight:800;
+  font-size:11px;
+}
+.badge.ok{background:#ecfdf5;border-color:#86efac;color:#166534}
+.badge.warn{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+.badge.bad{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+.badge.draft{background:#f5f3ff;border-color:#c4b5fd;color:#4c1d95}
+.badge.orphan{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+
+/* Équilibre par Programme */
+.prog-balance-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(290px, 1fr));
+  gap:10px;
+  margin-top:8px;
+}
+.prog-bal-row{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:10px 12px;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.prog-bal-row.is-orphan{
+  border-color:#fdba74;
+  background:#fffaf5;
+}
+.prog-bal-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+}
+.prog-bal-name{
+  font-weight:900;
+  font-size:12.5px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.prog-bal-metrics{
+  font-size:11px;
+  color:var(--muted);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.prog-bal-actions{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  flex-shrink:0;
+}
+.prog-mini-btn{
+  border:1px solid var(--border);
+  background:#f8fafc;
+  color:var(--text);
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:10.5px;
+  font-weight:800;
+  cursor:pointer;
+}
+.prog-mini-btn:hover{background:#e2e8f0;}
+.prog-mini-btn.add{border-color:#bbf7d0; background:#f0fdf4; color:#166534;}
+.prog-mini-btn.add:hover{background:#dcfce7;}
+.prog-mini-btn.rem{border-color:#fecaca; background:#fff1f2; color:#991b1b;}
+.prog-mini-btn.rem:hover{background:#ffe4e6;}
+
+/* Verdict */
+.stateBox{
+  border-radius:16px;
+  padding:12px 14px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,1));
+}
+.stateBox.draft{border-left:10px solid var(--sDraft)}
+.stateBox.ok{border-left:10px solid var(--sOk)}
+.stateBox.over{border-left:10px solid var(--sOver)}
+.stateBox.bad{border-left:10px solid var(--sBad)}
+.stateTitle{font-weight:900;font-size:16px;margin:0}
+.stateSub{color:var(--muted);margin-top:6px;font-size:12.5px;line-height:1.35}
+
+/* Equipes */
+.teamList{display:grid;gap:8px;margin-top:8px}
+.teamRow{
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:9px 12px;
+  background:#fff;
+}
+.teamTop{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.teamName{font-weight:900; font-size:12.5px;}
+.teamNums{font-weight:900; font-size:12px;}
+.track{height:9px;border-radius:999px;background:#eef2f7;overflow:hidden;border:1px solid #e5e7eb;margin-top:6px;}
+.fill{height:100%;width:0%;transition:width .25s ease;}
+.fill.ok{background:var(--sOk)}
+.fill.warn{background:var(--sOver)}
+.fill.bad{background:var(--sBad)}
+
+/* DnD zone & Filtres colonnes */
+.splitDnD{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+@media(max-width:900px){ .splitDnD{grid-template-columns:1fr} }
+.zoneWrap{border-radius:18px;padding:10px;border:1px solid var(--border);background:var(--tintDnD);}
+.dropZone{border:2px dashed #cbd5e1;border-radius:16px;padding:10px;background:linear-gradient(180deg,#fff,#fafbff);min-height:230px;}
+.dropZone.dragover{border-color:#7c3aed;background:#f5f3ff}
+.list{display:grid;gap:8px;margin-top:8px; max-height:520px; overflow-y:auto; padding-right:2px;}
+.proj{border:1px solid var(--border);border-radius:14px;padding:10px;background:#fff; transition:border-color .15s ease;}
+.proj:hover{border-color:#94a3b8;}
+.projTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.projName{font-weight:900; font-size:13px;}
+.projMeta{color:var(--muted);font-size:11.5px;margin-top:4px;line-height:1.35}
+.pRight{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;}
+.iconbtn{border:none;border-radius:999px;padding:5px 10px;font-weight:800;font-size:11px;cursor:pointer;background:#e2e8f0;color:#0f172a;display:inline-flex;gap:5px;align-items:center}
+.iconbtn.primary{background:var(--brand);color:#fff}
+.iconbtn:active{transform:translateY(1px)}
+.iconbtn[disabled]{opacity:.55;cursor:not-allowed;}
+.small{font-size:12px;color:var(--muted)}
+textarea{width:100%;min-height:95px;border:1px solid var(--border);border-radius:12px;padding:10px;font-family:inherit;font-size:12.5px;background:#fbfbfd;}
+textarea:focus{outline:none;border-color:#94a3b8;background:#fff;}
+
+/* Liens cliquables vers Gestion-supports-projet- */
+.proj-link-id{
+  background:none;
+  border:1px solid rgba(193,15,26,.28);
+  background:rgba(193,15,26,.06);
+  color:var(--brand);
+  border-radius:999px;
+  padding:2px 8px;
+  font-weight:900;
+  font-size:11px;
+  cursor:pointer;
+  text-decoration:underline;
+  text-decoration-color:rgba(193,15,26,.40);
+  text-underline-offset:2px;
+}
+.proj-link-id:hover{background:rgba(193,15,26,.14);}
+.proj-link-title{
+  background:none;
+  border:none;
+  padding:0;
+  font:inherit;
+  font-weight:900;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+}
+.proj-link-title:hover{color:var(--brand); text-decoration:underline;}
+
+.col-filters{
+  display:grid;
+  grid-template-columns:1fr 90px;
+  gap:6px;
+  margin-top:8px;
+}
+.pf-filter{
+  width:100%;
+  padding:6px 9px;
+  border-radius:9px;
+  border:1px solid var(--border);
+  background:#f8fafc;
+  font-family:inherit;
+  font-size:11.5px;
+  font-weight:700;
+  outline:none;
+}
+.pf-filter:focus{border-color:#94a3b8; background:#fff;}
+
+/* Checkbox "PDF synthèse" */
+.chkRow{display:flex;align-items:center;gap:5px;font-weight:800;font-size:11px;white-space:nowrap;cursor:pointer;}
+.chkRow input{transform:scale(1.05)}
+
+/* ===== MACRO GANTT + LISSAGE TRIMESTRIEL ===== */
+.ganttWrap{
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:#fff;
+  overflow:hidden;
+  margin-top:10px;
+}
+.gantt-inner{
+  min-width:860px;
+}
+.ganttScroll{
+  max-height:500px;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+.ganttHeaderGrid{
+  display:grid;
+  grid-template-columns:285px repeat(4, 1fr);
+  background:#f1f5f9;
+  border-bottom:1px solid var(--border);
+  font-weight:900;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.ganttHeaderCell{
+  padding:8px 10px;
+  border-right:1px solid rgba(15,23,42,.06);
+  text-align:center;
+}
+.ganttHeaderCell:first-child{text-align:left;}
+.ganttHeaderCell:last-child{border-right:none;}
+
+/* Barre de lissage T1-T4 */
+.ganttLoadGrid{
+  display:grid;
+  grid-template-columns:285px repeat(4, 1fr);
+  background:#fafbff;
+  border-bottom:2px solid var(--border);
+  font-size:11px;
+}
+.ganttLoadCell{
+  padding:7px 9px;
+  border-right:1px solid rgba(15,23,42,.06);
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.ganttLoadCell:last-child{border-right:none;}
+.q-load-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
+  font-size:11px;
+}
+.q-load-bar{
+  height:7px;
+  border-radius:999px;
+  background:#e2e8f0;
+  overflow:hidden;
+}
+.q-load-fill{height:100%; border-radius:999px; transition:width .25s ease;}
+.q-ok{color:#166534;} .q-fill-ok{background:#16a34a;}
+.q-warn{color:#9a3412;} .q-fill-warn{background:#f59e0b;}
+.q-bad{color:#991b1b;} .q-fill-bad{background:#ef4444;}
+
+.ganttRowGrid{
+  display:grid;
+  grid-template-columns:285px 1fr;
+  border-bottom:1px solid rgba(15,23,42,.06);
+  align-items:center;
+}
+.ganttRowGrid:hover{background:#f8fafc;}
+.ganttMetaCell{
+  padding:9px 10px;
+  border-right:1px solid rgba(15,23,42,.06);
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+}
+.ganttMetaLeft{min-width:0;}
+.ganttTrackCell{
+  position:relative;
+  height:100%;
+  padding:9px 10px;
+  display:flex;
+  align-items:center;
+  background:repeating-linear-gradient(90deg, transparent, transparent calc(25% - 1px), rgba(15,23,42,.04) 25%);
+}
+.ganttBar{
+  position:relative;
+  height:26px;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  transition:transform .15s ease, box-shadow .15s ease;
+  user-select:none;
+}
+.ganttBar:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+.ganttBarFill{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  background:rgba(22, 163, 74, 0.40);
+  z-index:1;
+}
+.ganttBarText{
+  position:relative;
+  z-index:2;
+  font-size:11px;
+  font-weight:900;
+  padding:0 10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  width:100%;
+  text-align:center;
+}
+.ganttBtnEdit{
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  font-size:14px;
+  opacity:.7;
+  padding:2px;
+}
+.ganttBtnEdit:hover{opacity:1;transform:scale(1.1);}
+
+/* Gantt Modal Edit */
+.modalEditBackdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.52);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+}
+.modalEditBox{
+  background:#fff;
+  border-radius:18px;
+  border:1px solid var(--border);
+  box-shadow:0 20px 40px rgba(0,0,0,.22);
+  width:min(440px, 92vw);
+  padding:16px;
+}
+.modalEditTitle{font-weight:900;font-size:15px;margin-bottom:10px;}
 
 .footer-ver{
   text-align:center; color:var(--muted); font-size:11.5px; margin-top:16px;
 }
+
+/* Print area (3 pages A4 Paysage) */
+#printArea{display:none}
+.printPage{
+  page-break-after:always;
+  break-after:page;
+  padding:0;
+}
+.printPage:last-child{
+  page-break-after:auto;
+  break-after:auto;
+}
+.printHeader{
+  background:var(--brand);
+  color:#fff;
+  padding:8px 14px;
+  border-radius:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+.printHeader .h1{font-weight:900;font-size:17px;line-height:1.1}
+.printHeader .h2{font-size:11px;opacity:.92;margin-top:2px}
+.printHeader .meta{font-weight:900;font-size:11.5px;opacity:.95}
+
+.printGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:8px;margin-top:8px}
+.printCard{border:1px solid rgba(15,23,42,.12);border-radius:12px;padding:9px 10px;background:#fff;break-inside:avoid;}
+.printCard h4{margin:0 0 6px 0;font-weight:900;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--text);}
+
+.printKpis{display:grid;grid-template-columns:repeat(3, 1fr);gap:6px}
+.printKpi{border:1px solid rgba(15,23,42,.10);border-radius:10px;padding:6px 8px;background:#fff}
+.printKpi.hp{background:var(--tintHp)}
+.printKpi.eng{background:var(--tintEng)}
+.printKpi.rest{background:var(--tintRest)}
+.printKpi.over{background:var(--tintOver)}
+.printKpi .lab{font-weight:900;font-size:10.5px}
+.printKpi .val{font-weight:900;font-size:14px;margin-top:2px}
+
+.printTable{width:100%;border-collapse:separate;border-spacing:0;border:1px solid rgba(15,23,42,.12);border-radius:10px;overflow:hidden}
+.printTable th,.printTable td{font-size:10px;padding:5px 7px;border-bottom:1px solid rgba(15,23,42,.08);vertical-align:top}
+.printTable th{background:#f1f5f9;text-transform:uppercase;letter-spacing:.3px;font-weight:900;text-align:left;}
+.printTable tr:last-child td{border-bottom:none}
+.right{text-align:right !important;}
+
+@page{ size:A4 landscape; margin:8mm; }
+@media print{
+  *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;}
+  body{background:#fff !important;}
+  .topbar,.ppm-nav,.wrap,.toast,.modalEditBackdrop{display:none !important;}
+  #printArea{display:block !important;}
+  .ganttScroll{max-height:none !important; overflow:visible !important;}
+  .gantt-inner{min-width:0 !important; width:100% !important;}
+  .ganttHeaderGrid, .ganttLoadGrid{grid-template-columns:250px repeat(4, 1fr) !important;}
+  .ganttRowGrid{grid-template-columns:250px 1fr !important; break-inside:avoid;}
+}
 </style>
 </head>
-<body>
 
-<div class="wrap" id="printRoot">
-  <!-- Bandeau Top -->
+<body>
+  <!-- Bandeau Top harmonisé -->
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand-ui">
-        <div class="badge">PMO</div>
+        <div class="badge-logo">DNSI</div>
         <div>
-          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.6)</div>
-          <div class="sub" id="subDate">Gouvernance DNSI • Programmes ➔ Portefeuille ➔ Capacité ➔ Stratégie</div>
+          <div class="h1">Stratégie & Arbitrage — Simulateur CODIR & Macro Gantt (V3.0)</div>
+          <div class="sub" id="subDate">Arbitrage multi-scénarios • Équilibre Programmes • Lissage trimestriel T1–T4</div>
         </div>
       </div>
-      <div class="toolbar no-print">
-        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
-        <button class="btn" id="btnImport">📥 Importer (.json)</button>
-        <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
-        <button class="btn action" id="btnPdf">🖨️ Exporter PDF (A3)</button>
-        <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
+      <div class="top-actions">
+        <button class="tbtn primary" id="btnSaveGov">💾 Sauvegarder</button>
+        <button class="tbtn" id="btnExportJson">⬇️ Exporter (.json)</button>
+        <button class="tbtn" id="btnRefresh">🔄 Réactualiser</button>
+        <button class="tbtn dark" id="btnPdf">🖨️ Export PDF (3 pages)</button>
       </div>
     </div>
   </header>
 
-  <!-- Navigation 5 Piliers (0. Synthèse en maître) -->
-  <nav class="ppm-nav no-print">
+  <!-- Navigation 5 Piliers -->
+  <nav class="ppm-nav">
     <div class="ppm-nav-row">
       <div class="ppm-links">
-        <a class="ppm-link active" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
+        <a class="ppm-link" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
         <a class="ppm-link" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes</a>
         <a class="ppm-link" href="Gouvernance - 2. Portefeuille.html">📚 2. Portefeuille Projets</a>
         <a class="ppm-link" href="Gouvernance - 3. Capacite.html">⚙️ 3. Capacité DNSI</a>
-        <a class="ppm-link" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
+        <a class="ppm-link active" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
       </div>
       <span class="chip-sync" id="chipSync">Source : Gouvernance.json</span>
     </div>
   </nav>
 
-  <!-- GRILLE CODIR (4 Quadrants) -->
-  <div class="grid-2x2">
+<div class="wrap">
+  <!-- BARRE MULTI-SCENARIOS (VARIANTES A / B / C) -->
+  <section class="variants-bar">
+    <div class="variants-tabs" id="variantsTabs"></div>
+    <div class="variants-actions">
+      <button class="btn sm" id="btnNewVariant" title="Créer une nouvelle variante vierge">➕ Variante</button>
+      <button class="btn sm" id="btnDupVariant" title="Dupliquer le scénario actif pour tester une option">📋 Dupliquer</button>
+      <button class="btn sm danger" id="btnDelVariant" title="Supprimer la variante active">🗑️</button>
+    </div>
+  </section>
 
-    <!-- QUADRANT 1 : PROGRAMMES & ALIGNEMENT -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">🎯 1. Programmes & Alignement Stratégique</div>
-          <div class="panel-sub" id="progSub">Répartition de la charge engagée (scénario actif) par Programme</div>
-        </div>
-        <a class="panel-link no-print" href="Gouvernance - 1. Programmes.html">Gérer ➔</a>
-      </div>
-      <div class="panel-body" id="dynamicProgrammesContainer">
-        <!-- Rempli dynamiquement -->
-      </div>
-    </section>
+  <!-- BARRE OUTILS + ZOOM TACTILE -->
+  <section class="toolbar-bar">
+    <div class="toolbar-left">
+      <span class="badge" id="badgeSynth">⭐ Synthèse PDF : 0</span>
+      <button class="btn dark" id="btnAutoFill" title="Remplit automatiquement un scénario compatible en priorisant P1 puis P2 jusqu'à la réserve">✨ Auto-arbitrage P1➔P4</button>
+      <button class="btn" id="btnImport">📥 Importer (.json)</button>
+      <button class="btn danger" id="btnReset">♻️ Vider ce scénario</button>
+      <input id="fileInput" type="file" accept="application/json,.json" style="display:none"/>
+    </div>
+    <div class="zoom-controls" title="Zoom / Dézoom (ou pincement à 2 doigts sur écran tactile)">
+      <button type="button" class="zoom-btn" id="btnZoomOut" title="Dézoomer (−10 %)">−</button>
+      <button type="button" class="zoom-pct" id="btnZoomReset" title="Revenir à 100 %">100%</button>
+      <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoomer (+10 %)">+</button>
+      <button type="button" class="zoom-fit-btn" id="btnZoomFit" title="Ajuster l'affichage à l'écran">⊡ Ajuster</button>
+    </div>
+  </section>
 
-    <!-- QUADRANT 2 : PORTEFEUILLE (LA DEMANDE) -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">📚 2. Portefeuille (La Demande)</div>
-          <div class="panel-sub">Entonnoir des demandes métiers, projets actifs et couverture Programme</div>
-        </div>
-        <a class="panel-link no-print" href="Gouvernance - 2. Portefeuille.html">Ouvrir ➔</a>
-      </div>
-      <div class="panel-body">
-        <div class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-label">Volume Total</div>
-            <div class="kpi-val" id="pfTotal">0</div>
-            <div class="kpi-sub">idées + projets</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Idées / Pré-cad.</div>
-            <div class="kpi-val" id="pfIdees" style="color:#f59e0b">0</div>
-            <div class="kpi-sub">en instruction</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Projets Lancés</div>
-            <div class="kpi-val" id="pfPivots" style="color:#16a34a">0</div>
-            <div class="kpi-sub">avec JSON CP</div>
-          </div>
-          <div class="kpi-card">
-            <div class="kpi-label">Couverture Pgm</div>
-            <div class="kpi-val" id="pfCoverage">—</div>
-            <div class="kpi-sub" id="pfOrphansSub">0 hors programme</div>
-          </div>
-        </div>
+  <div class="hint" id="hintLine"></div>
 
-        <div style="margin-top:20px;">
-          <div class="kpi-label" style="margin-bottom:8px;">Répartition par priorité (portefeuille global)</div>
-          <div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:#e2e8f0;" id="prioBar"></div>
-          <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-weight:800;" id="prioLabels"></div>
-        </div>
-      </div>
-    </section>
+  <!-- ZONE PINCH-TO-ZOOM -->
+  <div class="zoom-wrap" id="zoomZone">
+    <div id="zoomContent">
 
-    <!-- QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS) -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">⚙️ 3. Capacité DNSI (Les Moyens)</div>
-          <div class="panel-sub">Potentiel global, maintenance incompressible (MCO/RUN) et réserve projets</div>
-        </div>
-        <a class="panel-link no-print" href="Gouvernance - 3. Capacite.html">Ajuster ➔</a>
-      </div>
-      <div class="panel-body">
-        <div class="cap-layout">
-          <div class="pie-container">
-            <canvas id="pieCapacite" width="190" height="190"></canvas>
-          </div>
-          <div class="cap-legend">
-            <div class="cap-item" style="border-left:4px solid var(--potBlue);">
-              <div>
-                <div style="font-weight:900; font-size:13.5px;">Potentiel Total</div>
-                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité humaine brute DNSI</div>
-              </div>
-              <div style="font-size:17px; font-weight:900;" class="mono" id="legPot">0 j</div>
-            </div>
-            <div class="cap-item" style="border-left:4px solid var(--hpOrange);">
-              <div>
-                <div style="font-weight:900; font-size:13.5px;">Hors-projet (MCO / RUN)</div>
-                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Maintenance & charges incompressibles</div>
-              </div>
-              <div style="font-size:17px; font-weight:900;" class="mono" id="legHP">0 j</div>
-            </div>
-            <div class="cap-item" style="border-left:4px solid var(--remGreen);">
-              <div>
-                <div style="font-weight:900; font-size:13.5px;">Réserve Projets</div>
-                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité mobilisable pour arbitrer</div>
-              </div>
-              <div style="font-size:17px; font-weight:900; color:var(--ok);" class="mono" id="legRem">0 j</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+      <div class="grid">
+        <!-- COLONNE GAUCHE -->
+        <div class="card">
+          <h3>
+            <span>1) Synthèse stratégique & Capacité</span>
+            <span class="badge" id="badgeVariantActive">Scénario actif</span>
+          </h3>
 
-    <!-- QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE) -->
-    <section class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">🧠 4. Stratégie & Arbitrage (L'Équilibre)</div>
-          <div class="panel-sub">Scénario soumis au CODIR : <span id="stratName" style="font-weight:800; color:var(--text);">—</span></div>
-        </div>
-        <a class="panel-link no-print" href="Gouvernance - 4. Strategie.html">Simuler ➔</a>
-      </div>
-      <div class="panel-body">
-
-        <div class="strat-box" id="stratAlert">
-          <div class="strat-title" id="stratVerdictTitle">⚖️ Analyse en cours...</div>
-          <div style="font-size:12.5px; margin-top:5px; color:var(--muted);" id="stratVerdictSub">Vérification de la balance charge / capacité.</div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,.06);">
+          <div class="row2">
             <div>
-              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Réserve Projets</div>
-              <div style="font-size:16px; font-weight:900;" class="mono" id="stCap">0 j</div>
+              <div class="kv">
+                <div class="k">Nom du scénario</div>
+                <div class="v"><input type="text" id="scName" class="sc-input" placeholder="Nom du scénario…"/></div>
+              </div>
+              <div class="kv"><div class="k">Date</div><div class="v" id="scDate">—</div></div>
+              <div class="kv"><div class="k">Portefeuille</div><div class="v" id="pfInfo">—</div></div>
             </div>
-            <div style="font-size:18px; color:var(--muted);">−</div>
             <div>
-              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Charge Engagée</div>
-              <div style="font-size:16px; font-weight:900;" class="mono" id="stLoad">0 j</div>
+              <div class="kv"><div class="k">Réserve effective</div><div class="v mono" id="capProj">—</div></div>
+              <div class="kv"><div class="k">Charge engagée</div><div class="v mono" id="loadTotal">—</div></div>
+              <div class="kv"><div class="k">Marge / Écart</div><div class="v mono" id="capMargin">—</div></div>
             </div>
-            <div style="font-size:18px; color:var(--muted);">=</div>
-            <div style="text-align:right;">
-              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Écart (Marge)</div>
-              <div style="font-size:18px; font-weight:900;" class="mono" id="stRest">0 j</div>
+          </div>
+
+          <div class="pieWrap">
+            <div class="pieBox">
+              <div class="pie-container">
+                <canvas id="pieStrat" class="donut-canvas" width="190" height="190"></canvas>
+              </div>
+              <div class="badges" id="pieBadges" style="justify-content:center;"></div>
+            </div>
+
+            <div>
+              <div class="miniCards">
+                <div class="mini hp">
+                  <div class="lab">Hors-projet</div>
+                  <div class="sub">Charge fixe (RUN/MCO)</div>
+                  <div class="val mono" id="cardHP">—</div>
+                </div>
+                <div class="mini eng" id="cardEngBox">
+                  <div class="lab">Engagé</div>
+                  <div class="sub">Projets retenus</div>
+                  <div class="val mono" id="cardEng">—</div>
+                </div>
+                <div class="mini rest" id="cardRestBox">
+                  <div class="lab" id="cardRestLbl">Restant</div>
+                  <div class="sub" id="cardRestSub">Capacité disponible</div>
+                  <div class="val mono" id="cardRest">—</div>
+                </div>
+              </div>
+
+              <!-- Consolidation budgétaire du scénario -->
+              <div class="budget-strip">
+                <div class="budget-box">
+                  <div>
+                    <div class="b-lbl">💶 Budget Investissement engagé</div>
+                    <div class="b-sub" id="budInvSub">sur les projets retenus</div>
+                  </div>
+                  <div class="b-val mono" id="budInvTotal">0 k€</div>
+                </div>
+                <div class="budget-box">
+                  <div>
+                    <div class="b-lbl">🔄 Fonctionnement engagé</div>
+                    <div class="b-sub">coût récurrent annuel estimé</div>
+                  </div>
+                  <div class="b-val mono" id="budFonctTotal">0 k€/an</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulateur What-If (delta_jours) -->
+          <div class="whatif-box">
+            <div>
+              <div class="whatif-title">🎛️ Simulateur capacitaire « Et si ? » (Delta réserve)</div>
+              <div class="whatif-sub" id="whatIfSub">Simule un renfort externe ou une contrainte temporaire sans modifier la Capacité officielle.</div>
+            </div>
+            <div class="whatif-controls">
+              <button type="button" class="wf-chip" data-delta="-100">−100 j</button>
+              <button type="button" class="wf-chip" data-delta="0">0 (Base)</button>
+              <button type="button" class="wf-chip" data-delta="100">+100 j</button>
+              <button type="button" class="wf-chip" data-delta="170">+1 ETP (+170 j)</button>
+              <button type="button" class="wf-chip" data-delta="340">+2 ETP (+340 j)</button>
+              <input type="number" id="inpDeltaJ" class="wf-input mono" step="10" value="0" title="Delta capacité en jours"/>
+              <span class="small mono"><b>j</b></span>
+            </div>
+          </div>
+
+          <hr class="sep"/>
+
+          <!-- EQUILIBRE PAR PROGRAMME (NOUVEAU V3.0) -->
+          <h3>
+            <span>🎯 Équilibre du scénario par Programme</span>
+            <span class="small" id="progBalSummary">Poids de chaque programme dans la charge engagée</span>
+          </h3>
+          <div class="prog-balance-grid" id="progBalanceGrid"></div>
+
+          <hr class="sep"/>
+
+          <h3>⚙️ Occupation par équipe</h3>
+          <div class="small" id="teamsHint">—</div>
+          <div class="teamList" id="teamList"></div>
+
+          <hr class="sep"/>
+
+          <h3>2) Projets intégrés + 3) Non pris en compte</h3>
+          <div class="small">Astuce : clique sur l'<b>ID</b> ou le <b>titre</b> d'un projet lancé pour l'ouvrir dans Supports Projet · coche <b>⭐</b> pour le Cockpit CODIR et la page 1 du PDF.</div>
+
+          <div class="zoneWrap" style="margin-top:8px;">
+            <div class="splitDnD">
+              <!-- COLONNE PORTEFEUILLE SOURCE -->
+              <div class="dropZone" id="zonePortfolio">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                  <div>
+                    <div style="font-weight:900">Portefeuille (source)</div>
+                    <div class="small">Glisser → « Projets intégrés » ou bouton « Ajouter ».</div>
+                  </div>
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <div class="badge" id="countPf">0 projet</div>
+                    <button class="btn sm primary" id="btnAddAllInPf" title="Intégrer tous les projets intégrables visibles">➕ Tout ajouter</button>
+                  </div>
+                </div>
+                <div class="col-filters">
+                  <input type="text" id="fltSearchPf" class="pf-filter" placeholder="🔍 Chercher (ID, nom, direction...)"/>
+                  <select id="fltPrioPf" class="pf-filter">
+                    <option value="">Prio.</option>
+                    <option value="P1">🔴 P1</option>
+                    <option value="P2">🟠 P2</option>
+                    <option value="P3">🔵 P3</option>
+                    <option value="P4">⚪ P4</option>
+                  </select>
+                </div>
+                <select id="fltProgPf" class="pf-filter" style="margin-top:6px;">
+                  <option value="">🎯 Filtrer par programme (tous)</option>
+                </select>
+                <div class="list" id="listPf"></div>
+              </div>
+
+              <!-- COLONNE PROJETS INTEGRES -->
+              <div class="dropZone" id="zoneIntegrated">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+                  <div>
+                    <div style="font-weight:900">Projets intégrés</div>
+                    <div class="small">Consomment la réserve projets (et par équipe si disponible).</div>
+                  </div>
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <div class="badge draft" id="countInt">0 intégré</div>
+                    <button class="btn sm danger" id="btnRemoveAllInInt" title="Retirer les projets intégrés affichés">➖ Tout retirer</button>
+                  </div>
+                </div>
+                <div class="col-filters">
+                  <input type="text" id="fltSearchInt" class="pf-filter" placeholder="🔍 Filtrer les intégrés..."/>
+                  <select id="fltPrioInt" class="pf-filter">
+                    <option value="">Prio.</option>
+                    <option value="P1">🔴 P1</option>
+                    <option value="P2">🟠 P2</option>
+                    <option value="P3">🔵 P3</option>
+                    <option value="P4">⚪ P4</option>
+                  </select>
+                </div>
+
+                <div class="dropZone" id="dropHere" style="margin-top:8px;min-height:140px">
+                  <div class="small" style="padding:4px 6px">
+                    Dépose ici les projets (Étude ou Cadré).
+                  </div>
+                  <div class="list" id="listInt"></div>
+                </div>
+
+                <div style="margin-top:10px;">
+                  <div style="font-weight:900">Non pris en compte (visibles & assumés)</div>
+                  <div class="small">Inclut les projets non intégrables (charges absentes) et les reports d'arbitrage.</div>
+                  <div class="list" id="listOut"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div style="font-weight:900; font-size:13px; margin-bottom:6px;">Projets phares du scénario (⭐ Sélection PDF)</div>
-        <table>
-          <thead>
-            <tr>
-              <th style="width:44%">Nom du Projet</th>
-              <th style="width:26%">Programme</th>
-              <th style="width:12%">Prio.</th>
-              <th style="width:18%; text-align:right;">Reste à faire</th>
-            </tr>
-          </thead>
-          <tbody id="stratTableBody">
-            <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:14px;">Aucun projet mis en avant.</td></tr>
-          </tbody>
-        </table>
-        <div style="font-size:11.5px; color:var(--muted); margin-top:10px; text-align:right;">
-          Total des projets engagés dans ce scénario : <b id="stratCount">0</b>
+        <!-- COLONNE DROITE : VERDICT & ARBITRAGE -->
+        <div class="card">
+          <h3>4) Verdict stratégique</h3>
+          <div id="stateBox" class="stateBox draft">
+            <div class="stateTitle" id="stateTitle">—</div>
+            <div class="stateSub" id="stateSub">—</div>
+            <div class="badges" id="stateBadges"></div>
+          </div>
+
+          <hr class="sep"/>
+
+          <h3>🚨 Alertes & Points de tension</h3>
+          <div class="small" id="alerts">—</div>
+
+          <hr class="sep"/>
+
+          <h3>📝 Décision / Support CODIR</h3>
+          <div class="small" style="margin-bottom:5px;">✅ Bénéfices attendus (3–5 points max.)</div>
+          <textarea id="txtPros" placeholder="3–5 points max."></textarea>
+          <div style="height:8px"></div>
+          <div class="small" style="margin-bottom:5px;">⚠ Risques / arbitrages (3–5 points max.)</div>
+          <textarea id="txtCons" placeholder="3–5 points max."></textarea>
+          <div style="height:8px"></div>
+          <div class="small" style="margin-bottom:5px;">🎛️ Hypothèse capacitaire (si Delta ≠ 0)</div>
+          <input type="text" id="txtDeltaNote" class="sc-input" style="font-weight:600; font-size:12px;" placeholder="Ex : +1 ETP renfort AMO ou prestation externe 100 j…"/>
+
+          <div class="small" style="margin-top:10px;">
+            Le nom du scénario, le delta capacitaire et les textes sont sauvegardés automatiquement dans la gouvernance.
+          </div>
         </div>
       </div>
-    </section>
 
+      <!-- BLOC MACRO GANTT + LISSAGE TRIMESTRIEL (PAGE 3 PDF) -->
+      <div class="card" style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <h3>5) Feuille de route macro & Lissage trimestriel (T1–T4)</h3>
+            <div class="small">La charge de chaque projet engagé est répartie sur ses trimestres face à la cible <b>Réserve / 4</b>. Décale un projet via ⚙️ pour lisser un pic rouge.</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <select id="fltGanttProg" class="pf-filter" style="width:auto; min-width:170px;">
+              <option value="">🎯 Tous programmes</option>
+            </select>
+            <button class="btn primary" id="filterEng">⚡ Engagés (<span id="cntGEng">0</span>)</button>
+            <button class="btn" id="filterFav">⭐ Favoris PDF (<span id="cntGFav">0</span>)</button>
+            <button class="btn" id="filterAll">📚 Tout (<span id="cntGAll">0</span>)</button>
+          </div>
+        </div>
+
+        <div class="ganttWrap">
+          <div class="gantt-inner">
+            <div class="ganttHeaderGrid">
+              <div class="ganttHeaderCell">Projet, Programme & Domaine</div>
+              <div class="ganttHeaderCell">T1 (Jan - Mar)</div>
+              <div class="ganttHeaderCell">T2 (Avr - Jun)</div>
+              <div class="ganttHeaderCell">T3 (Jui - Sep)</div>
+              <div class="ganttHeaderCell">T4 (Oct - Déc)</div>
+            </div>
+            <!-- Jauge de lissage trimestriel T1-T4 -->
+            <div class="ganttLoadGrid" id="ganttLoadStrip"></div>
+            <div class="ganttScroll" id="ganttRowsContainer"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.6) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  <div class="footer-ver">Gouvernance DNSI — Support 4 : Stratégie & Arbitrage (V3.0) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+</div>
+
+<!-- Gantt Modal Surcharge Manuelle -->
+<div class="modalEditBackdrop" id="modalGanttEdit">
+  <div class="modalEditBox">
+    <div class="modalEditTitle" id="mGanttTitle">Planifier manuellement le projet</div>
+    <div class="small" style="margin-bottom:12px;">Forcer la période d'exécution dans le Macro Gantt de ce scénario (recalcule immédiatement le lissage T1–T4).</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div>
+        <label class="small" style="font-weight:800;display:block;margin-bottom:4px;">Début</label>
+        <select id="mGanttStart" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--border);font-weight:800;">
+          <option value="1">T1 (Jan - Mar)</option>
+          <option value="2">T2 (Avr - Jun)</option>
+          <option value="3">T3 (Jui - Sep)</option>
+          <option value="4">T4 (Oct - Déc)</option>
+        </select>
+      </div>
+      <div>
+        <label class="small" style="font-weight:800;display:block;margin-bottom:4px;">Fin</label>
+        <select id="mGanttEnd" style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--border);font-weight:800;">
+          <option value="1">T1 (Jan - Mar)</option>
+          <option value="2">T2 (Avr - Jun)</option>
+          <option value="3">T3 (Jui - Sep)</option>
+          <option value="4">T4 (Oct - Déc)</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+      <button class="btn danger" id="btnGanttAuto" style="font-size:12px;">♻️ Réinitialiser en Auto</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" id="btnGanttCancel" style="font-size:12px;">Annuler</button>
+        <button class="btn primary" id="btnGanttApply" style="font-size:12px;">Appliquer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print Area (3 pages : Synthèse + Programmes / Détail / Macro Gantt lissé) -->
+<div id="printArea"></div>
+
+<!-- Toast -->
+<div id="toast" class="toast">
+  <div class="t" id="toastTitle">—</div>
+  <div class="m" id="toastMsg">—</div>
 </div>
 
 <script>
-const APP_VERSION = "V2.6";
+/* =======================
+   SOURCE DE VÉRITÉ & CONSTANTES
+======================= */
+const APP_VERSION = "V3.0";
 const STORAGE_KEY = "GOUVERNANCE_JSON";
-const FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#2563eb", "#10b981", "#ef4444", "#0891b2", "#475569"];
+const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Gestion-supports-projet-/";
+const ZOOM_MIN = 0.35;
+const ZOOM_MAX = 2.0;
 
-const $ = id => document.getElementById(id);
-const safeNum = n => (Number.isFinite(Number(n)) ? Number(n) : 0);
+let currentZoom = 1;
 
-function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, m => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[m]));
+/* =======================
+   Utils
+======================= */
+const $ = (id)=>document.getElementById(id);
+const jparse = (s)=>{ try{return JSON.parse(s)}catch{return null} };
+const jclone = (o)=> JSON.parse(JSON.stringify(o||{}));
+const nowISO = ()=> new Date().toISOString();
+const safeNum = (n)=>{
+  if(n===null || n===undefined) return 0;
+  if(typeof n==='number') return Number.isFinite(n)?n:0;
+  const s=String(n).trim();
+  if(!s) return 0;
+  const m=s.replace(',', '.').match(/-?\d+(?:\.\d+)?/);
+  if(!m) return 0;
+  const v=Number(m[0]);
+  return Number.isFinite(v)?v:0;
+};
+const fmtJ = (n)=> Math.round(safeNum(n)).toLocaleString("fr-FR") + " j";
+const fmtK = (n)=> Math.round(safeNum(n)).toLocaleString("fr-FR") + " k€";
+const nowFR = ()=> new Date().toLocaleDateString("fr-FR");
+const escapeHtml = (s)=> String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* Toast non bloquant */
+let toastTimer=null;
+function toast(kind, title, msg){
+  const el = $("toast");
+  el.className = "toast show " + (kind||"draft");
+  $("toastTitle").textContent = title || "";
+  $("toastMsg").textContent = msg || "";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.className="toast"; }, 2600);
 }
 
-function toast(msg){
-  const d = document.createElement("div");
-  d.className = "toast";
-  d.textContent = msg;
-  document.body.appendChild(d);
-  setTimeout(() => d.remove(), 2500);
+function debounce(fn, ms){
+  let t=null;
+  return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), ms); };
 }
 
-function normalizePriority(v){
-  let s = String(v||"").toUpperCase().replace(/\s+/g,"");
-  let m = s.match(/P0*([1-4])/);
-  if(m) return "P"+m[1];
-  m = s.match(/^[1-4]$/);
-  return m ? "P"+m[1] : "P2";
+/* =======================
+   Zoom (Tactile & Boutons)
+======================= */
+function clampZoom(val){
+  return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(val * 100) / 100));
+}
+
+function applyZoomToDom(){
+  const pctBtn = $("btnZoomReset");
+  if(pctBtn) pctBtn.textContent = `${Math.round(currentZoom * 100)}%`;
+  const content = $("zoomContent");
+  if(content) content.style.zoom = currentZoom;
+}
+
+function setZoom(val){
+  currentZoom = clampZoom(val);
+  applyZoomToDom();
+}
+
+function fitZoomToScreen(){
+  const zone = $("zoomZone");
+  const availW = zone ? zone.clientWidth : window.innerWidth;
+  if(currentZoom < 0.98){
+    setZoom(1);
+    toast("draft", "Zoom", "Affichage réinitialisé à 100 %.");
+    return;
+  }
+  const target = availW < 520 ? 0.55 : availW < 920 ? 0.72 : 0.85;
+  setZoom(target);
+  toast("draft", "Zoom ajusté", `Échelle réglée à ${Math.round(currentZoom * 100)} %.`);
+}
+
+function setupPinchToZoom(){
+  const zone = $("zoomZone");
+  if(!zone) return;
+  let startDist = 0;
+  let startZoom = 1;
+
+  zone.addEventListener("touchstart", e => {
+    if(e.touches.length === 2){
+      startDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      startZoom = currentZoom;
+    }
+  }, { passive: true });
+
+  zone.addEventListener("touchmove", e => {
+    if(e.touches.length === 2 && startDist > 0){
+      e.preventDefault();
+      const currDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      currentZoom = clampZoom(startZoom * (currDist / startDist));
+      applyZoomToDom();
+    }
+  }, { passive: false });
+
+  const endPinch = e => { if(e.touches.length < 2) startDist = 0; };
+  zone.addEventListener("touchend", endPinch, { passive: true });
+  zone.addEventListener("touchcancel", endPinch, { passive: true });
+}
+
+window.addEventListener("beforeprint", () => {
+  const content = $("zoomContent");
+  if(content) content.style.zoom = 1;
+});
+window.addEventListener("afterprint", () => {
+  applyZoomToDom();
+});
+
+/* =======================
+   Normalisation Gouvernance & Variantes
+======================= */
+function normalizeScenarioObj(s, fallbackId, fallbackName){
+  const out = (s && typeof s === "object") ? jclone(s) : {};
+  out.id = String(out.id || fallbackId || ("STRAT-" + Date.now())).trim();
+  out.nom = String(out.nom || fallbackName || "Scénario").trim();
+  out.hypotheses = (out.hypotheses && typeof out.hypotheses === "object") ? out.hypotheses : {};
+  out.hypotheses.delta_jours = Math.round(safeNum(out.hypotheses.delta_jours ?? 0));
+  out.hypotheses.commentaire = String(out.hypotheses.commentaire || "");
+  out.selection = (out.selection && typeof out.selection === "object") ? out.selection : {};
+  out.selection.projets_lances = Array.isArray(out.selection.projets_lances) ? Array.from(new Set(out.selection.projets_lances.map(String))) : [];
+  out.selection.projets_synthese = Array.isArray(out.selection.projets_synthese) ? Array.from(new Set(out.selection.projets_synthese.map(String))) : [];
+  out.chronologie = (out.chronologie && typeof out.chronologie === "object") ? out.chronologie : {};
+  out.textes = (out.textes && typeof out.textes === "object") ? { pros: String(out.textes.pros || ""), cons: String(out.textes.cons || "") } : { pros: "", cons: "" };
+  out.date_creation = out.date_creation || nowISO();
+  return out;
+}
+
+function normalizeGov(j){
+  if(!j || typeof j!=="object") return null;
+  const g = jclone(j);
+
+  g.meta = g.meta || { schema:"gouvernance-dnsi", version:"3.4", nom:"Gouvernance DNSI" };
+  g.programmes = Array.isArray(g.programmes) ? g.programmes : (Array.isArray(g.politiques) ? g.politiques : []);
+
+  g.portefeuille = g.portefeuille || {};
+  g.portefeuille.projets = Array.isArray(g.portefeuille.projets) ? g.portefeuille.projets : [];
+  g.portefeuille.pivotsById = (g.portefeuille.pivotsById && typeof g.portefeuille.pivotsById==="object") ? g.portefeuille.pivotsById : {};
+
+  g.capacite = g.capacite || {};
+  g.capacite.total_jours = safeNum(g.capacite.total_jours ?? g.capacite.totalJours ?? 0);
+  g.capacite.run_hors_projet_jours = safeNum(g.capacite.run_hors_projet_jours ?? g.capacite.horsProjetJours ?? 0);
+  g.capacite.capacite_projet_jours = Math.max(0, safeNum(g.capacite.capacite_projet_jours ?? (g.capacite.total_jours - g.capacite.run_hors_projet_jours)));
+  g.capacite.teams = Array.isArray(g.capacite.teams) ? g.capacite.teams : [];
+
+  g.strategie_courante = normalizeScenarioObj(g.strategie_courante, "STRAT-A", "Scénario principal");
+
+  // Synchronisation avec le tableau des variantes (multi-scénarios A/B/C)
+  let vars = Array.isArray(g.strategies_variantes) ? g.strategies_variantes.map((v, i) => normalizeScenarioObj(v, `STRAT-${i+1}`, `Variante ${i+1}`)) : [];
+  const activeIdx = vars.findIndex(v => String(v.id) === String(g.strategie_courante.id));
+  if(activeIdx >= 0){
+    vars[activeIdx] = jclone(g.strategie_courante);
+  } else {
+    vars.unshift(jclone(g.strategie_courante));
+  }
+  g.strategies_variantes = vars;
+  g.strategie_active_id = g.strategie_courante.id;
+
+  return g;
 }
 
 function loadGov(){
+  const keys = [STORAGE_KEY, "dnsigov.gouvernance", "DNSI_GOUVERNANCE_JSON", "gouvernance_json"];
+  let raw = null, used = null;
+  for(const k of keys){
+    const v = localStorage.getItem(k);
+    if(v){ raw = v; used = k; break; }
+  }
+  const g = normalizeGov(jparse(raw||"null"));
+  if(!g) return null;
+
   try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) return JSON.parse(raw);
+    if(used && used !== STORAGE_KEY){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(g));
+    }
   }catch(e){}
-  return null;
+
+  try{
+    if((g.portefeuille.projets||[]).length===0){
+      const pRaw = localStorage.getItem("dnsigov.portfolio");
+      const pj = jparse(pRaw||"null");
+      const fallbackList = Array.isArray(pj?.projets) ? pj.projets : (Array.isArray(pj?.projects) ? pj.projects : null);
+      if(fallbackList && fallbackList.length){
+        g.portefeuille.projets = fallbackList;
+      }
+    }
+  }catch(e){}
+
+  return g;
 }
 
-function getProgrammesList(gov){
-  if(Array.isArray(gov?.programmes) && gov.programmes.length > 0) return gov.programmes;
-  if(Array.isArray(gov?.politiques) && gov.politiques.length > 0) return gov.politiques;
+function syncActiveVariantInGov(g){
+  if(!g || !g.strategie_courante) return;
+  g.strategies_variantes = Array.isArray(g.strategies_variantes) ? g.strategies_variantes : [];
+  const idx = g.strategies_variantes.findIndex(v => String(v.id) === String(g.strategie_courante.id));
+  if(idx >= 0) g.strategies_variantes[idx] = jclone(g.strategie_courante);
+  else g.strategies_variantes.push(jclone(g.strategie_courante));
+  g.strategie_active_id = g.strategie_courante.id;
+}
+
+function saveGov(g){
+  syncActiveVariantInGov(g);
+  const ts = nowISO();
+  g.meta = g.meta || { schema:"gouvernance-dnsi" };
+  g.meta.lastUpdatedAt = ts;
+  g.meta.dernier_enregistrement = ts;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(g));
+  notifyGouvernanceUpdated('strategie');
+}
+
+function notifyGouvernanceUpdated(source){
+  try{ window.opener?.postMessage({ type:'strategie-updated' }, '*'); }catch(e){}
+  try{ window.opener?.postMessage({ type:'GOUVERNANCE_UPDATED' }, '*'); }catch(e){}
+  try{ window.postMessage({ type:'strategie-updated' }, '*'); }catch(e){}
+  try{ window.postMessage({ type:'GOUVERNANCE_UPDATED' }, '*'); }catch(e){}
+  try{
+    const bc = new BroadcastChannel('dnsi-gouvernance');
+    bc.postMessage({ type:'GOUVERNANCE_UPDATED', source: source||'strategie' });
+    bc.close();
+  }catch(e){}
+}
+
+function openProjectSupport(projectId){
+  const g = loadGov();
+  if(g) saveGov(g);
+  window.open(`${SUPPORT_PROJECT_URL}?id=${encodeURIComponent(projectId)}&from=ppm`, "_blank");
+}
+
+/* =======================
+   Programmes helpers
+======================= */
+function getProgrammesList(g){
+  if(Array.isArray(g?.programmes) && g.programmes.length) return g.programmes;
+  if(Array.isArray(g?.politiques) && g.politiques.length) return g.politiques;
   return [];
 }
 
-function getProjectProgId(proj, validIds){
-  const direct = String(proj.programme_id || proj.axe_strategique || "").trim();
-  return (direct && validIds.has(direct)) ? direct : "";
+function resolveProgramme(g, project){
+  const pid = String(project?.programme_id || project?.axe_strategique || "").trim();
+  if(!pid) return null;
+  return getProgrammesList(g).find(x => String(x.id) === pid) || null;
 }
 
-function getProjectRAF(p){
-  const av = Math.max(0, Math.min(100, safeNum(p.avancement ?? p.avancement_pct ?? p.progress?.percent ?? 0)));
-  const chargeTot = safeNum(p.charges?.total ?? p.charge_estimee_jours ?? p.charge ?? 0);
-  return Math.max(0, Math.round(chargeTot * (1 - av/100)));
+function programmeBadgeHtml(g, project, compact=false){
+  const prg = resolveProgramme(g, project);
+  if(prg){
+    const col = prg.couleur || "#2563eb";
+    const lbl = compact ? (prg.code || prg.id) : (prg.code ? `${prg.code} · ${prg.titre}` : prg.titre);
+    return `<span class="badge" style="background:${escapeHtml(col)}16; border-color:${escapeHtml(col)}55; color:${escapeHtml(col)};" title="${escapeHtml(prg.id)} — ${escapeHtml(prg.titre)}">${escapeHtml(prg.icone || "🎯")} ${escapeHtml(lbl)}</span>`;
+  }
+  return `<span class="badge orphan" title="Non rattaché à un programme">⚠️ Hors pgm</span>`;
 }
 
-function renderAll(){
-  const GOV = loadGov();
-  $("subDate").textContent = `Gouvernance DNSI • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
+function programmeTextLabel(g, project){
+  const prg = resolveProgramme(g, project);
+  if(prg) return `${prg.icone || "🎯"} ${prg.code ? prg.code + " · " : ""}${prg.titre}`;
+  return "⚠️ Hors programme";
+}
 
-  if(!GOV){
-    $("chipSync").textContent = "Aucune donnée locale";
-    $("dynamicProgrammesContainer").innerHTML = `<div class="empty-note">Aucune gouvernance chargée en mémoire.<br/>Ouvre <b>1. Programmes</b> ou importe un fichier <b>Gouvernance.json</b>.</div>`;
+/* =======================
+   Pivot / charges / budget
+======================= */
+function getPivot(g, pid){
+  return g?.portefeuille?.pivotsById?.[String(pid)] || null;
+}
+
+function getProgressPct(pivot, project){
+  const a = safeNum(pivot?.project?.progress?.percent ?? pivot?.progress?.percent);
+  if((pivot?.project?.progress?.percent !== undefined || pivot?.progress?.percent !== undefined) && a>=0 && a<=100) return a;
+  const b = safeNum(project?.avancement ?? project?.avancement_pct ?? project?.progressPct ?? project?.progress?.percent);
+  if(b>=0 && b<=100) return b;
+  return 0;
+}
+
+function getProjectBudgetNumbers(project, pivot){
+  const bObj = (project?.budget && typeof project.budget === "object")
+    ? project.budget
+    : ((pivot?.budget && typeof pivot.budget === "object") ? pivot.budget : null);
+
+  if(bObj){
+    const inv = safeNum(bObj.investK ?? bObj.amountK ?? (bObj.amount != null ? Math.round(safeNum(bObj.amount)/1000) : 0));
+    const fct = safeNum(bObj.fonctK ?? 0);
+    return { inv: Math.max(0, inv), fct: Math.max(0, fct) };
+  }
+  const raw = project?.budget ?? project?.budget_k ?? project?.budgetK ?? 0;
+  const inv = Math.max(0, safeNum(raw));
+  return { inv, fct: 0 };
+}
+
+function getBudgetLabel(project, pivot){
+  const { inv, fct } = getProjectBudgetNumbers(project, pivot);
+  if(inv > 0 && fct > 0) return `${inv.toLocaleString("fr-FR")} k€ (+${fct.toLocaleString("fr-FR")}/an)`;
+  if(inv > 0) return `${inv.toLocaleString("fr-FR")} k€`;
+  if(fct > 0) return `${fct.toLocaleString("fr-FR")} k€/an`;
+  return "—";
+}
+
+function remainingLoad(g, project){
+  const pid = String(project.id);
+  const pivot = getPivot(g, pid);
+  const av = getProgressPct(pivot, project);
+
+  const totalDecl = safeNum(project?.charges?.total ?? project?.charge_estimee_jours);
+  if(totalDecl > 0){
+    const rem = Math.max(0, Math.round(totalDecl * (1 - av/100)));
+    const cdpRaw = safeNum(project?.charges?.cdp ?? 0);
+    const mcoRaw = safeNum(project?.charges?.mco ?? 0);
+    let teamsRemaining = { GLOBAL: rem };
+    if(cdpRaw > 0 || mcoRaw > 0){
+      teamsRemaining = {};
+      if(cdpRaw > 0) teamsRemaining.CDP = Math.max(0, Math.round(cdpRaw * (1 - av/100)));
+      if(mcoRaw > 0) teamsRemaining.MCO = Math.max(0, Math.round(mcoRaw * (1 - av/100)));
+    }
+    const kind = (project?.has_pivot || project?.hasPivot) ? "cadré" : "étude";
+    return { kind, hasCharges:true, av, totalRemaining: rem, teamsRemaining, detailLabel:`Charge portefeuille • Av. ${av}%` };
+  }
+
+  const teams = pivot?.chargesProjet?.teams;
+  if(Array.isArray(teams) && teams.length){
+    const teamsRemaining = {};
+    let total = 0;
+    for(const t of teams){
+      const code = String(t.code || "GLOBAL").toUpperCase();
+      const est = safeNum(t.estimated ?? t.estimation ?? t.jours ?? t.days ?? t.charge ?? t.value ?? t.total);
+      const rem = Math.max(0, Math.round(est * (1 - av/100)));
+      const bucket = ["TIRS","SSI","MCO","INFRA"].includes(code) ? "MCO" : "CDP";
+      teamsRemaining[bucket] = (teamsRemaining[bucket] || 0) + rem;
+      total += rem;
+    }
+    return { kind:"cadré", hasCharges:total>0, av, totalRemaining: total, teamsRemaining, detailLabel:`Charge cadrée • Av. ${av}%` };
+  }
+
+  return { kind:"étude", hasCharges:false, av, totalRemaining:0, teamsRemaining:{}, detailLabel:"Charge absente" };
+}
+
+/* =======================
+   Calcul scénario (avec Delta What-If, Budget & Lissage T1–T4)
+======================= */
+function computeTimeline(p, scenarioObj){
+  const forced = scenarioObj?.chronologie?.[String(p.id)];
+  if(forced && forced.start && forced.end){
+    return { start: Number(forced.start), end: Number(forced.end), isForced: true };
+  }
+  const prio = String(p.priorite || "P2").toUpperCase();
+  const ch = safeNum(p?.charges?.total ?? p.charge_estimee_jours);
+
+  let start = 2, end = 3;
+  if(prio==="P1"){ start=1; end=(ch>100 ? 3 : 2); }
+  else if(prio==="P2"){ start=2; end=(ch>100 ? 4 : 3); }
+  else { start=3; end=4; }
+  return { start, end, isForced: false };
+}
+
+function computeScenario(g, scenarioOverride=null){
+  const strat = scenarioOverride || g.strategie_courante;
+  const capBase = safeNum(g.capacite.capacite_projet_jours);
+  const deltaJ = Math.round(safeNum(strat?.hypotheses?.delta_jours ?? 0));
+  const capProj = Math.max(0, capBase + deltaJ);
+
+  const projects = g.portefeuille.projets || [];
+  const byId = new Map(projects.map(p=>[String(p.id), p]));
+  const ids = (strat?.selection?.projets_lances||[]).map(String);
+
+  let loadTotal = 0;
+  let budgetInvTotal = 0;
+  let budgetFonctTotal = 0;
+  const missing = [];
+  const integrated = [];
+  const teamsLoad = {};
+  const quarterLoads = [0, 0, 0, 0]; // T1, T2, T3, T4
+
+  for(const id of ids){
+    const p = byId.get(id);
+    if(!p){ missing.push(id); continue; }
+    const r = remainingLoad(g, p);
+    const pivot = getPivot(g, id);
+    const bud = getProjectBudgetNumbers(p, pivot);
+
+    loadTotal += r.totalRemaining;
+    budgetInvTotal += bud.inv;
+    budgetFonctTotal += bud.fct;
+
+    for(const [k,v] of Object.entries(r.teamsRemaining||{})){
+      teamsLoad[k] = (teamsLoad[k]||0) + safeNum(v);
+    }
+
+    const tl = computeTimeline(p, strat);
+    const nbQ = Math.max(1, (tl.end - tl.start + 1));
+    const perQ = r.totalRemaining / nbQ;
+    for(let q = tl.start; q <= tl.end; q++){
+      if(q >= 1 && q <= 4) quarterLoads[q - 1] += perQ;
+    }
+
+    integrated.push({ p, r, bud, tl });
+  }
+
+  const quarterTarget = capProj > 0 ? Math.round(capProj / 4) : 0;
+  const margin = capProj - loadTotal;
+
+  let state = "draft";
+  if(ids.length === 0) state = "draft";
+  else if(margin >= 0) state = "ok";
+  else state = "over";
+
+  return {
+    capBase, deltaJ, capProj, loadTotal, margin, state,
+    budgetInvTotal, budgetFonctTotal,
+    missing, integrated, ids, teamsLoad,
+    quarterLoads: quarterLoads.map(v => Math.round(v)),
+    quarterTarget
+  };
+}
+
+/* =======================
+   Donut homogène (0. Synthese & 3. Capacite)
+======================= */
+function drawStrategyPie(canvas, hp, capProj, engaged){
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w/2, cy = h/2;
+  const r = Math.min(w, h) * 0.44;
+  const isOver = engaged > capProj && capProj > 0;
+  const total = Math.max(1, hp + Math.max(capProj, engaged));
+  const rest = Math.max(0, capProj - engaged);
+
+  // Fond anneau léger
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(59,130,246,0.10)";
+  ctx.fill();
+
+  const parts = isOver
+    ? [
+        { v: Math.max(0, hp), col: "#f59e0b" },
+        { v: Math.max(0, capProj), col: "#2563eb" },
+        { v: Math.max(0, engaged - capProj), col: "#ef4444" }
+      ]
+    : [
+        { v: Math.max(0, hp), col: "#f59e0b" },
+        { v: Math.max(0, engaged), col: "#2563eb" },
+        { v: Math.max(0, rest), col: "#10b981" }
+      ];
+
+  let start = -Math.PI / 2;
+  for(const p of parts){
+    if(p.v <= 0) continue;
+    const ang = (p.v / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, start + ang);
+    ctx.closePath();
+    ctx.fillStyle = p.col;
+    ctx.fill();
+    start += ang;
+  }
+
+  // Cœur évidé à 60% (#f8fafc comme 0. Synthese & 3. Capacite)
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.60, 0, Math.PI * 2);
+  ctx.fillStyle = "#f8fafc";
+  ctx.fill();
+
+  const occPct = capProj > 0 ? Math.round((engaged / capProj) * 100) : 0;
+  ctx.textAlign = "center";
+  ctx.fillStyle = isOver ? "#b91c1c" : "#0f172a";
+  ctx.font = "800 10.5px system-ui, sans-serif";
+  ctx.fillText(isOver ? "Dépassement" : "Engagé", cx, cy - 11);
+
+  ctx.fillStyle = isOver ? "#ef4444" : "#2563eb";
+  ctx.font = "900 15px ui-monospace, monospace";
+  ctx.fillText(`${Math.round(engaged).toLocaleString("fr-FR")} j`, cx, cy + 7);
+
+  ctx.fillStyle = isOver ? "#b91c1c" : "#64748b";
+  ctx.font = "800 10px ui-monospace, monospace";
+  ctx.fillText(capProj > 0 ? `${occPct}% réserve` : "—", cx, cy + 22);
+}
+
+/* =======================
+   Sélection PDF (projets cochés ⭐)
+======================= */
+function getSynthSet(g){
+  return new Set((g.strategie_courante.selection.projets_synthese||[]).map(String));
+}
+
+function setSynthSelected(g, pid, checked){
+  const arr = (g.strategie_courante.selection.projets_synthese||[]).map(String);
+  const s = new Set(arr);
+  if(checked) s.add(String(pid)); else s.delete(String(pid));
+  g.strategie_courante.selection.projets_synthese = Array.from(s);
+}
+
+/* =======================
+   Multi-Scénarios (Variantes A/B/C)
+======================= */
+function renderVariantsBar(g){
+  const container = $("variantsTabs");
+  const vars = g.strategies_variantes || [];
+  const activeId = String(g.strategie_courante.id);
+
+  container.innerHTML = vars.map(v => {
+    const isAct = String(v.id) === activeId;
+    const scV = computeScenario(g, v);
+    const dot = scV.state === "draft" ? "🟣" : (scV.state === "ok" ? "🟢" : "🟠");
+    const mStr = scV.ids.length === 0 ? "0 prj" : (scV.margin >= 0 ? `+${scV.margin}j` : `${scV.margin}j`);
+    return `
+      <button type="button" class="variant-tab ${isAct ? "active" : ""}" data-vid="${escapeHtml(v.id)}" title="${escapeHtml(v.nom)} — ${scV.ids.length} projet(s)">
+        <span>${dot} ${escapeHtml(v.nom)}</span>
+        <span class="v-margin">${mStr}</span>
+      </button>
+    `;
+  }).join("");
+
+  $("btnDelVariant").disabled = vars.length <= 1;
+  $("badgeVariantActive").textContent = `${vars.length} variante${vars.length > 1 ? "s" : ""}`;
+
+  container.querySelectorAll("[data-vid]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const vid = btn.getAttribute("data-vid");
+      if(String(vid) === activeId) return;
+      const gNow = loadGov();
+      if(!gNow) return;
+      // Sauvegarder d'abord les champs courants
+      gNow.strategie_courante.nom = $("scName").value.trim() || gNow.strategie_courante.nom;
+      gNow.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+      gNow.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+      syncActiveVariantInGov(gNow);
+
+      const target = (gNow.strategies_variantes || []).find(v => String(v.id) === String(vid));
+      if(!target) return;
+      gNow.strategie_courante = jclone(target);
+      gNow.strategie_active_id = target.id;
+      saveGov(gNow);
+      render();
+      toast("draft", "Variante activée", `${target.nom} est désormais le scénario actif (synchronisé avec 0. Synthèse).`);
+    });
+  });
+}
+
+function createNewVariant(duplicate=false){
+  const g = loadGov();
+  if(!g) return;
+  g.strategie_courante.nom = $("scName").value.trim() || g.strategie_courante.nom;
+  g.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+  g.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+  syncActiveVariantInGov(g);
+
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const nextIdx = (g.strategies_variantes || []).length;
+  const letter = letters[nextIdx % letters.length];
+  const defaultName = duplicate
+    ? `${g.strategie_courante.nom} (Variante ${letter})`
+    : `Scénario ${letter} — Option arbitrage`;
+
+  const chosenName = prompt(duplicate ? "Nom de la variante dupliquée :" : "Nom de la nouvelle variante :", defaultName);
+  if(chosenName === null) return;
+
+  const newId = "STRAT-" + Date.now();
+  const nextObj = duplicate
+    ? normalizeScenarioObj({ ...jclone(g.strategie_courante), id: newId, nom: chosenName.trim() || defaultName, date_creation: nowISO() })
+    : normalizeScenarioObj({ id: newId, nom: chosenName.trim() || defaultName });
+
+  g.strategies_variantes.push(jclone(nextObj));
+  g.strategie_courante = nextObj;
+  g.strategie_active_id = newId;
+  saveGov(g);
+  render();
+  toast("ok", duplicate ? "Variante dupliquée" : "Nouvelle variante", nextObj.nom);
+}
+
+function deleteActiveVariant(){
+  const g = loadGov();
+  if(!g || (g.strategies_variantes || []).length <= 1) return;
+  const curName = g.strategie_courante.nom;
+  if(!confirm(`Supprimer la variante « ${curName} » ?`)) return;
+
+  const curId = String(g.strategie_courante.id);
+  g.strategies_variantes = g.strategies_variantes.filter(v => String(v.id) !== curId);
+  g.strategie_courante = jclone(g.strategies_variantes[0]);
+  g.strategie_active_id = g.strategie_courante.id;
+  saveGov(g);
+  render();
+  toast("warn", "Variante supprimée", `Retour sur « ${g.strategie_courante.nom} ».`);
+}
+
+/* =======================
+   Équilibre par Programme + Actions par lot
+======================= */
+function computeProgrammeBalance(g, sc){
+  const programmes = getProgrammesList(g);
+  const pf = g.portefeuille.projets || [];
+  const engagedIds = new Set(sc.ids.map(String));
+
+  const map = new Map();
+  programmes.forEach(pr => {
+    map.set(String(pr.id), {
+      id: String(pr.id),
+      isOrphan: false,
+      icone: pr.icone || "🎯",
+      code: pr.code || pr.id,
+      titre: pr.titre || pr.id,
+      couleur: pr.couleur || "#2563eb",
+      chargeCible: safeNum(pr.charge_cible_j),
+      budgetCible: safeNum(pr.budget_cible_k),
+      totalCount: 0,
+      integrableCount: 0,
+      engagedCount: 0,
+      engagedLoad: 0,
+      engagedBudgetInv: 0
+    });
+  });
+
+  const orphanRow = {
+    id: "__NONE__",
+    isOrphan: true,
+    icone: "⚠️",
+    code: "HORS PGM",
+    titre: "Hors programme (non rattachés)",
+    couleur: "#f97316",
+    chargeCible: 0,
+    budgetCible: 0,
+    totalCount: 0,
+    integrableCount: 0,
+    engagedCount: 0,
+    engagedLoad: 0,
+    engagedBudgetInv: 0
+  };
+
+  for(const p of pf){
+    const prg = resolveProgramme(g, p);
+    const row = prg ? map.get(String(prg.id)) : orphanRow;
+    if(!row) continue;
+    const r = remainingLoad(g, p);
+    row.totalCount++;
+    if(r.hasCharges) row.integrableCount++;
+    if(engagedIds.has(String(p.id))){
+      const pivot = getPivot(g, String(p.id));
+      const bud = getProjectBudgetNumbers(p, pivot);
+      row.engagedCount++;
+      row.engagedLoad += r.totalRemaining;
+      row.engagedBudgetInv += bud.inv;
+    }
+  }
+
+  const rows = Array.from(map.values());
+  if(orphanRow.totalCount > 0) rows.push(orphanRow);
+  return rows;
+}
+
+function renderProgrammeBalance(g, sc){
+  const rows = computeProgrammeBalance(g, sc);
+  const grid = $("progBalanceGrid");
+  if(!rows.length){
+    grid.innerHTML = `<div class="small">Aucun programme défini. Crée tes programmes dans l'onglet 1. Programmes.</div>`;
     return;
   }
 
-  const last = GOV?.meta?.lastUpdatedAt || GOV?.meta?.dernier_enregistrement;
+  const totalEng = Math.max(1, sc.loadTotal);
+  grid.innerHTML = rows.map(row => {
+    const sharePct = sc.loadTotal > 0 ? Math.round((row.engagedLoad / totalEng) * 100) : 0;
+    const overCharge = row.chargeCible > 0 && row.engagedLoad > row.chargeCible;
+    const overBudget = row.budgetCible > 0 && row.engagedBudgetInv > row.budgetCible;
+    const alertTag = (overCharge || overBudget)
+      ? `<span class="badge bad" title="Dépassement de l'enveloppe macro définie dans 1. Programmes">⚠️ > Enveloppe</span>`
+      : "";
+
+    const canAddMore = row.engagedCount < row.integrableCount;
+    const canRemSome = row.engagedCount > 0;
+
+    return `
+      <div class="prog-bal-row ${row.isOrphan ? "is-orphan" : ""}">
+        <div class="prog-bal-top">
+          <div class="prog-bal-name" title="${escapeHtml(row.titre)}">
+            <span>${escapeHtml(row.icone)}</span>
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(row.titre)}</span>
+          </div>
+          <div class="prog-bal-actions">
+            ${canAddMore ? `<button type="button" class="prog-mini-btn add" data-padd="${escapeHtml(row.id)}" title="Engager tous les projets intégrables de ce programme">➕ Lot</button>` : ""}
+            ${canRemSome ? `<button type="button" class="prog-mini-btn rem" data-prem="${escapeHtml(row.id)}" title="Retirer tous les projets de ce programme">➖</button>` : ""}
+          </div>
+        </div>
+        <div class="prog-bal-metrics">
+          <span><b>${row.engagedCount}</b>/${row.integrableCount} engagé(s) · <b class="mono">${fmtJ(row.engagedLoad)}</b> (${sharePct}%)</span>
+          <span class="mono"><b>${fmtK(row.engagedBudgetInv)}</b></span>
+        </div>
+        <div class="track" style="margin-top:2px;height:7px;">
+          <div class="fill" style="width:${sharePct}%; background:${escapeHtml(row.couleur)};"></div>
+        </div>
+        ${(row.chargeCible > 0 || alertTag) ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--muted);">
+            <span>Enveloppe macro : ${row.chargeCible ? fmtJ(row.chargeCible) : "—"} / ${row.budgetCible ? fmtK(row.budgetCible) : "—"}</span>
+            ${alertTag}
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }).join("");
+
+  grid.querySelectorAll("[data-padd]").forEach(btn => {
+    btn.addEventListener("click", () => bulkToggleProgramme(btn.getAttribute("data-padd"), true));
+  });
+  grid.querySelectorAll("[data-prem]").forEach(btn => {
+    btn.addEventListener("click", () => bulkToggleProgramme(btn.getAttribute("data-prem"), false));
+  });
+}
+
+function bulkToggleProgramme(progKey, addMode){
+  const g = loadGov();
+  if(!g) return;
+  const pf = g.portefeuille.projets || [];
+  const current = new Set((g.strategie_courante.selection.projets_lances || []).map(String));
+  const synth = new Set((g.strategie_courante.selection.projets_synthese || []).map(String));
+  let changed = 0;
+
+  for(const p of pf){
+    const prg = resolveProgramme(g, p);
+    const match = (progKey === "__NONE__") ? !prg : (prg && String(prg.id) === String(progKey));
+    if(!match) continue;
+    const id = String(p.id);
+    if(addMode){
+      if(!current.has(id) && remainingLoad(g, p).hasCharges){
+        current.add(id);
+        changed++;
+      }
+    } else {
+      if(current.has(id)){
+        current.delete(id);
+        synth.delete(id);
+        changed++;
+      }
+    }
+  }
+
+  g.strategie_courante.selection.projets_lances = Array.from(current);
+  g.strategie_courante.selection.projets_synthese = Array.from(synth);
+  saveGov(g);
+  render();
+  toast(addMode ? "ok" : "draft", addMode ? "Lot Programme engagé" : "Lot Programme retiré", `${changed} projet(s) ${addMode ? "ajouté(s)" : "retiré(s)"}.`);
+}
+
+/* =======================
+   Auto-Arbitrage par priorité (P1 ➔ P4)
+======================= */
+function autoArbitrateByPriority(){
+  const g = loadGov();
+  if(!g) return;
+  const capBase = safeNum(g.capacite.capacite_projet_jours);
+  const deltaJ = Math.round(safeNum(g.strategie_courante?.hypotheses?.delta_jours ?? 0));
+  const capEff = Math.max(0, capBase + deltaJ);
+
+  if(capEff <= 0){
+    toast("warn", "Capacité nulle", "Définis d'abord une réserve projets dans 3. Capacité ou un Delta positif.");
+    return;
+  }
+
+  const existingCount = (g.strategie_courante.selection.projets_lances || []).length;
+  if(existingCount > 0 && !confirm("Remplacer la sélection actuelle par un remplissage automatique P1 ➔ P4 compatible avec la réserve ?")){
+    return;
+  }
+
+  const candidates = (g.portefeuille.projets || [])
+    .map(p => ({ p, r: remainingLoad(g, p) }))
+    .filter(x => x.r.hasCharges && x.r.totalRemaining > 0);
+
+  // Tri : P1 -> P4, puis projets déjà lancés en premier, puis charge croissante pour maximiser le nombre de projets livrés
+  candidates.sort((a, b) => {
+    const pa = String(a.p.priorite || "P9").toUpperCase();
+    const pb = String(b.p.priorite || "P9").toUpperCase();
+    if(pa !== pb) return pa.localeCompare(pb);
+    const la = (a.p.has_pivot || a.p.hasPivot) ? 0 : 1;
+    const lb = (b.p.has_pivot || b.p.hasPivot) ? 0 : 1;
+    if(la !== lb) return la - lb;
+    return a.r.totalRemaining - b.r.totalRemaining;
+  });
+
+  let used = 0;
+  const picked = [];
+  for(const item of candidates){
+    if(used + item.r.totalRemaining <= capEff){
+      picked.push(String(item.p.id));
+      used += item.r.totalRemaining;
+    }
+  }
+
+  g.strategie_courante.selection.projets_lances = picked;
+  // Conserver les favoris existants qui restent engagés
+  const pickedSet = new Set(picked);
+  g.strategie_courante.selection.projets_synthese = (g.strategie_courante.selection.projets_synthese || []).filter(id => pickedSet.has(String(id)));
+  saveGov(g);
+  render();
+  toast("ok", "Auto-arbitrage appliqué", `${picked.length} projet(s) retenus (${fmtJ(used)} / ${fmtJ(capEff)}).`);
+}
+
+/* =======================
+   GANTT MACRO & LISSAGE TRIMESTRIEL T1–T4
+======================= */
+let activeGanttFilter = "eng";
+let editingGanttPid = null;
+
+function renderGanttLoadStrip(sc){
+  const strip = $("ganttLoadStrip");
+  if(!strip) return;
+  const target = sc.quarterTarget;
+
+  const cells = sc.quarterLoads.map((loadQ, i) => {
+    const pct = target > 0 ? Math.round((loadQ / target) * 100) : (loadQ > 0 ? 999 : 0);
+    const cls = pct > 100 ? "bad" : (pct > 85 ? "warn" : "ok");
+    return `
+      <div class="ganttLoadCell">
+        <div class="q-load-top">
+          <span class="q-${cls}">T${i+1} : <span class="mono">${loadQ} j</span></span>
+          <span class="mono q-${cls}">${pct >= 999 ? "∞" : pct + "%"}</span>
+        </div>
+        <div class="q-load-bar">
+          <div class="q-load-fill q-fill-${cls}" style="width:${Math.min(100, Math.max(0, pct))}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  strip.innerHTML = `
+    <div class="ganttLoadCell" style="justify-content:center;">
+      <div style="font-weight:900;color:var(--text);">⚖️ Lissage charge / trimestre</div>
+      <div class="small">Cible lissée : <b class="mono">${fmtJ(target)}</b> / trim.</div>
+    </div>
+    ${cells}
+  `;
+}
+
+function renderGanttRows(g, sc){
+  const container = $("ganttRowsContainer");
+  const projects = g?.portefeuille?.projets || [];
+  const engagedIds = new Set((g?.strategie_courante?.selection?.projets_lances||[]).map(String));
+  const favIds = getSynthSet(g || {strategie_courante:{selection:{projets_synthese:[]}}});
+
+  const engagedList = projects.filter(p=>engagedIds.has(String(p.id)));
+  const favList = projects.filter(p=>favIds.has(String(p.id)));
+
+  $("cntGEng").textContent = engagedList.length;
+  $("cntGFav").textContent = favList.length;
+  $("cntGAll").textContent = projects.length;
+
+  renderGanttLoadStrip(sc);
+
+  let list = [];
+  if(activeGanttFilter==="eng") list = [...engagedList];
+  else if(activeGanttFilter==="fav") list = [...favList];
+  else list = [...projects];
+
+  const ganttProgFlt = $("fltGanttProg")?.value || "";
+  if(ganttProgFlt){
+    list = list.filter(p => {
+      const prg = resolveProgramme(g, p);
+      if(ganttProgFlt === "__NONE__") return !prg;
+      return prg && String(prg.id) === ganttProgFlt;
+    });
+  }
+
+  list.sort((a,b)=>{
+    const pa = String(a.priorite||"P9"), pb = String(b.priorite||"P9");
+    if(pa!==pb) return pa.localeCompare(pb);
+    return String(a.nom||a.name||"").localeCompare(String(b.nom||b.name||""));
+  });
+
+  if(!list.length){
+    container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);">Aucun projet à afficher dans ce filtre.</div>`;
+    return;
+  }
+
+  container.innerHTML = list.map(p=>{
+    const time = computeTimeline(p, g.strategie_courante);
+    const r = remainingLoad(g, p);
+    const prio = String(p.priorite || "P2").toUpperCase();
+    const dir = escapeHtml(p.direction || "—");
+
+    const leftPct = (time.start - 1) * 25;
+    const widthPct = ((time.end - time.start) + 1) * 25;
+
+    let bgVar = "var(--gP2)"; let borderVar = "var(--gP2Border)";
+    if(prio==="P1"){ bgVar="var(--gP1)"; borderVar="var(--gP1Border)"; }
+    else if(prio==="P3"){ bgVar="var(--gP3)"; borderVar="var(--gP3Border)"; }
+    else if(prio==="P4"){ bgVar="var(--gP4)"; borderVar="var(--gP4Border)"; }
+
+    const nbQ = Math.max(1, time.end - time.start + 1);
+    const perQ = Math.round(r.totalRemaining / nbQ);
+    const ruleText = time.isForced
+      ? `Forcé T${time.start}-T${time.end} (${perQ}j/trim)`
+      : `T${time.start}-T${time.end} (${perQ}j/trim)`;
+
+    return `
+      <div class="ganttRowGrid">
+        <div class="ganttMetaCell">
+          <div class="ganttMetaLeft">
+            <div style="font-weight:900;font-size:12px;">${escapeHtml(p.nom||p.name||p.id)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">${prio} • ${dir} • RAF ${fmtJ(r.totalRemaining)}</div>
+            <div style="margin-top:4px;">${programmeBadgeHtml(g, p, true)}</div>
+          </div>
+          <button type="button" class="ganttBtnEdit" data-gedit="${escapeHtml(p.id)}" title="Décaler les trimestres pour lisser la charge">⚙️</button>
+        </div>
+        <div class="ganttTrackCell">
+          <div class="ganttBar" style="left:${leftPct}%; width:${widthPct}%; background:${bgVar}; border-left:4px solid ${borderVar};">
+            <div class="ganttBarFill" style="width:${r.av}%;"></div>
+            <div class="ganttBarText" style="color:#0f172a;">${escapeHtml(ruleText)} • Av. ${r.av}%</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-gedit]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      openGanttEditModal(btn.getAttribute("data-gedit"));
+    });
+  });
+}
+
+function wireGanttFilters(){
+  const fEng = $("filterEng"), fFav = $("filterFav"), fAll = $("filterAll");
+  function resetBtns(){
+    fEng.className="btn"; fFav.className="btn"; fAll.className="btn";
+  }
+  fEng.addEventListener("click", ()=>{ activeGanttFilter="eng"; resetBtns(); fEng.className="btn primary"; render(); });
+  fFav.addEventListener("click", ()=>{ activeGanttFilter="fav"; resetBtns(); fFav.className="btn primary"; render(); });
+  fAll.addEventListener("click", ()=>{ activeGanttFilter="all"; resetBtns(); fAll.className="btn primary"; render(); });
+  $("fltGanttProg").addEventListener("change", render);
+}
+
+function openGanttEditModal(pid){
+  editingGanttPid = pid;
+  const g = loadGov();
+  const p = (g.portefeuille.projets||[]).find(x=>String(x.id)===String(pid));
+  if(!p) return;
+
+  $("mGanttTitle").textContent = `Planifier : ${p.nom || p.name || p.id}`;
+  const time = computeTimeline(p, g.strategie_courante);
+  $("mGanttStart").value = time.start;
+  $("mGanttEnd").value = time.end;
+  $("modalGanttEdit").style.display = "flex";
+}
+
+function closeGanttEditModal(){
+  $("modalGanttEdit").style.display = "none";
+  editingGanttPid = null;
+}
+
+function wireGanttModalBtns(){
+  $("btnGanttCancel").addEventListener("click", closeGanttEditModal);
+  $("modalGanttEdit").addEventListener("click", (e)=>{ if(e.target===$("modalGanttEdit")) closeGanttEditModal(); });
+
+  $("btnGanttApply").addEventListener("click", ()=>{
+    if(!editingGanttPid) return;
+    const start = Number($("mGanttStart").value);
+    const end = Number($("mGanttEnd").value);
+    if(start > end){
+      toast("bad", "Dates invalides", "Le trimestre de début ne peut pas être après la fin.");
+      return;
+    }
+    const g = loadGov();
+    g.strategie_courante.chronologie = g.strategie_courante.chronologie || {};
+    g.strategie_courante.chronologie[editingGanttPid] = { start, end };
+    saveGov(g);
+    closeGanttEditModal();
+    render();
+    toast("ok", "Lissage mis à jour", `Planifié de T${start} à T${end}.`);
+  });
+
+  $("btnGanttAuto").addEventListener("click", ()=>{
+    if(!editingGanttPid) return;
+    const g = loadGov();
+    if(g.strategie_courante.chronologie && g.strategie_courante.chronologie[editingGanttPid]){
+      delete g.strategie_courante.chronologie[editingGanttPid];
+      saveGov(g);
+    }
+    closeGanttEditModal();
+    render();
+    toast("draft", "Mode Automatique", "Chronologie rétablie en mode inféré.");
+  });
+}
+
+/* =======================
+   Drag & Drop + Boutons
+======================= */
+let dropZoneWired = false;
+function wireDropZoneOnce(){
+  if(dropZoneWired) return;
+  dropZoneWired = true;
+  const dz = $("dropHere");
+  dz.addEventListener("dragover",(e)=>{ e.preventDefault(); dz.classList.add("dragover"); });
+  dz.addEventListener("dragleave",()=>dz.classList.remove("dragover"));
+  dz.addEventListener("drop",(e)=>{
+    e.preventDefault();
+    dz.classList.remove("dragover");
+    const pid = e.dataTransfer.getData("text/plain");
+    if(!pid) return;
+    const g = loadGov();
+    if(!g) return;
+    const p = (g.portefeuille.projets||[]).find(x=>String(x.id)===String(pid));
+    if(!p) return;
+
+    const r = remainingLoad(g, p);
+    if(!r.hasCharges){
+      toast("bad","Non intégrable","Ce projet n’a aucune charge (ni cadrée, ni étude).");
+      return;
+    }
+    const ids = new Set((g.strategie_courante.selection.projets_lances||[]).map(String));
+    if(!ids.has(String(pid))){
+      ids.add(String(pid));
+      g.strategie_courante.selection.projets_lances = Array.from(ids);
+      saveGov(g);
+      render();
+      toast("ok","Projet intégré",`${p.nom||p.name||p.id} (+${fmtJ(r.totalRemaining)})`);
+    }
+  });
+}
+
+function wireDnDAndButtons(){
+  wireDropZoneOnce();
+
+  document.querySelectorAll('[draggable="true"][data-pid]').forEach(card=>{
+    card.addEventListener("dragstart",(e)=>{
+      e.dataTransfer.setData("text/plain", card.getAttribute("data-pid"));
+    });
+  });
+
+  document.querySelectorAll("[data-open-proj]").forEach(btn=>{
+    btn.addEventListener("click", () => {
+      openProjectSupport(btn.getAttribute("data-open-proj"));
+    });
+  });
+
+  document.querySelectorAll("[data-add]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const pid = btn.getAttribute("data-add");
+      const g = loadGov();
+      if(!g) return;
+      const p = (g.portefeuille.projets||[]).find(x=>String(x.id)===String(pid));
+      if(!p) return;
+      const r = remainingLoad(g, p);
+      if(!r.hasCharges){
+        toast("bad","Non intégrable","Aucune charge disponible.");
+        return;
+      }
+      const ids = new Set((g.strategie_courante.selection.projets_lances||[]).map(String));
+      ids.add(String(pid));
+      g.strategie_courante.selection.projets_lances = Array.from(ids);
+      saveGov(g);
+      render();
+      toast("ok","Projet intégré",`${p.nom||p.name||p.id} (+${fmtJ(r.totalRemaining)})`);
+    });
+  });
+
+  document.querySelectorAll("[data-remove]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const pid = btn.getAttribute("data-remove");
+      const g = loadGov();
+      if(!g) return;
+      g.strategie_courante.selection.projets_lances = (g.strategie_courante.selection.projets_lances||[]).map(String).filter(x=>x!==String(pid));
+      setSynthSelected(g, pid, false);
+      saveGov(g);
+      render();
+      toast("draft","Projet retiré","Projet retiré du scénario.");
+    });
+  });
+
+  document.querySelectorAll("[data-synth]").forEach(chk=>{
+    chk.addEventListener("change",()=>{
+      const pid = chk.getAttribute("data-synth");
+      const g = loadGov();
+      if(!g) return;
+      setSynthSelected(g, pid, chk.checked);
+      saveGov(g);
+      renderBadgeSynth(g);
+      if(activeGanttFilter==="fav") render();
+    });
+  });
+}
+
+function renderBadgeSynth(g){
+  const n = getSynthSet(g).size;
+  $("badgeSynth").textContent = `⭐ Synthèse PDF : ${n}`;
+}
+
+/* =======================
+   Rendu principal
+======================= */
+function populateProgSelect(selEl, programmes, emptyLabel){
+  const cur = selEl.value;
+  selEl.innerHTML =
+    `<option value="">${emptyLabel}</option>` +
+    `<option value="__NONE__">⚠️ Hors programme uniquement</option>` +
+    programmes.map(pr => `<option value="${escapeHtml(pr.id)}">${escapeHtml(pr.icone || "🎯")} ${escapeHtml(pr.id)} — ${escapeHtml(pr.titre)}</option>`).join("");
+  selEl.value = cur;
+}
+
+function render(){
+  const g = loadGov();
+  $("subDate").textContent = `Arbitrage multi-scénarios • Équilibre Programmes • Lissage T1–T4 • Édition du ${nowFR()}`;
+
+  if(!g){
+    $("hintLine").innerHTML = `⚠️ Aucun fichier <b>Gouvernance</b> trouvé en mémoire. Ouvre d'abord <b>0. Synthèse CODIR</b> ou clique sur <b>📥 Importer (.json)</b>.`;
+    $("btnSaveGov").disabled = true;
+    $("btnPdf").disabled = true;
+    $("btnReset").disabled = true;
+    $("scDate").textContent = nowFR();
+    $("pfInfo").textContent = "—";
+    $("capProj").textContent = "—";
+    $("loadTotal").textContent = "—";
+    $("capMargin").textContent = "—";
+    $("cardHP").textContent = "—";
+    $("cardEng").textContent = "—";
+    $("cardRest").textContent = "—";
+    $("budInvTotal").textContent = "0 k€";
+    $("budFonctTotal").textContent = "0 k€/an";
+    $("pieBadges").innerHTML = "";
+    $("variantsTabs").innerHTML = "";
+    $("progBalanceGrid").innerHTML = `<div class="small">—</div>`;
+    $("teamList").innerHTML = `<div class="small">—</div>`;
+    $("teamsHint").textContent = "—";
+    $("listPf").innerHTML = `<div class="small">—</div>`;
+    $("listInt").innerHTML = `<div class="small">—</div>`;
+    $("listOut").innerHTML = `<div class="small">—</div>`;
+    $("badgeSynth").textContent = "⭐ Synthèse PDF : 0";
+    $("chipSync").textContent = "Aucune donnée locale";
+    drawStrategyPie($("pieStrat"), 0, 0, 0);
+    renderGanttRows({portefeuille:{projets:[]}, strategie_courante:{selection:{}}}, {quarterLoads:[0,0,0,0], quarterTarget:0});
+    return;
+  }
+
+  $("btnSaveGov").disabled = false;
+  $("btnPdf").disabled = false;
+  $("btnReset").disabled = false;
+
+  const last = g?.meta?.lastUpdatedAt || g?.meta?.dernier_enregistrement;
   $("chipSync").textContent = last
     ? `Dernière MAJ : ${new Date(last).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`
     : "Source : Gouvernance.json";
 
-  const projets = Array.isArray(GOV.portefeuille?.projets) ? GOV.portefeuille.projets : [];
-  const programmes = getProgrammesList(GOV);
-  const validProgIds = new Set(programmes.map(p => String(p.id)));
-  const strat = GOV.strategie_courante || {};
-  const cap = GOV.capacite || {};
-  const selectionIds = new Set((strat.selection?.projets_lances || []).map(String));
-  const pdfIds = new Set((strat.selection?.projets_synthese || []).map(String));
+  renderVariantsBar(g);
 
-  /* =========================================================
-     QUADRANT 1 : PROGRAMMES & ALIGNEMENT STRATÉGIQUE
-  ========================================================= */
-  const progLoads = {};
-  programmes.forEach(p => { progLoads[String(p.id)] = 0; });
+  if(document.activeElement !== $("scName")) $("scName").value = g.strategie_courante.nom || "Scénario";
+  if(document.activeElement !== $("txtPros")) $("txtPros").value = g.strategie_courante.textes?.pros || "";
+  if(document.activeElement !== $("txtCons")) $("txtCons").value = g.strategie_courante.textes?.cons || "";
+  if(document.activeElement !== $("txtDeltaNote")) $("txtDeltaNote").value = g.strategie_courante.hypotheses?.commentaire || "";
 
-  let totalEngagedDays = 0;
-  let orphanEngagedDays = 0;
-  const engagedProjects = [];
+  const deltaVal = Math.round(safeNum(g.strategie_courante.hypotheses?.delta_jours ?? 0));
+  if(document.activeElement !== $("inpDeltaJ")) $("inpDeltaJ").value = deltaVal;
+  document.querySelectorAll(".wf-chip[data-delta]").forEach(ch => {
+    ch.classList.toggle("active", Number(ch.getAttribute("data-delta")) === deltaVal);
+  });
 
-  for(const p of projets){
-    if(selectionIds.has(String(p.id))){
-      engagedProjects.push(p);
-      const raf = getProjectRAF(p);
-      const pid = getProjectProgId(p, validProgIds);
-      if(pid && progLoads[pid] !== undefined) progLoads[pid] += raf;
-      else orphanEngagedDays += raf;
-      totalEngagedDays += raf;
-    }
+  $("scDate").textContent = nowFR();
+  const pf = g.portefeuille.projets || [];
+  const withPivot = pf.filter(p => p.has_pivot || p.hasPivot).length;
+  $("pfInfo").textContent = `${pf.length} élément(s) (${withPivot} lancé(s) / ${pf.length - withPivot} idée(s))`;
+  $("hintLine").innerHTML = `✅ Connecté à <b>${escapeHtml(g.meta?.nom || "Gouvernance DNSI")}</b> — tous les arbitrages se synchronisent en temps réel avec les 4 autres piliers.`;
+
+  renderBadgeSynth(g);
+
+  const programmes = getProgrammesList(g);
+  populateProgSelect($("fltProgPf"), programmes, "🎯 Filtrer par programme (tous)");
+  populateProgSelect($("fltGanttProg"), programmes, "🎯 Tous programmes");
+
+  const sc = computeScenario(g);
+
+  $("capProj").textContent = sc.deltaJ !== 0
+    ? `${fmtJ(sc.capProj)} (base ${fmtJ(sc.capBase)} ${sc.deltaJ > 0 ? "+" : ""}${sc.deltaJ}j)`
+    : fmtJ(sc.capProj);
+  $("loadTotal").textContent = fmtJ(sc.loadTotal);
+  $("capMargin").textContent = sc.margin >= 0 ? `+ ${fmtJ(sc.margin)}` : fmtJ(sc.margin);
+  $("capMargin").style.color = sc.margin >= 0 ? "var(--sOk)" : "var(--sBad)";
+
+  $("whatIfSub").textContent = sc.deltaJ === 0
+    ? `Réserve officielle utilisée : ${fmtJ(sc.capBase)} (aucune simulation active).`
+    : `Simulation active : Réserve base ${fmtJ(sc.capBase)} ${sc.deltaJ > 0 ? "+" : ""}${sc.deltaJ} j = ${fmtJ(sc.capProj)} mobilisables.`;
+
+  const hp = safeNum(g.capacite.run_hors_projet_jours);
+  const capProj = sc.capProj;
+  const engaged = sc.loadTotal;
+  const isOver = engaged > capProj && capProj > 0;
+  const restProj = Math.max(0, capProj - engaged);
+
+  $("cardHP").textContent = fmtJ(hp);
+  $("cardEng").textContent = fmtJ(engaged);
+  $("cardEngBox").className = isOver ? "mini over" : "mini eng";
+
+  if(isOver){
+    $("cardRestBox").className = "mini over";
+    $("cardRestLbl").textContent = "Dépassement";
+    $("cardRestSub").textContent = "Arbitrage requis";
+    $("cardRest").textContent = `− ${fmtJ(engaged - capProj)}`;
+    $("cardRest").style.color = "var(--sBad)";
+  } else {
+    $("cardRestBox").className = "mini rest";
+    $("cardRestLbl").textContent = "Restant";
+    $("cardRestSub").textContent = "Capacité disponible";
+    $("cardRest").textContent = fmtJ(restProj);
+    $("cardRest").style.color = "var(--sOk)";
   }
 
-  const activeProgs = programmes.filter(p => p.statut !== "cloture" && p.statut !== "inactif");
-  const container = $("dynamicProgrammesContainer");
+  $("budInvTotal").textContent = fmtK(sc.budgetInvTotal);
+  $("budInvSub").textContent = `sur ${sc.integrated.length} projet(s) retenu(s)`;
+  $("budFonctTotal").textContent = `${Math.round(sc.budgetFonctTotal).toLocaleString("fr-FR")} k€/an`;
 
-  if(activeProgs.length === 0){
-    container.innerHTML = `<div class="empty-note">Aucun programme actif défini dans le Support <b>1. Programmes</b>.</div>`;
+  drawStrategyPie($("pieStrat"), hp, capProj, engaged);
+  $("pieBadges").innerHTML = isOver
+    ? `<span class="badge bad">⚠️ Dépassement : ${fmtJ(engaged - capProj)}</span>`
+    : `<span class="badge ok">✅ Marge : ${fmtJ(capProj - engaged)}</span>`;
+
+  // Équilibre par Programme
+  renderProgrammeBalance(g, sc);
+
+  // Occupation par équipe
+  const teams = Array.isArray(g.capacite.teams) ? g.capacite.teams : [];
+  const teamAlerts = [];
+  if(!teams.length){
+    $("teamsHint").textContent = "ℹ Aucune capacité par équipe détectée (capacite.teams[]). Lecture globale uniquement.";
+    $("teamList").innerHTML = `<div class="small">—</div>`;
   } else {
-    let html = activeProgs.map((prg, idx) => {
-      const load = progLoads[String(prg.id)] || 0;
-      const pct = totalEngagedDays > 0 ? Math.round((load / totalEngagedDays) * 100) : 0;
-      const color = prg.couleur || FALLBACK_COLORS[idx % FALLBACK_COLORS.length];
-      const codeStr = prg.code ? `${prg.id} · ${prg.code}` : prg.id;
+    $("teamsHint").textContent = "Une barre par équipe : % occupation + charge restante / capacité.";
+    const rows = teams.map(t=>{
+      const code = String(t.code || t.id || "—");
+      const label = t.label ? `${code} — ${t.label}` : code;
+      const cap = safeNum(t.capacite_jours ?? t.capacite ?? 0);
+      const load = safeNum(sc.teamsLoad[code] ?? 0);
+      const pct = cap>0 ? Math.round((load/cap)*100) : (load>0 ? 999 : 0);
+      const lvl = (cap===0) ? "bad" : (pct<=80 ? "ok" : (pct<=100 ? "warn" : "bad"));
+      if(pct > 100) teamAlerts.push(`Équipe ${code} en surcharge (${pct}%)`);
+      return {code, label, cap, load, pct, lvl};
+    }).sort((a,b)=>b.pct-a.pct);
 
-      return `
-        <div class="axe-row">
-          <div class="axe-head">
-            <span class="axe-name">
-              <span>${escapeHtml(prg.icone || "🎯")}</span>
-              <span>${escapeHtml(prg.titre)}</span>
-              <span class="axe-code mono">${escapeHtml(codeStr)}</span>
-            </span>
-            <span class="axe-val mono">${load.toLocaleString("fr-FR")} j (${pct}%)</span>
+    $("teamList").innerHTML = rows.map(r=>`
+      <div class="teamRow">
+        <div class="teamTop">
+          <div class="teamName">${escapeHtml(r.label)}</div>
+          <div class="teamNums mono">${fmtJ(r.load)} / ${fmtJ(r.cap)} • ${r.pct>=999?"∞":r.pct}%</div>
+        </div>
+        <div class="track"><div class="fill ${r.lvl}" style="width:${Math.min(100, Math.max(0, r.pct))}%"></div></div>
+      </div>
+    `).join("");
+  }
+
+  // Verdict & Alertes (y compris surcharge trimestrielle & équipe)
+  const stateBox = $("stateBox");
+  const stateBadges = [];
+  const alerts = [...teamAlerts];
+  if(sc.missing.length) alerts.push(`Projets manquants : ${sc.missing.join(", ")}`);
+
+  const orphanIntCount = sc.integrated.filter(x => !resolveProgramme(g, x.p)).length;
+  if(orphanIntCount > 0) alerts.push(`${orphanIntCount} projet(s) engagé(s) hors programme`);
+
+  if(sc.quarterTarget > 0){
+    const overloadedQs = sc.quarterLoads
+      .map((v, i) => ({ q: i+1, pct: Math.round((v / sc.quarterTarget) * 100) }))
+      .filter(x => x.pct > 100);
+    if(overloadedQs.length){
+      alerts.push(`Pic trimestriel sur ${overloadedQs.map(x => `T${x.q} (${x.pct}%)`).join(", ")}`);
+    }
+  }
+  if(sc.deltaJ !== 0){
+    alerts.push(`Hypothèse What-If active (${sc.deltaJ > 0 ? "+" : ""}${sc.deltaJ} j)`);
+  }
+
+  if(sc.state==="draft"){
+    stateBox.className="stateBox draft";
+    $("stateTitle").textContent="🟣 Brouillon";
+    $("stateSub").textContent="Ajoute des projets au scénario ou clique sur ✨ Auto-arbitrage pour construire une option.";
+    stateBadges.push(`<span class="badge draft">Brouillon</span>`);
+    $("countInt").className="badge draft";
+  } else if(sc.state==="ok"){
+    stateBox.className="stateBox ok";
+    $("stateTitle").textContent="🟢 Scénario Compatible";
+    $("stateSub").textContent="La charge engagée respecte la réserve projets DNSI.";
+    stateBadges.push(`<span class="badge ok">Compatible</span>`);
+    stateBadges.push(`<span class="badge ok">Marge : +${fmtJ(sc.margin)}</span>`);
+    $("countInt").className="badge ok";
+  } else {
+    stateBox.className="stateBox over";
+    $("stateTitle").textContent="🔴 Dépassement Capacitaire";
+    $("stateSub").textContent="Charge > réserve projets : décaler des projets, ou tester un renfort dans le simulateur « Et si ? ».";
+    stateBadges.push(`<span class="badge bad">Dépassement</span>`);
+    stateBadges.push(`<span class="badge bad">Écart : ${fmtJ(Math.max(0, -sc.margin))}</span>`);
+    $("countInt").className="badge bad";
+  }
+
+  $("stateBadges").innerHTML = stateBadges.join("");
+  $("alerts").innerHTML = alerts.length
+    ? alerts.map(a => `<div style="margin-bottom:4px;">• ${escapeHtml(a)}</div>`).join("")
+    : `<span style="color:var(--sOk);font-weight:800;">✅ Aucune alerte critique détectée.</span>`;
+
+  // Filtrage Source & Intégrés
+  const ids = new Set(sc.ids.map(String));
+  const notIntegratedAll = pf.filter(p=>!ids.has(String(p.id)));
+  const integratedAll = sc.integrated.map(x=>x.p);
+
+  const qPf = ($("fltSearchPf")?.value || "").toLowerCase().trim();
+  const prPf = $("fltPrioPf")?.value || "";
+  const pgPf = $("fltProgPf")?.value || "";
+
+  const notIntegrated = notIntegratedAll.filter(p => {
+    const prg = resolveProgramme(g, p);
+    if(qPf && !`${p.id} ${p.nom||p.name} ${p.direction} ${p.cdp_nom} ${prg?.titre||""}`.toLowerCase().includes(qPf)) return false;
+    if(prPf && String(p.priorite||"P2").toUpperCase() !== prPf) return false;
+    if(pgPf === "__NONE__" && prg) return false;
+    if(pgPf && pgPf !== "__NONE__" && (!prg || String(prg.id) !== pgPf)) return false;
+    return true;
+  });
+
+  const qInt = ($("fltSearchInt")?.value || "").toLowerCase().trim();
+  const prInt = $("fltPrioInt")?.value || "";
+
+  const integrated = integratedAll.filter(p => {
+    const prg = resolveProgramme(g, p);
+    if(qInt && !`${p.id} ${p.nom||p.name} ${p.direction} ${p.cdp_nom} ${prg?.titre||""}`.toLowerCase().includes(qInt)) return false;
+    if(prInt && String(p.priorite||"P2").toUpperCase() !== prInt) return false;
+    return true;
+  });
+
+  $("countPf").textContent = `${notIntegrated.length} / ${notIntegratedAll.length}`;
+  $("countInt").textContent = `${integrated.length} / ${integratedAll.length}`;
+
+  notIntegrated.sort((a,b)=>{
+    const pa = String(a.priorite||"P9"), pb = String(b.priorite||"P9");
+    if(pa!==pb) return pa.localeCompare(pb);
+    return String(a.nom||a.name||"").localeCompare(String(b.nom||b.name||""));
+  });
+
+  const renderProjIdAndTitle = (p) => {
+    const isLaunched = !!(p.has_pivot || p.hasPivot);
+    const encId = escapeHtml(p.id);
+    const title = escapeHtml(p.nom || p.name || p.id);
+    if(isLaunched){
+      return {
+        titleHtml: `<button type="button" class="proj-link-title" data-open-proj="${encId}" title="Ouvrir ${encId} dans Gestion-supports-projet-">${title}</button>`,
+        idHtml: `<button type="button" class="proj-link-id mono" data-open-proj="${encId}" title="Ouvrir ${encId} dans Gestion-supports-projet-">${encId}</button>`
+      };
+    }
+    return {
+      titleHtml: `<div class="projName">${title}</div>`,
+      idHtml: `<span class="badge mono">${encId}</span>`
+    };
+  };
+
+  $("listPf").innerHTML = notIntegrated.map(p=>{
+    const r = remainingLoad(g, p);
+    const pivot = getPivot(g, String(p.id));
+    const budLbl = getBudgetLabel(p, pivot);
+    const can = r.hasCharges;
+    const kindBadge = (r.kind==="étude") ? `<span class="badge draft">Étude</span>` : `<span class="badge ok">Cadré</span>`;
+    const flag = can ? `<span class="badge ok">Intégrable</span>` : `<span class="badge bad">Sans charge</span>`;
+    const btn = can
+      ? `<button type="button" class="iconbtn primary" data-add="${escapeHtml(p.id)}">➕ Ajouter</button>`
+      : `<button type="button" class="iconbtn" disabled title="Renseigner une charge dans 2. Portefeuille">⚠ Charge 0</button>`;
+    const { titleHtml, idHtml } = renderProjIdAndTitle(p);
+
+    return `
+      <div class="proj" draggable="true" data-pid="${escapeHtml(p.id)}">
+        <div class="projTop">
+          <div>
+            ${titleHtml}
+            <div class="projMeta">${escapeHtml(p.priorite||"—")} • RAF <b>${fmtJ(r.totalRemaining)}</b> • Bud. ${escapeHtml(budLbl)}</div>
+            <div class="badges">${programmeBadgeHtml(g, p, true)} ${kindBadge} ${flag}</div>
           </div>
-          <div class="axe-track">
-            <div class="axe-fill" style="width:${pct}%; background-color:${escapeHtml(color)};"></div>
+          <div class="pRight">
+            ${idHtml}
+            ${btn}
           </div>
         </div>
-      `;
-    }).join("");
+      </div>
+    `;
+  }).join("") || `<div class="small" style="padding:8px;">Aucun projet correspondant dans le portefeuille.</div>`;
 
-    if(orphanEngagedDays > 0){
-      const pctOrph = totalEngagedDays > 0 ? Math.round((orphanEngagedDays / totalEngagedDays) * 100) : 0;
-      html += `
-        <div class="axe-row" style="margin-top:14px; padding-top:10px; border-top:1px dashed #fdba74;">
-          <div class="axe-head" style="color:#9a3412;">
-            <span class="axe-name"><span>⚠️</span><span>Hors programme (projets engagés non rattachés)</span></span>
-            <span class="axe-val mono">${orphanEngagedDays.toLocaleString("fr-FR")} j (${pctOrph}%)</span>
+  const synthSet = getSynthSet(g);
+  $("listInt").innerHTML = integrated.map(p=>{
+    const r = remainingLoad(g, p);
+    const pivot = getPivot(g, String(p.id));
+    const budLbl = getBudgetLabel(p, pivot);
+    const kindBadge = (r.kind==="étude")
+      ? `<span class="badge draft">Étude</span>`
+      : `<span class="badge ok">Cadré</span>`;
+    const checked = synthSet.has(String(p.id)) ? "checked" : "";
+    const { titleHtml, idHtml } = renderProjIdAndTitle(p);
+
+    return `
+      <div class="proj">
+        <div class="projTop">
+          <div>
+            ${titleHtml}
+            <div class="projMeta">${escapeHtml(p.priorite||"—")} • RAF <b>${fmtJ(r.totalRemaining)}</b> • Bud. ${escapeHtml(budLbl)}</div>
+            <div class="badges">${programmeBadgeHtml(g, p, true)} ${kindBadge}</div>
           </div>
-          <div class="axe-track">
-            <div class="axe-fill" style="width:${pctOrph}%; background-color:#f97316;"></div>
+          <div class="pRight">
+            ${idHtml}
+            <label class="chkRow" title="Afficher en page 1 du PDF et dans le Cockpit CODIR (0. Synthèse)">
+              <input type="checkbox" ${checked} data-synth="${escapeHtml(p.id)}"/>
+              ⭐ Synthèse PDF
+            </label>
+            <button type="button" class="iconbtn" data-remove="${escapeHtml(p.id)}">⛔ Retirer</button>
           </div>
         </div>
-      `;
-    }
+      </div>
+    `;
+  }).join("") || `<div class="small" style="padding:8px;">Dépose ici des projets (ou utilise ✨ Auto-arbitrage).</div>`;
 
-    if(engagedProjects.length === 0){
-      html += `<div style="margin-top:12px; font-size:11.5px; color:var(--muted); font-style:italic;">
-        ℹ️ Aucun projet engagé dans le scénario actif (Support 4) — les jauges se rempliront dès la sélection de projets.
-      </div>`;
-    }
-
-    container.innerHTML = html;
+  const nonIntegrables = notIntegratedAll.filter(p=>!remainingLoad(g,p).hasCharges);
+  const integrables = notIntegratedAll.filter(p=>remainingLoad(g,p).hasCharges);
+  const out = [];
+  for(const p of nonIntegrables.slice(0,5)){
+    out.push(`<div class="proj"><div class="projName">${escapeHtml(p.nom||p.name||p.id)}</div><div class="projMeta">Non intégrable (charge absente) • ${escapeHtml(programmeTextLabel(g,p))}</div></div>`);
   }
-
-  /* =========================================================
-     QUADRANT 2 : PORTEFEUILLE (LA DEMANDE)
-  ========================================================= */
-  $("pfTotal").textContent = projets.length;
-  let nbIdees = 0, nbPivots = 0, nbOrphans = 0;
-  const prioCount = {P1:0, P2:0, P3:0, P4:0};
-
-  for(const p of projets){
-    if(p.has_pivot || p.hasPivot) nbPivots++; else nbIdees++;
-    if(!getProjectProgId(p, validProgIds)) nbOrphans++;
-    const pr = normalizePriority(p.priorite ?? p.prio);
-    if(prioCount[pr] !== undefined) prioCount[pr]++;
+  for(const p of integrables.slice(0, Math.max(0, 6-out.length))){
+    const r = remainingLoad(g,p);
+    out.push(`<div class="proj"><div class="projName">${escapeHtml(p.nom||p.name||p.id)}</div><div class="projMeta">Report arbitrage (${fmtJ(r.totalRemaining)}) • ${escapeHtml(programmeTextLabel(g,p))}</div></div>`);
   }
-  $("pfIdees").textContent = nbIdees;
-  $("pfPivots").textContent = nbPivots;
+  $("listOut").innerHTML = out.join("") || `<div class="small">Tous les projets sont intégrés au scénario.</div>`;
 
-  if(projets.length === 0){
-    $("pfCoverage").textContent = "—";
-    $("pfCoverage").style.color = "var(--muted)";
-    $("pfOrphansSub").textContent = "portefeuille vide";
-  } else {
-    const covPct = Math.round(((projets.length - nbOrphans) / projets.length) * 100);
-    $("pfCoverage").textContent = `${covPct}%`;
-    $("pfCoverage").style.color = nbOrphans === 0 ? "var(--ok)" : "#c2410c";
-    $("pfOrphansSub").textContent = `${nbOrphans} hors programme`;
-  }
-
-  const totPrio = projets.length || 1;
-  $("prioBar").innerHTML = `
-    <div style="width:${(prioCount.P1/totPrio)*100}%; background:#ef4444;" title="P1 : ${prioCount.P1}"></div>
-    <div style="width:${(prioCount.P2/totPrio)*100}%; background:#f97316;" title="P2 : ${prioCount.P2}"></div>
-    <div style="width:${(prioCount.P3/totPrio)*100}%; background:#3b82f6;" title="P3 : ${prioCount.P3}"></div>
-    <div style="width:${(prioCount.P4/totPrio)*100}%; background:#94a3b8;" title="P4 : ${prioCount.P4}"></div>
-  `;
-  $("prioLabels").innerHTML = `
-    <span style="color:#ef4444">P1 : ${prioCount.P1}</span>
-    <span style="color:#f97316">P2 : ${prioCount.P2}</span>
-    <span style="color:#3b82f6">P3 : ${prioCount.P3}</span>
-    <span style="color:#64748b">P4 : ${prioCount.P4}</span>
-  `;
-
-  /* =========================================================
-     QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS)
-  ========================================================= */
-  const cPot = safeNum(cap.total_jours);
-  const cHP = safeNum(cap.run_hors_projet_jours);
-  const cProj = Math.max(0, cPot - cHP);
-
-  $("legPot").textContent = `${cPot.toLocaleString("fr-FR")} j`;
-  $("legHP").textContent = `${cHP.toLocaleString("fr-FR")} j`;
-  $("legRem").textContent = `${cProj.toLocaleString("fr-FR")} j`;
-
-  const canvas = $("pieCapacite");
-  if(canvas){
-    const ctx = canvas.getContext("2d");
-    const w = canvas.width, h = canvas.height;
-    ctx.clearRect(0,0,w,h);
-    const cx = w/2, cy = h/2, radius = Math.min(w,h)*0.44;
-
-    ctx.beginPath(); ctx.arc(cx,cy,radius,0,Math.PI*2);
-    ctx.fillStyle = "rgba(59,130,246,0.12)"; ctx.fill();
-
-    let start = -Math.PI/2;
-    const parts = [ {v: cHP, c: "#f59e0b"}, {v: cProj, c: "#10b981"} ];
-    const totalPie = cPot > 0 ? cPot : 1;
-    for(const p of parts){
-      const angle = (p.v/totalPie) * Math.PI*2;
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,radius,start,start+angle);
-      ctx.fillStyle = p.c; ctx.fill(); start += angle;
-    }
-
-    ctx.beginPath(); ctx.arc(cx,cy,radius*0.60,0,Math.PI*2);
-    ctx.fillStyle = "#f8fafc"; ctx.fill();
-
-    ctx.fillStyle = "#0f172a";
-    ctx.textAlign = "center";
-    ctx.font = "800 11px system-ui, sans-serif";
-    ctx.fillText("Réserve", cx, cy - 5);
-    ctx.fillStyle = "#16a34a";
-    ctx.font = "900 15px ui-monospace, monospace";
-    ctx.fillText(`${cProj.toLocaleString("fr-FR")} j`, cx, cy + 14);
-  }
-
-  /* =========================================================
-     QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE)
-  ========================================================= */
-  $("stratName").textContent = strat.nom || "Scénario par défaut";
-  const restFinal = cProj - totalEngagedDays;
-  $("stCap").textContent = `${cProj.toLocaleString("fr-FR")} j`;
-  $("stLoad").textContent = `${totalEngagedDays.toLocaleString("fr-FR")} j`;
-
-  const box = $("stratAlert"), bTitle = $("stratVerdictTitle"), bSub = $("stratVerdictSub"), vRest = $("stRest");
-  box.className = "strat-box";
-  if(selectionIds.size === 0){
-    bTitle.innerHTML = "🟣 Brouillon";
-    bSub.innerHTML = "Aucun projet n'est encore engagé dans le scénario.";
-    vRest.textContent = "—";
-    vRest.style.color = "var(--muted)";
-  } else if (restFinal >= 0){
-    box.classList.add("strat-ok");
-    bTitle.innerHTML = "🟢 Scénario Compatible";
-    bSub.innerHTML = "La charge des projets engagés respecte la réserve capacitaire DNSI.";
-    vRest.textContent = `+ ${restFinal.toLocaleString("fr-FR")} j`;
-    vRest.style.color = "var(--ok)";
-  } else {
-    box.classList.add("strat-bad");
-    bTitle.innerHTML = "🔴 Dépassement Capacitaire";
-    bSub.innerHTML = "La charge excède la capacité disponible : arbitrage requis (report ou renfort).";
-    vRest.textContent = `${restFinal.toLocaleString("fr-FR")} j`;
-    vRest.style.color = "var(--bad)";
-  }
-
-  const tBody = $("stratTableBody");
-  const pdfProjects = engagedProjects.filter(p => pdfIds.has(String(p.id)));
-
-  if(pdfProjects.length > 0){
-    tBody.innerHTML = pdfProjects.map(p => {
-      const raf = getProjectRAF(p);
-      const pid = getProjectProgId(p, validProgIds);
-      const prg = pid ? programmes.find(x => String(x.id) === pid) : null;
-
-      let progBadgeHtml = `<span class="badge b-orphan">⚠️ Hors pgm</span>`;
-      if(prg){
-        const col = prg.couleur || "#2563eb";
-        const lbl = prg.code || prg.titre;
-        progBadgeHtml = `<span class="badge" style="background:${escapeHtml(col)}16; border-color:${escapeHtml(col)}55; color:${escapeHtml(col)}; max-width:165px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(prg.titre)}">${escapeHtml(prg.icone || "🎯")} ${escapeHtml(lbl)}</span>`;
-      }
-
-      const pr = normalizePriority(p.priorite ?? p.prio);
-      const prCls = pr === "P1" ? "b-prio1" : pr === "P2" ? "b-prio2" : pr === "P3" ? "b-prio3" : "b-prio4";
-
-      return `
-        <tr>
-          <td>
-            <b style="font-size:12.5px;">${escapeHtml(p.nom || p.name || p.id)}</b><br/>
-            <span class="mono" style="color:var(--muted)">${escapeHtml(p.id)}</span>
-          </td>
-          <td>${progBadgeHtml}</td>
-          <td><span class="badge ${prCls}">${pr}</span></td>
-          <td style="text-align:right; font-weight:900;" class="mono">${raf.toLocaleString("fr-FR")} j</td>
-        </tr>
-      `;
-    }).join("");
-  } else {
-    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
-  }
-  $("stratCount").textContent = engagedProjects.length;
+  wireDnDAndButtons();
+  renderGanttRows(g, sc);
+  applyZoomToDom();
 }
 
-/* =============================
-   Import / Export JSON & Synchro
-============================== */
-function downloadGov(){
-  const GOV = loadGov();
-  if(!GOV){ alert("Aucune gouvernance en mémoire à sauvegarder."); return; }
-  const blob = new Blob([JSON.stringify(GOV, null, 2)], { type: "application/json" });
+/* =======================
+   PDF CODIR (3 pages A4 Paysage)
+======================= */
+function buildPrintArea(g, sc){
+  const pa = $("printArea");
+  const hp = safeNum(g.capacite.run_hors_projet_jours);
+  const capProj = sc.capProj;
+  const engaged = sc.loadTotal;
+  const isOver = engaged > capProj && capProj > 0;
+  const restProj = Math.max(0, capProj - engaged);
+
+  const synthSet = getSynthSet(g);
+  const integrated = sc.integrated;
+  const selected = integrated.filter(x=>synthSet.has(String(x.p.id)));
+  const progRows = computeProgrammeBalance(g, sc).filter(r => r.engagedCount > 0 || r.totalCount > 0);
+
+  const pros = g.strategie_courante.textes?.pros || "";
+  const cons = g.strategie_courante.textes?.cons || "";
+  const deltaNote = g.strategie_courante.hypotheses?.commentaire || "";
+
+  const verdictLabel = (sc.state==="draft") ? "Brouillon" : (sc.state==="ok" ? "Compatible" : "Dépassement (arbitrage)");
+  const verdictBadge = (sc.state==="draft") ? "draft" : (sc.state==="ok" ? "ok" : "bad");
+
+  function rowHTML(x){
+    const p = x.p;
+    const r = x.r;
+    const pivot = getPivot(g, String(p.id));
+    const budget = getBudgetLabel(p, pivot);
+    const type = (r.kind==="étude") ? "Étude" : "Cadré";
+    return `<tr>
+      <td><b>${escapeHtml(p.nom||p.name||p.id)}</b> <span style="color:rgba(15,23,42,.55)" class="mono">(${escapeHtml(p.id)})</span></td>
+      <td>${escapeHtml(programmeTextLabel(g, p))}</td>
+      <td>${escapeHtml(p.priorite||"—")}</td>
+      <td>${escapeHtml(budget)}</td>
+      <td class="right mono"><b>${fmtJ(r.totalRemaining)}</b></td>
+      <td>${escapeHtml(type)} (${r.av}%)</td>
+    </tr>`;
+  }
+
+  const progTableRows = progRows.map(r => {
+    const pct = sc.loadTotal > 0 ? Math.round((r.engagedLoad / sc.loadTotal) * 100) : 0;
+    return `<tr>
+      <td><b>${escapeHtml(r.icone)} ${escapeHtml(r.titre)}</b></td>
+      <td class="right mono">${r.engagedCount} / ${r.integrableCount}</td>
+      <td class="right mono"><b>${fmtJ(r.engagedLoad)}</b> (${pct}%)</td>
+      <td class="right mono">${fmtK(r.engagedBudgetInv)}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="4">Aucun programme.</td></tr>`;
+
+  const selectedRows = selected.length
+    ? selected.map(rowHTML).join("")
+    : `<tr><td colspan="6" style="color:rgba(15,23,42,.65)">Aucun projet sélectionné pour la synthèse (⭐).</td></tr>`;
+
+  const fullRows = integrated.length
+    ? integrated.map(rowHTML).join("")
+    : `<tr><td colspan="6" style="color:rgba(15,23,42,.65)">Aucun projet intégré.</td></tr>`;
+
+  const engagedIds = new Set(sc.ids.map(String));
+  const printGanttList = (g.portefeuille.projets||[]).filter(p=>engagedIds.has(String(p.id)));
+  printGanttList.sort((a,b)=>{
+    const pa = String(a.priorite||"P9"), pb = String(b.priorite||"P9");
+    if(pa!==pb) return pa.localeCompare(pb);
+    return String(a.nom||a.name||"").localeCompare(String(b.nom||b.name||""));
+  });
+
+  const ganttPrintLoadCells = sc.quarterLoads.map((loadQ, i) => {
+    const pct = sc.quarterTarget > 0 ? Math.round((loadQ / sc.quarterTarget) * 100) : 0;
+    const cls = pct > 100 ? "bad" : (pct > 85 ? "warn" : "ok");
+    return `<div class="ganttLoadCell"><div class="q-load-top"><span class="q-${cls}">T${i+1} : ${loadQ} j</span><span class="q-${cls}">${pct}%</span></div><div class="q-load-bar"><div class="q-load-fill q-fill-${cls}" style="width:${Math.min(100, pct)}%"></div></div></div>`;
+  }).join("");
+
+  const ganttPrintRows = printGanttList.map(p=>{
+    const time = computeTimeline(p, g.strategie_courante);
+    const r = remainingLoad(g, p);
+    const prio = String(p.priorite || "P2").toUpperCase();
+    const dir = escapeHtml(p.direction || "—");
+    const leftPct = (time.start - 1) * 25;
+    const widthPct = ((time.end - time.start) + 1) * 25;
+    let bgVar = "var(--gP2)"; let borderVar = "var(--gP2Border)";
+    if(prio==="P1"){ bgVar="var(--gP1)"; borderVar="var(--gP1Border)"; }
+    else if(prio==="P3"){ bgVar="var(--gP3)"; borderVar="var(--gP3Border)"; }
+    else if(prio==="P4"){ bgVar="var(--gP4)"; borderVar="var(--gP4Border)"; }
+    const nbQ = Math.max(1, time.end - time.start + 1);
+    const perQ = Math.round(r.totalRemaining / nbQ);
+    const ruleText = `T${time.start}-T${time.end} (${perQ}j/trim) • ${r.av}%`;
+
+    return `
+      <div class="ganttRowGrid" style="border-bottom:1px solid rgba(15,23,42,.08);">
+        <div style="padding:5px 8px;font-size:10px;">
+          <b>${escapeHtml(p.nom||p.name||p.id)}</b><br/>
+          <span style="color:var(--muted);font-size:9px;">${prio} • ${dir} • RAF ${fmtJ(r.totalRemaining)} • ${escapeHtml(programmeTextLabel(g,p))}</span>
+        </div>
+        <div class="ganttTrackCell" style="padding:5px 8px;">
+          <div class="ganttBar" style="left:${leftPct}%; width:${widthPct}%; background:${bgVar}; border-left:4px solid ${borderVar}; height:19px;">
+            <div class="ganttBarFill" style="width:${r.av}%;"></div>
+            <div class="ganttBarText" style="font-size:9.5px;">${escapeHtml(ruleText)}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("") || `<div style="padding:10px;font-size:11px;color:var(--muted)">Aucun projet engagé à planifier.</div>`;
+
+  pa.innerHTML = `
+    <!-- PAGE 1 : SYNTHESE & PROGRAMMES -->
+    <div class="printPage">
+      <div class="printHeader">
+        <div>
+          <div class="h1">Stratégie & Arbitrage DNSI — ${escapeHtml(g.strategie_courante.nom||"Scénario")}</div>
+          <div class="h2">Page 1 / 3 : Synthèse Capacité, Budget & Équilibre Programmes • ${escapeHtml(nowFR())}</div>
+        </div>
+        <div class="meta">Verdict : <span class="badge ${verdictBadge}">${escapeHtml(verdictLabel)}</span></div>
+      </div>
+
+      <div class="printGrid">
+        <div class="printCard">
+          <h4>Capacité & Budget du scénario</h4>
+          <div style="display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center">
+            <div style="display:flex;align-items:center;justify-content:center;background:#f8fafc;border-radius:50%;border:1px solid #e2e8f0;width:170px;height:170px;margin:0 auto;">
+              <canvas id="piePrint1" width="160" height="160"></canvas>
+            </div>
+            <div>
+              <div class="printKpis">
+                <div class="printKpi hp"><div class="lab">Hors-projet</div><div class="val mono">${fmtJ(hp)}</div></div>
+                <div class="printKpi ${isOver ? "over" : "eng"}"><div class="lab">Engagé</div><div class="val mono">${fmtJ(engaged)}</div></div>
+                <div class="printKpi ${isOver ? "over" : "rest"}"><div class="lab">${isOver ? "Écart" : "Restant"}</div><div class="val mono">${isOver ? "−"+fmtJ(engaged-capProj) : fmtJ(restProj)}</div></div>
+              </div>
+              <div style="margin-top:6px;font-size:10.5px;color:#334155;">
+                Réserve effective : <b>${fmtJ(capProj)}</b>${sc.deltaJ !== 0 ? ` (base ${fmtJ(sc.capBase)} ${sc.deltaJ>0?"+":""}${sc.deltaJ}j)` : ""} •
+                Budget engagé : <b>${fmtK(sc.budgetInvTotal)}</b> Inv. + <b>${Math.round(sc.budgetFonctTotal).toLocaleString("fr-FR")} k€/an</b> Fct.
+              </div>
+              ${deltaNote ? `<div style="margin-top:4px;font-size:10px;color:#1d4ed8;"><b>Hypothèse :</b> ${escapeHtml(deltaNote)}</div>` : ""}
+            </div>
+          </div>
+
+          <h4 style="margin-top:8px;">Équilibre par Programme</h4>
+          <table class="printTable">
+            <thead>
+              <tr>
+                <th>Programme</th>
+                <th class="right">Projets</th>
+                <th class="right">Charge engagée</th>
+                <th class="right">Budget Inv.</th>
+              </tr>
+            </thead>
+            <tbody>${progTableRows}</tbody>
+          </table>
+        </div>
+
+        <div class="printCard">
+          <h4>✅ Bénéfices attendus</h4>
+          <div style="font-size:10.5px;white-space:pre-wrap;line-height:1.35;">${escapeHtml(pros||"—")}</div>
+          <div style="height:8px"></div>
+          <h4>⚠ Risques / arbitrages</h4>
+          <div style="font-size:10.5px;white-space:pre-wrap;line-height:1.35;">${escapeHtml(cons||"—")}</div>
+        </div>
+      </div>
+
+      <div class="printCard" style="margin-top:8px">
+        <h4>⭐ Projets phares mis en avant (${selected.length})</h4>
+        <table class="printTable">
+          <thead>
+            <tr>
+              <th style="width:34%">Projet</th>
+              <th style="width:22%">Programme</th>
+              <th style="width:7%">Prio.</th>
+              <th style="width:15%">Budget</th>
+              <th style="width:10%" class="right">RAF</th>
+              <th style="width:12%">Statut</th>
+            </tr>
+          </thead>
+          <tbody>${selectedRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE 2 : DETAIL EXHAUSTIF -->
+    <div class="printPage">
+      <div class="printHeader">
+        <div>
+          <div class="h1">Stratégie & Arbitrage DNSI — ${escapeHtml(g.strategie_courante.nom||"Scénario")}</div>
+          <div class="h2">Page 2 / 3 : Liste exhaustive des projets intégrés</div>
+        </div>
+        <div class="meta">Intégrés : ${integrated.length} • ${fmtJ(engaged)} • ${fmtK(sc.budgetInvTotal)}</div>
+      </div>
+
+      <div class="printCard" style="margin-top:8px">
+        <h4>Projets engagés dans le scénario</h4>
+        <table class="printTable">
+          <thead>
+            <tr>
+              <th style="width:34%">Projet</th>
+              <th style="width:22%">Programme</th>
+              <th style="width:7%">Prio.</th>
+              <th style="width:15%">Budget</th>
+              <th style="width:10%" class="right">RAF</th>
+              <th style="width:12%">Statut</th>
+            </tr>
+          </thead>
+          <tbody>${fullRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE 3 : MACRO GANTT LISSE -->
+    <div class="printPage">
+      <div class="printHeader">
+        <div>
+          <div class="h1">Stratégie & Arbitrage DNSI — ${escapeHtml(g.strategie_courante.nom||"Scénario")}</div>
+          <div class="h2">Page 3 / 3 : Feuille de route macro & Lissage trimestriel (T1–T4)</div>
+        </div>
+        <div class="meta">Planifiés : ${printGanttList.length} • Cible : ${fmtJ(sc.quarterTarget)}/trim</div>
+      </div>
+
+      <div class="printCard" style="margin-top:8px; padding:0; overflow:hidden;">
+        <div class="ganttHeaderGrid" style="border-bottom:1px solid rgba(15,23,42,.10);">
+          <div class="ganttHeaderCell">Projet, Programme & Domaine</div>
+          <div class="ganttHeaderCell">T1 (Jan - Mar)</div>
+          <div class="ganttHeaderCell">T2 (Avr - Jun)</div>
+          <div class="ganttHeaderCell">T3 (Jui - Sep)</div>
+          <div class="ganttHeaderCell">T4 (Oct - Déc)</div>
+        </div>
+        <div class="ganttLoadGrid">
+          <div class="ganttLoadCell" style="justify-content:center;font-weight:900;">⚖️ Charge / trim.</div>
+          ${ganttPrintLoadCells}
+        </div>
+        <div>
+          ${ganttPrintRows}
+        </div>
+      </div>
+    </div>
+  `;
+
+  const c = document.getElementById("piePrint1");
+  if(c) drawStrategyPie(c, hp, capProj, engaged);
+}
+
+/* =======================
+   Toolbar + autosave + Bulk
+======================= */
+const autoSaveFields = debounce(()=>{
+  const g0 = loadGov();
+  if(!g0) return;
+  const g = normalizeGov(g0);
+  g.strategie_courante.nom = $("scName").value.trim() || "Scénario";
+  g.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+  g.strategie_courante.hypotheses = g.strategie_courante.hypotheses || {};
+  g.strategie_courante.hypotheses.delta_jours = Math.round(safeNum($("inpDeltaJ").value));
+  g.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+  saveGov(g);
+  renderVariantsBar(g);
+}, 500);
+
+function applyDeltaJours(val){
+  const g0 = loadGov();
+  if(!g0) return;
+  const g = normalizeGov(g0);
+  g.strategie_courante.hypotheses = g.strategie_courante.hypotheses || {};
+  g.strategie_courante.hypotheses.delta_jours = Math.round(safeNum(val));
+  saveGov(g);
+  render();
+}
+
+function downloadGovJson(){
+  const g0 = loadGov();
+  if(!g0){ toast("bad","Export","Contexte introuvable."); return; }
+  const g = normalizeGov(g0);
+  g.strategie_courante.nom = $("scName").value.trim() || "Scénario";
+  g.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+  g.strategie_courante.hypotheses.delta_jours = Math.round(safeNum($("inpDeltaJ").value));
+  g.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+  saveGov(g);
+  const blob = new Blob([JSON.stringify(g, null, 2)], { type:"application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "Gouvernance.json";
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
-  toast("Gouvernance.json téléchargé ✅");
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  toast("ok","Export JSON","Fichier Gouvernance.json téléchargé.");
 }
 
-async function importGov(file){
-  if(!file) return;
-  try{
-    const parsed = JSON.parse(await file.text());
-    if(!parsed || typeof parsed !== "object"){ alert("JSON invalide."); return; }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-    try{
-      const bc = new BroadcastChannel("dnsi-gouvernance");
-      bc.postMessage({ type: "GOUVERNANCE_UPDATED", source: "synthese" });
-      bc.close();
-    }catch(e){}
-    renderAll();
-    toast("Gouvernance importée ✅");
-  }catch(e){
-    alert("Erreur de lecture du fichier JSON.");
+function bulkAddAll(){
+  const g = loadGov();
+  if(!g) return;
+  const projects = g.portefeuille?.projets || [];
+  const qPf = ($("fltSearchPf")?.value || "").toLowerCase().trim();
+  const prPf = $("fltPrioPf")?.value || "";
+  const pgPf = $("fltProgPf")?.value || "";
+  const current = new Set((g.strategie_courante?.selection?.projets_lances || []).map(String));
+  let added = 0, skippedNoCharge = 0;
+
+  for(const p of projects){
+    const id = String(p?.id ?? "");
+    if(!id || current.has(id)) continue;
+
+    const prg = resolveProgramme(g, p);
+    if(qPf && !`${p.id} ${p.nom||p.name} ${p.direction} ${p.cdp_nom} ${prg?.titre||""}`.toLowerCase().includes(qPf)) continue;
+    if(prPf && String(p.priorite||"P2").toUpperCase() !== prPf) continue;
+    if(pgPf === "__NONE__" && prg) continue;
+    if(pgPf && pgPf !== "__NONE__" && (!prg || String(prg.id) !== pgPf)) continue;
+
+    const r = remainingLoad(g, p);
+    if(!r || !r.hasCharges){ skippedNoCharge++; continue; }
+    current.add(id);
+    added++;
+  }
+
+  g.strategie_courante.selection.projets_lances = Array.from(current);
+  saveGov(g);
+  render();
+
+  if(added === 0){
+    toast("warn","Aucun projet ajouté", skippedNoCharge ? `${skippedNoCharge} projet(s) sans charge (non intégrables).` : "Tous les projets intégrables affichés sont déjà intégrés.");
+  }else{
+    const msg = skippedNoCharge ? `+${added} intégré(s) · ${skippedNoCharge} sans charge ignoré(s)` : `+${added} intégré(s)`;
+    toast("ok","Intégration complète", msg);
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderAll();
+function bulkRemoveAll(){
+  const g = loadGov();
+  if(!g) return;
+  const qInt = ($("fltSearchInt")?.value || "").toLowerCase().trim();
+  const prInt = $("fltPrioInt")?.value || "";
+  const byId = new Map((g.portefeuille.projets || []).map(p => [String(p.id), p]));
 
-  $("btnRefresh").addEventListener("click", () => {
-    renderAll();
-    toast("Synthèse réactualisée 🔄");
-  });
-  $("btnPdf").addEventListener("click", () => window.print());
-  $("btnSaveJson").addEventListener("click", downloadGov);
-  $("btnImport").addEventListener("click", () => { $("fileInput").value = ""; $("fileInput").click(); });
-  $("fileInput").addEventListener("change", e => importGov(e.target.files?.[0]));
+  const current = (g.strategie_courante?.selection?.projets_lances || []).map(String);
+  const toKeep = [];
+  const removed = new Set();
 
-  window.addEventListener("storage", ev => {
-    if(ev.key === STORAGE_KEY) renderAll();
+  for(const id of current){
+    const p = byId.get(id);
+    if(!p){ removed.add(id); continue; }
+    const prg = resolveProgramme(g, p);
+    const matchesFilter =
+      (!qInt || `${p.id} ${p.nom||p.name} ${p.direction} ${p.cdp_nom} ${prg?.titre||""}`.toLowerCase().includes(qInt)) &&
+      (!prInt || String(p.priorite||"P2").toUpperCase() === prInt);
+    if(matchesFilter) removed.add(id);
+    else toKeep.push(id);
+  }
+
+  g.strategie_courante.selection.projets_lances = toKeep;
+  g.strategie_courante.selection.projets_synthese = (g.strategie_courante.selection.projets_synthese || []).filter(id => !removed.has(String(id)));
+  saveGov(g);
+  render();
+  toast("draft","Projets retirés", removed.size ? `${removed.size} projet(s) retiré(s).` : "Aucun projet à retirer.");
+}
+
+function init(){
+  setupPinchToZoom();
+  render();
+  wireGanttFilters();
+  wireGanttModalBtns();
+
+  // Zoom controls
+  $("btnZoomOut").addEventListener("click", () => setZoom(currentZoom - 0.10));
+  $("btnZoomIn").addEventListener("click", () => setZoom(currentZoom + 0.10));
+  $("btnZoomReset").addEventListener("click", () => { setZoom(1); toast("draft","Zoom","Affichage réinitialisé à 100 %."); });
+  $("btnZoomFit").addEventListener("click", fitZoomToScreen);
+
+  // Variants controls
+  $("btnNewVariant").addEventListener("click", () => createNewVariant(false));
+  $("btnDupVariant").addEventListener("click", () => createNewVariant(true));
+  $("btnDelVariant").addEventListener("click", deleteActiveVariant);
+
+  // What-If controls
+  document.querySelectorAll(".wf-chip[data-delta]").forEach(btn => {
+    btn.addEventListener("click", () => applyDeltaJours(Number(btn.getAttribute("data-delta"))));
   });
+  $("inpDeltaJ").addEventListener("input", () => applyDeltaJours($("inpDeltaJ").value));
+
+  // Auto-arbitrage
+  $("btnAutoFill").addEventListener("click", autoArbitrateByPriority);
+
+  // Filters Source & Intégrés
+  ["fltSearchPf","fltPrioPf","fltProgPf","fltSearchInt","fltPrioInt"].forEach(id => {
+    $(id).addEventListener("input", render);
+    $(id).addEventListener("change", render);
+  });
+
+  $("btnRefresh").addEventListener("click", ()=>{ toast("draft","Réactualiser","Lecture des dernières données…"); render(); });
+  $("btnExportJson").addEventListener("click", downloadGovJson);
+  $("btnAddAllInPf").addEventListener("click", bulkAddAll);
+  $("btnRemoveAllInInt").addEventListener("click", bulkRemoveAll);
+
+  $("btnSaveGov").addEventListener("click", ()=>{
+    const g0 = loadGov();
+    if(!g0){ toast("bad","Sauvegarde","Contexte introuvable."); return; }
+    const g = normalizeGov(g0);
+    g.strategie_courante.nom = $("scName").value.trim() || "Scénario";
+    g.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+    g.strategie_courante.hypotheses.delta_jours = Math.round(safeNum($("inpDeltaJ").value));
+    g.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+    saveGov(g);
+    toast("ok","Sauvegardé","Gouvernance et variantes enregistrées.");
+    render();
+  });
+
+  $("btnPdf").addEventListener("click", ()=>{
+    const g0 = loadGov();
+    if(!g0){ toast("bad","PDF","Contexte introuvable."); return; }
+    const g = normalizeGov(g0);
+    g.strategie_courante.nom = $("scName").value.trim() || "Scénario";
+    g.strategie_courante.textes = { pros: $("txtPros").value || "", cons: $("txtCons").value || "" };
+    g.strategie_courante.hypotheses.delta_jours = Math.round(safeNum($("inpDeltaJ").value));
+    g.strategie_courante.hypotheses.commentaire = $("txtDeltaNote").value || "";
+    saveGov(g);
+    const sc = computeScenario(g);
+    buildPrintArea(g, sc);
+    const content = $("zoomContent");
+    if(content) content.style.zoom = 1;
+    window.print();
+  });
+
+  $("btnReset").addEventListener("click", ()=>{
+    const g0 = loadGov();
+    if(!g0){ toast("bad","Reset","Contexte introuvable."); return; }
+    if(!confirm("Vider tous les projets et les textes de cette variante de scénario ?")) return;
+    const g = normalizeGov(g0);
+    g.strategie_courante.selection.projets_lances = [];
+    g.strategie_courante.selection.projets_synthese = [];
+    g.strategie_courante.hypotheses = { delta_jours: 0, commentaire: "" };
+    g.strategie_courante.textes = { pros:"", cons:"" };
+    saveGov(g);
+    toast("draft","Scénario vidé","La variante active a été remise à zéro.");
+    render();
+  });
+
+  $("btnImport").addEventListener("click", ()=> { $("fileInput").value = ""; $("fileInput").click(); });
+  $("fileInput").addEventListener("change", async ()=>{
+    const f = $("fileInput").files?.[0];
+    if(!f) return;
+    const raw = jparse(await f.text());
+    if(!raw){ toast("bad","Import","JSON invalide."); $("fileInput").value=""; return; }
+
+    const imported = normalizeGov(raw);
+    const g0 = loadGov();
+    if(!g0){
+      saveGov(imported);
+      toast("ok","Import","Gouvernance complète importée.");
+      render();
+      $("fileInput").value="";
+      return;
+    }
+
+    const g = normalizeGov(g0);
+    if(imported?.strategie_courante){
+      g.strategie_courante = imported.strategie_courante;
+      if(Array.isArray(imported.strategies_variantes) && imported.strategies_variantes.length){
+        g.strategies_variantes = imported.strategies_variantes;
+      }
+      saveGov(g);
+      toast("ok","Import stratégie","Stratégie et variantes importées (Programmes/PF/Capacité conservés).");
+      render();
+    } else {
+      toast("warn","Import stratégie","Aucune stratégie trouvée dans le fichier.");
+    }
+    $("fileInput").value="";
+  });
+
+  $("scName").addEventListener("input", autoSaveFields);
+  $("txtPros").addEventListener("input", autoSaveFields);
+  $("txtCons").addEventListener("input", autoSaveFields);
+  $("txtDeltaNote").addEventListener("input", autoSaveFields);
+
+  window.addEventListener("storage", (ev)=>{ if(ev.key===STORAGE_KEY) render(); });
   try{
-    const bc = new BroadcastChannel("dnsi-gouvernance");
-    bc.onmessage = ev => {
-      if(ev?.data?.type === "GOUVERNANCE_UPDATED") renderAll();
+    const bc = new BroadcastChannel('dnsi-gouvernance');
+    bc.onmessage = (e)=>{
+      const d = e?.data;
+      if(d && d.type==='GOUVERNANCE_UPDATED' && d.source !== 'strategie') render();
     };
   }catch(e){}
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
+
+  if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
 }
-});
+
+init();
 </script>
 </body>
 </html>
