@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cockpit CODIR — Synthèse Gouvernance (V2.7)</title>
+<title>Cockpit CODIR — Synthèse Gouvernance (V2.8)</title>
 <meta name="theme-color" content="#C10F1A" />
 <link rel="manifest" href="./manifest.json" />
 <link rel="icon" type="image/png" href="./icon.png" />
@@ -99,7 +99,7 @@ html,body{
 .btn.action{background:#0f172a; border-color:#0f172a; color:#fff;}
 .btn.action:hover{background:#1e293b;}
 
-/* Navigation 5 Piliers + Aide + Zoom */
+/* Navigation 5 Piliers — Frise Workflow guidée (Option 1) + Aide + Zoom */
 .ppm-nav{
   background:#fff;
   border-bottom:1px solid var(--border);
@@ -110,19 +110,101 @@ html,body{
   max-width:1360px; margin:0 auto;
   display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
 }
-.ppm-links{display:flex; gap:8px; flex-wrap:wrap;}
+.ppm-links{
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
+}
 .ppm-link{
-  text-decoration:none; padding:6px 12px; border-radius:999px;
-  font-size:12px; font-weight:800; color:var(--text);
-  background:#f1f5f9; border:1px solid var(--border);
-  display:inline-flex; align-items:center; gap:6px;
+  text-decoration:none;
+  padding:5px 11px;
+  border-radius:12px;
+  color:var(--text);
+  background:#f8fafc;
+  border:1px solid var(--border);
+  display:inline-flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:1px;
+  transition:background .15s ease, border-color .15s ease, transform .1s ease;
+}
+.ppm-link-top{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.ppm-link-sub{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--muted);
+  line-height:1.15;
+  white-space:nowrap;
 }
 .ppm-link.active{
   background:var(--brand-light);
   color:var(--brand);
-  border-color:rgba(193,15,26,.28);
+  border-color:rgba(193,15,26,.34);
+  box-shadow:0 2px 6px rgba(193,15,26,.08);
 }
-.ppm-link:hover:not(.active){background:#e2e8f0;}
+.ppm-link.active .ppm-link-sub{
+  color:var(--brand-dark);
+  opacity:.88;
+}
+.ppm-link:hover:not(.active){
+  background:#eef2f6;
+  border-color:#cbd5e1;
+}
+.wf-sep{
+  width:1px;
+  height:28px;
+  background:#cbd5e1;
+  margin:0 4px;
+  flex-shrink:0;
+}
+.wf-arrow{
+  color:#94a3b8;
+  font-size:12px;
+  font-weight:900;
+  user-select:none;
+  line-height:1;
+}
+.wf-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  display:inline-block;
+  flex-shrink:0;
+  background:#cbd5e1;
+}
+.wf-dot.wf-ok{
+  background:var(--ok);
+  box-shadow:0 0 0 2px rgba(22,163,74,.18);
+}
+.wf-dot.wf-todo{
+  background:var(--warn);
+  box-shadow:0 0 0 2px rgba(245,158,11,.22);
+}
+.guide-flow-pill{
+  display:inline-flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:10px;
+  padding:6px 11px;
+  border-radius:10px;
+  background:#fff;
+  border:1px solid #bfdbfe;
+  font-size:11.5px;
+  font-weight:800;
+  color:#1e3a8a;
+}
+.guide-flow-pill .gf-sep{color:#60a5fa; font-weight:900;}
+@media (max-width: 720px){
+  .wf-sep, .wf-arrow{display:none;}
+}
 
 .ppm-nav-right{
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -521,7 +603,7 @@ td{
       <div class="brand-ui">
         <div class="badge">PMO</div>
         <div>
-          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.7)</div>
+          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.8)</div>
           <div class="sub" id="subDate">Gouvernance DNSI • Programmes ➔ Portefeuille ➔ Capacité ➔ Stratégie</div>
         </div>
       </div>
@@ -535,16 +617,44 @@ td{
     </div>
   </header>
 
-  <!-- Navigation 5 Piliers + Aide à la demande + Zoom -->
-  <nav class="ppm-nav no-print">
+  <!-- Navigation 5 Piliers — Frise Workflow guidée (Option 1) + Aide + Zoom -->
+  <nav class="ppm-nav no-print" aria-label="Workflow de gouvernance en 5 supports">
     <div class="ppm-nav-row">
       <div class="ppm-links">
-        <a class="ppm-link active" href="Gouvernance - 0. Synthese.html">📊 0. Synthèse CODIR</a>
-        <a class="ppm-link" href="Gouvernance - 1. Programmes.html">🎯 1. Programmes</a>
-        <a class="ppm-link" href="Gouvernance - 2. Portefeuille.html">📚 2. Portefeuille Projets</a>
-        <a class="ppm-link" href="Gouvernance - 3. Capacite.html">⚙️ 3. Capacité DNSI</a>
-        <a class="ppm-link" href="Gouvernance - 4. Strategie.html">🧠 4. Stratégie & Arbitrage</a>
+        <a class="ppm-link active" href="Gouvernance - 0. Synthese.html" title="Cockpit de restitution CODIR (lecture seule) : consolidé automatiquement à partir des étapes 1 à 4.">
+          <span class="ppm-link-top">📊 0. Synthèse CODIR</span>
+          <span class="ppm-link-sub">Lire &amp; piloter (auto)</span>
+        </a>
+
+        <span class="wf-sep" aria-hidden="true"></span>
+
+        <a class="ppm-link" id="wfLink1" href="Gouvernance - 1. Programmes.html" title="Étape 1 (Le Cap) : définir les grands axes/programmes stratégiques, leurs sponsors et horizons.">
+          <span class="ppm-link-top">🎯 1. Programmes <span class="wf-dot wf-todo" id="wfDot1" aria-hidden="true"></span></span>
+          <span class="ppm-link-sub">Fixer les grands axes</span>
+        </a>
+
+        <span class="wf-arrow" aria-hidden="true">➔</span>
+
+        <a class="ppm-link" id="wfLink2" href="Gouvernance - 2. Portefeuille.html" title="Étape 2 (La Demande) : déclarer les besoins métiers, qualifier les priorités et importer les JSON des chefs de projet.">
+          <span class="ppm-link-top">📚 2. Portefeuille <span class="wf-dot wf-todo" id="wfDot2" aria-hidden="true"></span></span>
+          <span class="ppm-link-sub">Recenser &amp; chiffrer</span>
+        </a>
+
+        <span class="wf-arrow" aria-hidden="true">➔</span>
+
+        <a class="ppm-link" id="wfLink3" href="Gouvernance - 3. Capacite.html" title="Étape 3 (Les Moyens) : déclarer le potentiel humain DNSI et isoler la maintenance incompressible (MCO/RUN).">
+          <span class="ppm-link-top">⚙️ 3. Capacité <span class="wf-dot wf-todo" id="wfDot3" aria-hidden="true"></span></span>
+          <span class="ppm-link-sub">Déclarer les moyens</span>
+        </a>
+
+        <span class="wf-arrow" aria-hidden="true">➔</span>
+
+        <a class="ppm-link" id="wfLink4" href="Gouvernance - 4. Strategie.html" title="Étape 4 (L'Arbitrage) : sélectionner les projets engagés, lisser T1–T4 et cocher les projets phares ⭐ pour ce cockpit.">
+          <span class="ppm-link-top">🧠 4. Stratégie <span class="wf-dot wf-todo" id="wfDot4" aria-hidden="true"></span></span>
+          <span class="ppm-link-sub">Arbitrer le scénario</span>
+        </a>
       </div>
+
       <div class="ppm-nav-right">
         <button type="button" class="help-toggle-btn" id="btnToggleGuide" aria-expanded="false">❓ Comprendre cet écran</button>
         <div class="zoom-controls" title="Zoom / Dézoom (ou pincement à 2 doigts sur écran tactile)">
@@ -562,8 +672,19 @@ td{
   <section class="guide-drawer no-print" id="guideDrawer">
     <div class="guide-box">
       <p class="guide-lead">
-        <b>📊 Cockpit en lecture seule :</b> cette vue consolide automatiquement les données saisies dans les 4 piliers ci-dessous. Cliquez sur un bloc pour accéder directement à son écran :
+        <b>📊 Cockpit en lecture seule :</b> cette vue consolide automatiquement les données saisies dans les 4 piliers ci-dessous. Une pastille <b>verte</b> indique un pilier renseigné, <b>ambre</b> un pilier encore vide.
       </p>
+      <div class="guide-flow-pill">
+        <span>🎯 1. Programmes</span>
+        <span class="gf-sep">+</span>
+        <span>📚 2. Portefeuille</span>
+        <span class="gf-sep">+</span>
+        <span>⚙️ 3. Capacité</span>
+        <span class="gf-sep">➔</span>
+        <span>🧠 4. Stratégie (Arbitrage)</span>
+        <span class="gf-sep">➔</span>
+        <span style="color:var(--brand);">📊 0. Synthèse CODIR</span>
+      </div>
       <div class="guide-steps">
         <a class="guide-step" href="Gouvernance - 1. Programmes.html">
           <strong>1. 🎯 Programmes (Le Cap)</strong>
@@ -795,11 +916,11 @@ td{
     </div>
   </div>
 
-  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.7) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.8) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
 </div>
 
 <script>
-const APP_VERSION = "V2.7";
+const APP_VERSION = "V2.8";
 const STORAGE_KEY = "GOUVERNANCE_JSON";
 const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Gestion-supports-projet-/";
 const FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#2563eb", "#10b981", "#ef4444", "#0891b2", "#475569"];
@@ -977,6 +1098,47 @@ function openProjectSupport(projectId){
 /* =============================
    Rendu Principal
 ============================= */
+function updateWorkflowIndicators(state){
+  const steps = [
+    {
+      dot: "wfDot1", link: "wfLink1", ok: !!state.hasProgs,
+      baseTitle: "Étape 1 (Le Cap) : définir les grands axes/programmes stratégiques, leurs sponsors et horizons.",
+      okMsg: `${state.nbProgs || 0} programme(s) actif(s)`,
+      todoMsg: "Aucun programme actif — commencez ici"
+    },
+    {
+      dot: "wfDot2", link: "wfLink2", ok: !!state.hasProjects,
+      baseTitle: "Étape 2 (La Demande) : déclarer les besoins métiers, qualifier les priorités et importer les JSON des chefs de projet.",
+      okMsg: `${state.nbProjects || 0} demande(s) / projet(s)`,
+      todoMsg: "Portefeuille vide — ajoutez vos demandes ou importez des JSON CDP"
+    },
+    {
+      dot: "wfDot3", link: "wfLink3", ok: !!state.hasCap,
+      baseTitle: "Étape 3 (Les Moyens) : déclarer le potentiel humain DNSI et isoler la maintenance incompressible (MCO/RUN).",
+      okMsg: `${(state.capPot || 0).toLocaleString("fr-FR")} j de potentiel déclaré`,
+      todoMsg: "Capacité à 0 j — renseignez le potentiel DNSI"
+    },
+    {
+      dot: "wfDot4", link: "wfLink4", ok: !!state.hasStrat,
+      baseTitle: "Étape 4 (L'Arbitrage) : sélectionner les projets engagés, lisser T1–T4 et cocher les projets phares ⭐ pour ce cockpit.",
+      okMsg: `${state.nbEngaged || 0} projet(s) engagé(s) dans le scénario`,
+      todoMsg: "Aucun projet engagé — arbitrez votre scénario"
+    }
+  ];
+
+  steps.forEach(s => {
+    const d = $(s.dot);
+    if(d){
+      d.classList.toggle("wf-ok", s.ok);
+      d.classList.toggle("wf-todo", !s.ok);
+    }
+    const a = $(s.link);
+    if(a){
+      a.title = `${s.baseTitle} (${s.ok ? "✅ " + s.okMsg : "⚠️ " + s.todoMsg})`;
+    }
+  });
+}
+
 function renderAll(){
   const GOV = loadGov();
   $("subDate").textContent = `Gouvernance DNSI • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
@@ -986,6 +1148,7 @@ function renderAll(){
 
   if(!GOV){
     $("chipSync").textContent = "Aucune donnée locale";
+    updateWorkflowIndicators({ hasProgs: false, hasProjects: false, hasCap: false, hasStrat: false });
     if(onboardEl) onboardEl.style.display = "block";
     if(zoomZoneEl) zoomZoneEl.style.display = "none";
     return;
@@ -1282,6 +1445,18 @@ function renderAll(){
     tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
   }
   $("stratCount").textContent = engagedProjects.length;
+
+  updateWorkflowIndicators({
+    hasProgs: activeProgs.length > 0,
+    nbProgs: activeProgs.length,
+    hasProjects: projets.length > 0,
+    nbProjects: projets.length,
+    hasCap: cPot > 0,
+    capPot: cPot,
+    hasStrat: engagedProjects.length > 0,
+    nbEngaged: engagedProjects.length
+  });
+
   applyZoomToDom();
 }
 
