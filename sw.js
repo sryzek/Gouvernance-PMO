@@ -1,5 +1,5 @@
 /* Service Worker — Gouvernance DNSI (V1.0.0) */
-const CACHE_NAME = "gouvernance-dnsi-v1.0.1";
+const CACHE_NAME = "gouvernance-dnsi-v1.0.2";
 
 const ASSETS = [
   "./",
