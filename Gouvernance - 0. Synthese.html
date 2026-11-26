@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Cockpit CODIR — Synthèse Gouvernance (V2.7)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cockpit CODIR — Synthèse Gouvernance (V2.8)</title>
 <meta name="theme-color" content="#C10F1A" />
 <link rel="manifest" href="./manifest.json" />
 <link rel="icon" type="image/png" href="./icon.png" />
@@ -28,7 +28,10 @@
   --remGreen:#10b981;
 }
 
-*{box-sizing:border-box;}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
 html,body{
   margin:0; padding:0;
@@ -36,21 +39,43 @@ html,body{
   color:var(--text);
   background:var(--bg);
   font-size:13px;
+  -webkit-font-smoothing:antialiased;
 }
 
-/* Impression A3 Paysage CODIR */
+button, a, select, input{
+  touch-action:manipulation;
+}
+
+/* Impression A3 Paysage CODIR (strictement préservée) */
 @page{ size:A3 landscape; margin:12mm; }
 @media print{
   *{-webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;}
   html, body{background:#fff !important;}
   .wrap{max-width:100% !important; padding:0 !important; margin:0 !important;}
   .topbar{box-shadow:none !important; position:static !important; margin-bottom:10px !important; border-radius:10px !important;}
-  .toolbar, .ppm-nav, .guide-drawer, .zoom-controls, .info-wrap, .no-print, .toast, #emptyOnboarding{display:none !important;}
-  .zoom-wrap{overflow:visible !important;}
-  #zoomContent{zoom:1 !important; width:100% !important;}
-  .grid-2x2{gap:12px !important; padding:0 !important; grid-template-columns:1fr 1fr !important;}
-  .panel{break-inside:avoid; page-break-inside:avoid; box-shadow:none !important; border:1px solid #cbd5e1 !important;}
-  .proj-link-title, .proj-link-id{text-decoration:none !important; color:inherit !important; padding:0 !important; background:none !important; border:none !important;}
+  .toolbar, .mobile-top-actions, .ppm-nav, .mobile-quad-bar, .bottom-nav, .sheet-backdrop, .guide-drawer, .info-btn, .info-inline, .no-print, .toast, #emptyOnboarding{
+    display:none !important;
+  }
+  .grid-2x2{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:12px !important;
+    padding:0 !important;
+  }
+  .panel{
+    display:flex !important;
+    break-inside:avoid;
+    page-break-inside:avoid;
+    box-shadow:none !important;
+    border:1px solid #cbd5e1 !important;
+  }
+  .proj-link-title, .proj-link-id{
+    text-decoration:none !important;
+    color:inherit !important;
+    padding:0 !important;
+    background:none !important;
+    border:none !important;
+  }
 }
 
 .wrap{
@@ -61,7 +86,7 @@ html,body{
 
 /* Top bar */
 .topbar{
-  position:sticky; top:0; z-index:50;
+  position:sticky; top:0; z-index:60;
   background:var(--brand);
   color:#fff;
   padding:12px 20px;
@@ -72,7 +97,7 @@ html,body{
   max-width:1360px; margin:0 auto;
 }
 .brand-ui{
-  display:flex; align-items:center; gap:14px;
+  display:flex; align-items:center; gap:12px; min-width:0;
 }
 .brand-ui .badge{
   width:40px; height:40px; border-radius:11px;
@@ -81,8 +106,15 @@ html,body{
   font-weight:900; font-size:13px;
   color:#fff; border:none; flex-shrink:0;
 }
-.brand-ui .h1{font-weight:900; font-size:17px; letter-spacing:.2px;}
-.brand-ui .sub{font-size:12px; opacity:.92;}
+.brand-ui .titles{min-width:0;}
+.brand-ui .h1{
+  font-weight:900; font-size:17px; letter-spacing:.2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.brand-ui .sub{
+  font-size:12px; opacity:.92;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
 .toolbar{
   display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -92,14 +124,36 @@ html,body{
   background:transparent; color:#fff;
   padding:7px 13px; border-radius:999px;
   font-weight:800; font-size:12px; cursor:pointer;
-  transition:all .15s ease;
+  transition:background .15s ease, transform .1s ease;
   display:inline-flex; align-items:center; gap:6px;
 }
 .btn:hover{background:rgba(255,255,255,.14);}
+.btn:active{transform:scale(0.97);}
 .btn.action{background:#0f172a; border-color:#0f172a; color:#fff;}
 .btn.action:hover{background:#1e293b;}
 
-/* Navigation 5 Piliers + Aide + Zoom */
+/* Boutons compacts de la topbar sur tactile/mobile (masqués sur desktop) */
+.mobile-top-actions{
+  display:none;
+  align-items:center;
+  gap:8px;
+  flex-shrink:0;
+}
+.icon-top-btn{
+  width:40px; height:40px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.30);
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:background .15s ease, transform .1s ease;
+}
+.icon-top-btn:active{transform:scale(0.94); background:rgba(255,255,255,.24);}
+
+/* Navigation 5 Piliers (Desktop) */
 .ppm-nav{
   background:#fff;
   border-bottom:1px solid var(--border);
@@ -116,6 +170,7 @@ html,body{
   font-size:12px; font-weight:800; color:var(--text);
   background:#f1f5f9; border:1px solid var(--border);
   display:inline-flex; align-items:center; gap:6px;
+  transition:background .15s ease;
 }
 .ppm-link.active{
   background:var(--brand-light);
@@ -131,13 +186,13 @@ html,body{
   border:1px solid #cbd5e1;
   background:#f8fafc;
   color:#334155;
-  padding:5px 11px;
+  padding:6px 12px;
   border-radius:999px;
-  font-size:11.5px;
+  font-size:12px;
   font-weight:800;
   cursor:pointer;
   display:inline-flex; align-items:center; gap:5px;
-  transition:all .15s ease;
+  transition:background .15s ease, border-color .15s ease, color .15s ease;
 }
 .help-toggle-btn:hover, .help-toggle-btn.open{
   background:#eff6ff;
@@ -145,47 +200,52 @@ html,body{
   border-color:#93c5fd;
 }
 
-/* Contrôles Zoom (tactile + boutons rapides) */
-.zoom-controls{
-  display:inline-flex;
-  align-items:center;
-  background:#f1f5f9;
-  padding:2px 3px;
+.chip-sync{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:5px 10px; border-radius:999px;
+  background:#f8fafc; border:1px solid var(--border);
+  font-size:11px; font-weight:800; color:var(--muted);
+}
+
+/* Barre d'onglets rapides des 4 quadrants (tactile <= 900px) */
+.mobile-quad-bar{
+  display:none;
+  position:sticky;
+  top:58px;
+  z-index:45;
+  background:rgba(246,247,251,.94);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:8px 12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  gap:6px;
+}
+.mobile-quad-bar::-webkit-scrollbar{display:none;}
+.quad-tab{
+  flex:0 0 auto;
+  min-height:38px;
+  padding:6px 13px;
   border-radius:999px;
   border:1px solid var(--border);
-  gap:2px;
-}
-.zoom-btn, .zoom-pct, .zoom-fit-btn{
-  border:none;
-  background:transparent;
+  background:#fff;
   color:var(--text);
-  border-radius:999px;
+  font-size:12.5px;
   font-weight:800;
-  font-size:11.5px;
   cursor:pointer;
   display:inline-flex;
   align-items:center;
-  justify-content:center;
-  transition:background .15s ease, color .15s ease;
+  gap:5px;
+  transition:background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
 }
-.zoom-btn{width:24px; height:24px; font-size:14px; line-height:1;}
-.zoom-pct{
-  min-width:42px; height:24px; padding:0 5px;
-  font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size:11px; color:var(--muted);
-}
-.zoom-fit-btn{
-  height:24px; padding:0 8px; font-size:11px;
-  background:#fff; border:1px solid var(--border); margin-left:2px;
-}
-.zoom-btn:hover, .zoom-pct:hover{background:#e2e8f0; color:var(--text);}
-.zoom-fit-btn:hover{background:#0f172a; color:#fff; border-color:#0f172a;}
-
-.chip-sync{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:4px 10px; border-radius:999px;
-  background:#f8fafc; border:1px solid var(--border);
-  font-size:11px; font-weight:800; color:var(--muted);
+.quad-tab:active{transform:scale(0.96);}
+.quad-tab.active{
+  background:#0f172a;
+  color:#fff;
+  border-color:#0f172a;
+  box-shadow:0 3px 10px rgba(15,23,42,.18);
 }
 
 /* Tiroir "Comprendre cet écran" (replié par défaut) */
@@ -204,10 +264,26 @@ html,body{
   padding:12px 16px;
   color:#1e3a8a;
 }
+.guide-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-bottom:10px;
+}
 .guide-lead{
   font-size:12.5px;
-  margin:0 0 10px 0;
+  margin:0;
   line-height:1.4;
+}
+.guide-close{
+  border:1px solid #bfdbfe;
+  background:#fff;
+  color:#1d4ed8;
+  width:32px; height:32px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:14px;
+  cursor:pointer;
+  flex-shrink:0;
+  display:inline-flex; align-items:center; justify-content:center;
 }
 .guide-steps{
   display:grid;
@@ -219,12 +295,12 @@ html,body{
 .guide-step{
   text-decoration:none;
   color:inherit;
-  background:rgba(255,255,255,.85);
+  background:rgba(255,255,255,.90);
   border:1px solid #dbeafe;
-  border-radius:10px;
-  padding:9px 11px;
-  font-size:11.5px;
-  line-height:1.38;
+  border-radius:11px;
+  padding:10px 12px;
+  font-size:12px;
+  line-height:1.4;
   transition:transform .12s ease, border-color .15s ease, background .15s ease;
   display:block;
 }
@@ -244,38 +320,39 @@ html,body{
 #emptyOnboarding{
   display:none;
   max-width:760px;
-  margin:28px auto;
-  padding:0 20px;
+  margin:24px auto;
+  padding:0 16px;
 }
 .onboard-card{
   background:#fff;
   border:1px solid var(--border);
   border-radius:20px;
-  padding:28px 26px;
+  padding:26px 22px;
   text-align:center;
   box-shadow:0 12px 30px rgba(15,23,42,.06);
 }
 .onboard-icon{font-size:42px; margin-bottom:8px;}
-.onboard-card h2{margin:0 0 8px 0; font-size:20px; font-weight:900; color:var(--text);}
+.onboard-card h2{margin:0 0 8px 0; font-size:19px; font-weight:900; color:var(--text);}
 .onboard-card p{
   margin:0 auto 20px; max-width:560px;
   font-size:13px; color:var(--muted); line-height:1.5;
 }
 .onboard-actions{
-  display:flex; justify-content:center; gap:12px; flex-wrap:wrap;
+  display:flex; justify-content:center; gap:10px; flex-wrap:wrap;
 }
 .onboard-btn{
   text-decoration:none;
   border:1px solid var(--border);
   border-radius:12px;
-  padding:11px 18px;
+  padding:12px 18px;
+  min-height:46px;
   font-weight:900;
   font-size:13px;
   cursor:pointer;
-  display:inline-flex; align-items:center; gap:7px;
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
   transition:transform .1s ease, background .15s ease;
 }
-.onboard-btn:active{transform:scale(0.98);}
+.onboard-btn:active{transform:scale(0.97);}
 .onboard-btn.primary{
   background:var(--brand); color:#fff; border-color:var(--brand);
   box-shadow:0 4px 12px rgba(193,15,26,.22);
@@ -285,15 +362,6 @@ html,body{
   background:#0f172a; color:#fff; border-color:#0f172a;
 }
 .onboard-btn.dark:hover{background:#1e293b;}
-
-/* Zone tactile Pinch-to-Zoom */
-.zoom-wrap{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  touch-action:pan-x pan-y;
-  width:100%;
-}
-#zoomContent{width:100%;}
 
 /* Grille 4 Quadrants */
 .grid-2x2{
@@ -310,75 +378,73 @@ html,body{
   border-radius:18px;
   box-shadow:0 8px 24px rgba(15,23,42,.04);
   display:flex; flex-direction:column;
+  min-width:0;
 }
+.panel.quad-hidden{display:none;}
+
 .panel-head{
-  padding:15px 20px;
+  padding:14px 18px;
   border-bottom:1px solid var(--border);
-  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
   background:linear-gradient(180deg, #fff, #f8fafc);
   border-radius:18px 18px 0 0;
 }
+.panel-head-main{min-width:0; flex:1;}
 .panel-title{
   font-weight:900; font-size:15px; color:var(--text);
-  display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap;
 }
 .panel-sub{font-size:12px; color:var(--muted); margin-top:3px; font-weight:500;}
-.panel-link{
-  text-decoration:none;
-  font-size:11.5px; font-weight:800; color:var(--brand);
-  padding:5px 11px; border-radius:999px;
-  background:var(--brand-light); white-space:nowrap; flex-shrink:0;
+.panel-head-actions{
+  display:flex; align-items:center; gap:6px; flex-shrink:0;
 }
-.panel-link:hover{background:rgba(193,15,26,.15);}
-.panel-body{padding:18px 20px; flex:1;}
 
-/* Pastille discrète ⓘ par quadrant (hover PC + tap tactile) */
-.info-wrap{
-  position:relative;
-  display:inline-flex;
-  align-items:center;
-}
+/* Bouton d'aide ⓘ tactile confortable (36px+) + accordéon inline sans débordement */
 .info-btn{
-  width:19px; height:19px;
-  border-radius:50%;
+  min-width:36px; height:36px;
+  border-radius:999px;
   border:1px solid #cbd5e1;
   background:#f8fafc;
   color:var(--muted);
-  font-size:11px;
+  font-size:13px;
   font-weight:900;
-  line-height:1;
   cursor:pointer;
   display:inline-flex; align-items:center; justify-content:center;
-  padding:0;
-  transition:all .15s ease;
+  padding:0 8px;
+  transition:background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
 }
-.info-btn:hover, .info-wrap.open .info-btn{
+.info-btn:hover, .info-btn.open{
   background:#eff6ff;
   color:#1d4ed8;
   border-color:#93c5fd;
 }
-.info-pop{
+.info-btn:active{transform:scale(0.94);}
+
+.info-inline{
   display:none;
-  position:absolute;
-  top:calc(100% + 7px);
-  left:0;
-  width:295px;
-  max-width:78vw;
-  background:#0f172a;
-  color:#f8fafc;
-  font-size:11.5px;
-  font-weight:500;
+  padding:10px 18px;
+  background:#eff6ff;
+  border-bottom:1px solid #dbeafe;
+  color:#1e3a8a;
+  font-size:12px;
   line-height:1.45;
-  padding:9px 11px;
-  border-radius:10px;
-  box-shadow:0 12px 28px rgba(15,23,42,.28);
-  z-index:80;
-  pointer-events:auto;
+  font-weight:600;
 }
-.info-wrap.open .info-pop{display:block;}
-@media (hover: hover){
-  .info-wrap:hover .info-pop{display:block;}
+.info-inline.open{display:block;}
+
+.panel-link{
+  text-decoration:none;
+  font-size:12px; font-weight:800; color:var(--brand);
+  min-height:36px;
+  padding:6px 12px; border-radius:999px;
+  background:var(--brand-light); white-space:nowrap;
+  display:inline-flex; align-items:center; gap:4px;
+  transition:background .15s ease, transform .1s ease;
 }
+.panel-link:hover{background:rgba(193,15,26,.15);}
+.panel-link:active{transform:scale(0.96);}
+
+.panel-body{padding:16px 18px; flex:1;}
 
 /* KPIs */
 .kpi-grid{
@@ -400,7 +466,7 @@ html,body{
   display:flex; justify-content:space-between; align-items:baseline; gap:8px;
   font-size:13px; font-weight:800; margin-bottom:5px;
 }
-.axe-name{display:flex; align-items:center; gap:6px; min-width:0;}
+.axe-name{display:flex; align-items:center; gap:6px; min-width:0; flex-wrap:wrap;}
 .axe-code{font-size:11px; color:var(--muted); font-weight:800;}
 .axe-val{font-weight:900; white-space:nowrap;}
 .axe-track{height:10px; background:#e2e8f0; border-radius:999px; overflow:hidden;}
@@ -449,37 +515,40 @@ html,body{
   font-size:12px; color:#334155;
 }
 
-/* Table Projets Synthèse + Liens cliquables */
+/* Table Projets Synthèse + Liens cliquables confortables */
 table{width:100%; border-collapse:collapse; margin-top:8px;}
 th{
   text-align:left; font-size:10.5px; color:var(--muted);
   text-transform:uppercase; padding-bottom:8px; border-bottom:1px solid var(--border);
 }
 td{
-  padding:9px 4px; border-bottom:1px solid #f1f5f9;
+  padding:10px 4px; border-bottom:1px solid #f1f5f9;
   font-size:12.5px; vertical-align:middle;
 }
 .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:11.5px;}
 
 .proj-link-title{
-  background:none; border:none; padding:0;
-  font-family:inherit; font-size:12.5px; font-weight:800;
+  background:none; border:none; padding:2px 0;
+  font-family:inherit; font-size:13px; font-weight:800;
   color:var(--text); cursor:pointer; text-align:left;
+  line-height:1.3;
 }
 .proj-link-title:hover{color:var(--brand); text-decoration:underline; text-underline-offset:2px;}
 .proj-link-id{
   background:rgba(193,15,26,.06);
   border:1px solid rgba(193,15,26,.24);
   color:var(--brand);
-  border-radius:6px;
-  padding:1px 6px;
-  font-size:10.5px;
+  border-radius:7px;
+  padding:3px 8px;
+  font-size:11px;
   font-weight:800;
   cursor:pointer;
-  margin-top:3px;
+  margin-top:4px;
   display:inline-flex; align-items:center; gap:3px;
+  min-height:28px;
 }
 .proj-link-id:hover{background:rgba(193,15,26,.14); border-color:var(--brand);}
+.proj-link-id:active{transform:scale(0.96);}
 
 .badge{
   display:inline-flex; align-items:center; gap:4px;
@@ -499,43 +568,194 @@ td{
   font-size:12.5px; text-align:center; line-height:1.45;
 }
 
+/* Barre de navigation fixe en bas (PWA tactile <= 900px) */
+.bottom-nav{
+  display:none;
+  position:fixed;
+  bottom:0; left:0; right:0;
+  z-index:90;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  box-shadow:0 -4px 18px rgba(15,23,42,.08);
+  padding:4px 6px calc(6px + env(safe-area-inset-bottom));
+}
+.bottom-nav-row{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:2px;
+  max-width:680px;
+  margin:0 auto;
+}
+.bnav-item{
+  text-decoration:none;
+  color:var(--muted);
+  min-height:50px;
+  border-radius:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  font-size:10.5px;
+  font-weight:800;
+  transition:background .15s ease, color .15s ease, transform .1s ease;
+}
+.bnav-item .bnav-ico{font-size:18px; line-height:1.1;}
+.bnav-item.active{
+  color:var(--brand);
+  background:var(--brand-light);
+}
+.bnav-item:active{transform:scale(0.94);}
+
+/* Feuille d'actions mobile (Bottom Sheet via ⋯) */
+.sheet-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.48);
+  z-index:120;
+  align-items:flex-end;
+  justify-content:center;
+}
+.sheet-backdrop.open{display:flex;}
+.action-sheet{
+  width:min(520px, 100%);
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding:14px 16px calc(18px + env(safe-area-inset-bottom));
+  box-shadow:0 -12px 34px rgba(0,0,0,.22);
+}
+.sheet-handle{
+  width:40px; height:4px;
+  border-radius:999px;
+  background:#cbd5e1;
+  margin:0 auto 12px;
+}
+.sheet-head{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:10px;
+}
+.sheet-title{font-weight:900; font-size:15px;}
+.sheet-sync{font-size:11px; color:var(--muted); font-weight:700;}
+.sheet-list{
+  display:grid; gap:8px;
+}
+.sheet-btn{
+  width:100%;
+  min-height:46px;
+  border:1px solid var(--border);
+  background:#f8fafc;
+  color:var(--text);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:13.5px;
+  font-weight:800;
+  cursor:pointer;
+  display:flex; align-items:center; gap:10px;
+  text-align:left;
+  transition:background .15s ease, transform .1s ease;
+}
+.sheet-btn:active{transform:scale(0.98); background:#e2e8f0;}
+.sheet-btn.dark{background:#0f172a; color:#fff; border-color:#0f172a;}
+.sheet-btn.cancel{background:#fff; color:var(--muted); justify-content:center; margin-top:4px;}
+
 .toast{
-  position:fixed; left:16px; bottom:16px;
+  position:fixed; left:50%; transform:translateX(-50%); bottom:20px;
   background:#0f172a; color:#fff;
-  padding:10px 16px; border-radius:999px;
+  padding:10px 18px; border-radius:999px;
   font-size:12.5px; font-weight:800;
-  z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.22);
+  z-index:99999; box-shadow:0 10px 24px rgba(0,0,0,.24);
+  white-space:nowrap;
 }
 
 .footer-ver{
-  text-align:center; color:var(--muted); font-size:11.5px; margin-top:16px;
+  text-align:center; color:var(--muted); font-size:11.5px; margin-top:16px; padding:0 14px;
+}
+
+/* ===== ADAPTATION TACTILE FLUIDE (<= 900px) ===== */
+@media (max-width: 900px){
+  .topbar{padding:9px 14px;}
+  .brand-ui .badge{width:34px; height:34px; font-size:11.5px; border-radius:9px;}
+  .brand-ui .h1{font-size:15px;}
+  .brand-ui .sub{display:none;}
+  .toolbar{display:none;}
+  .mobile-top-actions{display:flex;}
+
+  .ppm-nav{display:none;}
+  .mobile-quad-bar{display:flex;}
+  .bottom-nav{display:block;}
+
+  .wrap{padding-bottom:calc(82px + env(safe-area-inset-bottom));}
+  .guide-drawer{padding:10px 12px 0; margin-bottom:10px;}
+  .grid-2x2{padding:10px 12px 0; gap:12px;}
+  .panel-head{padding:12px 14px;}
+  .panel-body{padding:14px;}
+  .info-inline{padding:10px 14px;}
+  .toast{bottom:calc(74px + env(safe-area-inset-bottom));}
+}
+
+/* Adaptation ultra-lisible de la table Projets phares sur écran étroit */
+@media (max-width: 580px){
+  table.star-table thead{display:none;}
+  table.star-table, table.star-table tbody, table.star-table tr, table.star-table td{
+    display:block; width:100%;
+  }
+  table.star-table tr{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    margin-bottom:8px;
+    background:#fafbff;
+  }
+  table.star-table tr.empty-row{
+    border:none; background:transparent; padding:0;
+  }
+  table.star-table td{
+    border:none; padding:2px 0;
+  }
+  table.star-table td.td-meta-row{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    margin-top:6px; padding-top:6px; border-top:1px dashed var(--border);
+    flex-wrap:wrap;
+  }
 }
 </style>
 </head>
 <body>
 
 <div class="wrap" id="printRoot">
-  <!-- Bandeau Top -->
+  <!-- Bandeau Top (Desktop complet | Tactile ultra-fin 1 ligne) -->
   <header class="topbar">
     <div class="topbar-row">
       <div class="brand-ui">
         <div class="badge">PMO</div>
-        <div>
-          <div class="h1">Cockpit CODIR — Synthèse Gouvernance (V2.7)</div>
+        <div class="titles">
+          <div class="h1">Cockpit CODIR — Synthèse (V2.8)</div>
           <div class="sub" id="subDate">Gouvernance DNSI • Programmes ➔ Portefeuille ➔ Capacité ➔ Stratégie</div>
         </div>
       </div>
+
+      <!-- Actions Desktop -->
       <div class="toolbar no-print">
-        <button class="btn" id="btnRefresh">🔄 Réactualiser</button>
-        <button class="btn" id="btnImport">📥 Importer (.json)</button>
-        <button class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
-        <button class="btn action" id="btnPdf">🖨️ Exporter PDF (A3)</button>
-        <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
+        <button type="button" class="btn" id="btnRefresh">🔄 Réactualiser</button>
+        <button type="button" class="btn" id="btnImport">📥 Importer (.json)</button>
+        <button type="button" class="btn" id="btnSaveJson">💾 Sauvegarder (.json)</button>
+        <button type="button" class="btn action" id="btnPdf">🖨️ Exporter PDF (A3)</button>
       </div>
+
+      <!-- Actions Tactiles compactes (<= 900px) -->
+      <div class="mobile-top-actions no-print">
+        <button type="button" class="icon-top-btn" id="btnRefreshMob" aria-label="Réactualiser" title="Réactualiser">🔄</button>
+        <button type="button" class="icon-top-btn" id="btnOpenSheet" aria-label="Menu d'actions" title="Actions & Aide">⋯</button>
+      </div>
+
+      <input type="file" id="fileInput" accept="application/json,.json" style="display:none"/>
     </div>
   </header>
 
-  <!-- Navigation 5 Piliers + Aide à la demande + Zoom -->
+  <!-- Navigation 5 Piliers (Desktop > 900px) -->
   <nav class="ppm-nav no-print">
     <div class="ppm-nav-row">
       <div class="ppm-links">
@@ -547,23 +767,29 @@ td{
       </div>
       <div class="ppm-nav-right">
         <button type="button" class="help-toggle-btn" id="btnToggleGuide" aria-expanded="false">❓ Comprendre cet écran</button>
-        <div class="zoom-controls" title="Zoom / Dézoom (ou pincement à 2 doigts sur écran tactile)">
-          <button type="button" class="zoom-btn" id="btnZoomOut" title="Dézoomer (−10 %)">−</button>
-          <button type="button" class="zoom-pct" id="btnZoomReset" title="Revenir à 100 %">100%</button>
-          <button type="button" class="zoom-btn" id="btnZoomIn" title="Zoomer (+10 %)">+</button>
-          <button type="button" class="zoom-fit-btn" id="btnZoomFit" title="Ajuster l'affichage à l'écran">⊡ Ajuster</button>
-        </div>
         <span class="chip-sync" id="chipSync">Source : Gouvernance.json</span>
       </div>
     </div>
   </nav>
 
+  <!-- Barre d'onglets rapides 4 quadrants (Tactile <= 900px) -->
+  <div class="mobile-quad-bar no-print" id="mobileQuadBar" role="tablist" aria-label="Filtrer les cadrans">
+    <button type="button" class="quad-tab active" data-quad="all" role="tab" aria-selected="true">⚡ Tout (4)</button>
+    <button type="button" class="quad-tab" data-quad="q1" role="tab" aria-selected="false">🎯 1. Progs</button>
+    <button type="button" class="quad-tab" data-quad="q2" role="tab" aria-selected="false">📚 2. Portef.</button>
+    <button type="button" class="quad-tab" data-quad="q3" role="tab" aria-selected="false">⚙️ 3. Capacité</button>
+    <button type="button" class="quad-tab" data-quad="q4" role="tab" aria-selected="false">🧠 4. Stratégie</button>
+  </div>
+
   <!-- Tiroir Comprendre cet écran (replié par défaut) -->
   <section class="guide-drawer no-print" id="guideDrawer">
     <div class="guide-box">
-      <p class="guide-lead">
-        <b>📊 Cockpit en lecture seule :</b> cette vue consolide automatiquement les données saisies dans les 4 piliers ci-dessous. Cliquez sur un bloc pour accéder directement à son écran :
-      </p>
+      <div class="guide-head">
+        <p class="guide-lead">
+          <b>📊 Cockpit en lecture seule :</b> cette vue consolide automatiquement les données saisies dans les 4 piliers ci-dessous. Touchez un bloc pour ouvrir son écran :
+        </p>
+        <button type="button" class="guide-close" id="btnCloseGuide" aria-label="Fermer l'aide">✕</button>
+      </div>
       <div class="guide-steps">
         <a class="guide-step" href="Gouvernance - 1. Programmes.html">
           <strong>1. 🎯 Programmes (Le Cap)</strong>
@@ -595,218 +821,249 @@ td{
       </p>
       <div class="onboard-actions">
         <button type="button" class="onboard-btn primary" id="btnOnboardImport">📥 Importer un fichier Gouvernance.json</button>
-        <a class="onboard-btn dark" href="Gouvernance - 1. Programmes.html?action=new">🎯 Démarrer de zéro (Étape 1 : créer un programme)</a>
+        <a class="onboard-btn dark" href="Gouvernance - 1. Programmes.html?action=new">🎯 Démarrer de zéro (Étape 1)</a>
       </div>
     </div>
   </section>
 
-  <!-- ZONE PINCH-TO-ZOOM : GRILLE CODIR (4 Quadrants) -->
-  <div class="zoom-wrap" id="zoomZone">
-    <div id="zoomContent">
-      <div class="grid-2x2">
+  <!-- GRILLE CODIR (4 Quadrants — nativement fluide, zéro style.zoom) -->
+  <div class="grid-2x2" id="cockpitGrid">
 
-        <!-- QUADRANT 1 : PROGRAMMES & ALIGNEMENT -->
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">
-                <span>🎯 1. Programmes & Alignement Stratégique</span>
-                <span class="info-wrap no-print">
-                  <button type="button" class="info-btn" aria-label="Explication quadrant Programmes" aria-expanded="false">i</button>
-                  <span class="info-pop" role="tooltip">Somme du Reste à Faire (en jours) des seuls projets engagés dans le scénario Stratégie, ventilée par programme.</span>
-                </span>
-              </div>
-              <div class="panel-sub" id="progSub">Répartition de la charge engagée (scénario actif) par Programme</div>
-            </div>
-            <a class="panel-link no-print" href="Gouvernance - 1. Programmes.html">Éditer les programmes ➔</a>
-          </div>
-          <div class="panel-body" id="dynamicProgrammesContainer">
-            <!-- Rempli dynamiquement -->
-          </div>
-        </section>
-
-        <!-- QUADRANT 2 : PORTEFEUILLE (LA DEMANDE) -->
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">
-                <span>📚 2. Portefeuille (La Demande)</span>
-                <span class="info-wrap no-print">
-                  <button type="button" class="info-btn" aria-label="Explication quadrant Portefeuille" aria-expanded="false">i</button>
-                  <span class="info-pop" role="tooltip">Photo de tout le portefeuille (idées + pré-cadrages + projets lancés), indépendamment du scénario arbitré.</span>
-                </span>
-              </div>
-              <div class="panel-sub">Entonnoir des demandes métiers, projets actifs et alignement Programme</div>
-            </div>
-            <a class="panel-link no-print" href="Gouvernance - 2. Portefeuille.html">Ouvrir le portefeuille ➔</a>
-          </div>
-          <div class="panel-body">
-            <div class="kpi-grid">
-              <div class="kpi-card">
-                <div class="kpi-label">Volume Total</div>
-                <div class="kpi-val" id="pfTotal">0</div>
-                <div class="kpi-sub">idées + projets</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-label">Idées / Pré-cad.</div>
-                <div class="kpi-val" id="pfIdees" style="color:#f59e0b">0</div>
-                <div class="kpi-sub">en instruction</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-label">Projets Lancés</div>
-                <div class="kpi-val" id="pfPivots" style="color:#16a34a">0</div>
-                <div class="kpi-sub" id="pfPivotsSub">avec JSON CP</div>
-              </div>
-              <div class="kpi-card">
-                <div class="kpi-label">Projets rattachés</div>
-                <div class="kpi-val" id="pfCoverage">—</div>
-                <div class="kpi-sub" id="pfOrphansSub">0 hors programme</div>
-              </div>
-            </div>
-
-            <div style="margin-top:20px;">
-              <div class="kpi-label" style="margin-bottom:8px;">Répartition par priorité (portefeuille global)</div>
-              <div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:#e2e8f0;" id="prioBar"></div>
-              <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-weight:800;" id="prioLabels"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS) -->
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">
-                <span>⚙️ 3. Capacité DNSI (Les Moyens)</span>
-                <span class="info-wrap no-print">
-                  <button type="button" class="info-btn" aria-label="Explication quadrant Capacité" aria-expanded="false">i</button>
-                  <span class="info-pop" role="tooltip">Capacité déclarative DNSI : Potentiel brut − Maintenance incompressible (RUN/MCO) = Réserve mobilisable.</span>
-                </span>
-              </div>
-              <div class="panel-sub">Potentiel global, maintenance incompressible (MCO/RUN) et réserve projets</div>
-            </div>
-            <a class="panel-link no-print" href="Gouvernance - 3. Capacite.html">Ajuster la capacité ➔</a>
-          </div>
-          <div class="panel-body">
-            <div class="cap-layout">
-              <div class="pie-container">
-                <canvas id="pieCapacite" width="190" height="190"></canvas>
-              </div>
-              <div class="cap-legend">
-                <div class="cap-item" style="border-left:4px solid var(--potBlue);">
-                  <div>
-                    <div style="font-weight:900; font-size:13.5px;">Potentiel Total</div>
-                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité humaine brute DNSI</div>
-                  </div>
-                  <div style="font-size:17px; font-weight:900;" class="mono" id="legPot">0 j</div>
-                </div>
-                <div class="cap-item" style="border-left:4px solid var(--hpOrange);">
-                  <div>
-                    <div style="font-weight:900; font-size:13.5px;">Hors-projet (MCO / RUN)</div>
-                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Maintenance & charges incompressibles</div>
-                  </div>
-                  <div style="display:flex; align-items:center; white-space:nowrap;">
-                    <span style="font-size:17px; font-weight:900;" class="mono" id="legHP">0 j</span>
-                    <span class="hp-pct-pill mono" id="legHPPct" style="display:none;">0%</span>
-                  </div>
-                </div>
-                <div class="cap-item" style="border-left:4px solid var(--remGreen);">
-                  <div>
-                    <div style="font-weight:900; font-size:13.5px;">Réserve Projets</div>
-                    <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité mobilisable pour arbitrer</div>
-                  </div>
-                  <div style="font-size:17px; font-weight:900; color:var(--ok);" class="mono" id="legRem">0 j</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE) -->
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">
-                <span>🧠 4. Stratégie & Arbitrage (L'Équilibre)</span>
-                <span class="info-wrap no-print">
-                  <button type="button" class="info-btn" aria-label="Explication quadrant Stratégie" aria-expanded="false">i</button>
-                  <span class="info-pop" role="tooltip">Équilibre entre la réserve projets (incluant un éventuel Delta « Et si ? ») et la charge engagée du scénario actif. Les projets cochés ⭐ apparaissent ci-dessous.</span>
-                </span>
-              </div>
-              <div class="panel-sub">Scénario soumis au CODIR : <span id="stratName" style="font-weight:800; color:var(--text);">—</span></div>
-            </div>
-            <a class="panel-link no-print" href="Gouvernance - 4. Strategie.html">Arbitrer le scénario ➔</a>
-          </div>
-          <div class="panel-body">
-
-            <div class="strat-box" id="stratAlert">
-              <div class="strat-title" id="stratVerdictTitle">⚖️ Analyse en cours...</div>
-              <div style="font-size:12.5px; margin-top:5px; color:var(--muted);" id="stratVerdictSub">Vérification de la balance charge / capacité.</div>
-              <div id="whatIfRow" style="display:none;"></div>
-
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,.06); gap:8px; flex-wrap:wrap;">
-                <div>
-                  <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;" id="stCapLbl">Réserve Projets</div>
-                  <div style="font-size:16px; font-weight:900;" class="mono" id="stCap">0 j</div>
-                </div>
-                <div style="font-size:18px; color:var(--muted);">−</div>
-                <div>
-                  <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Charge Engagée</div>
-                  <div style="font-size:16px; font-weight:900;" class="mono" id="stLoad">0 j</div>
-                </div>
-                <div style="font-size:18px; color:var(--muted);">=</div>
-                <div style="text-align:right;">
-                  <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Écart (Marge)</div>
-                  <div style="font-size:18px; font-weight:900;" class="mono" id="stRest">0 j</div>
-                </div>
-              </div>
-
-              <!-- Consolidation budgétaire du scénario engagé -->
-              <div class="strat-budget-row">
-                <span>💶 Budget engagé (Inv.) : <b class="mono" id="stBudInv">0 k€</b></span>
-                <span>🔄 Fonctionnement : <b class="mono" id="stBudFct">0 k€/an</b></span>
-              </div>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
-              <div style="font-weight:900; font-size:13px;">Projets phares du scénario (⭐ Sélection PDF)</div>
-              <span class="no-print" style="font-size:11px; color:var(--muted);">Cliquez sur un projet lancé ↗ pour ouvrir sa fiche</span>
-            </div>
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:44%">Nom du Projet</th>
-                  <th style="width:26%">Programme</th>
-                  <th style="width:12%">Prio.</th>
-                  <th style="width:18%; text-align:right;">Reste à faire</th>
-                </tr>
-              </thead>
-              <tbody id="stratTableBody">
-                <tr><td colspan="4" style="text-align:center; color:var(--muted); padding:14px;">Aucun projet mis en avant.</td></tr>
-              </tbody>
-            </table>
-            <div style="font-size:11.5px; color:var(--muted); margin-top:10px; text-align:right;">
-              Total des projets engagés dans ce scénario : <b id="stratCount">0</b>
-            </div>
-          </div>
-        </section>
-
+    <!-- QUADRANT 1 : PROGRAMMES & ALIGNEMENT -->
+    <section class="panel" data-quad-panel="q1">
+      <div class="panel-head">
+        <div class="panel-head-main">
+          <div class="panel-title">🎯 1. Programmes & Alignement</div>
+          <div class="panel-sub" id="progSub">Charge engagée (scénario actif) par Programme</div>
+        </div>
+        <div class="panel-head-actions no-print">
+          <button type="button" class="info-btn" data-info-target="infoQ1" aria-expanded="false" title="D'où viennent ces chiffres ?">ⓘ</button>
+          <a class="panel-link" href="Gouvernance - 1. Programmes.html">Éditer ➔</a>
+        </div>
       </div>
-    </div>
+      <div class="info-inline no-print" id="infoQ1">
+        💡 Somme du <b>Reste à Faire (en jours)</b> des seuls projets engagés dans le scénario actif (Support 4), ventilée par programme.
+      </div>
+      <div class="panel-body" id="dynamicProgrammesContainer"></div>
+    </section>
+
+    <!-- QUADRANT 2 : PORTEFEUILLE (LA DEMANDE) -->
+    <section class="panel" data-quad-panel="q2">
+      <div class="panel-head">
+        <div class="panel-head-main">
+          <div class="panel-title">📚 2. Portefeuille (La Demande)</div>
+          <div class="panel-sub">Entonnoir des besoins, projets lancés et rattachement</div>
+        </div>
+        <div class="panel-head-actions no-print">
+          <button type="button" class="info-btn" data-info-target="infoQ2" aria-expanded="false" title="D'où viennent ces chiffres ?">ⓘ</button>
+          <a class="panel-link" href="Gouvernance - 2. Portefeuille.html">Ouvrir ➔</a>
+        </div>
+      </div>
+      <div class="info-inline no-print" id="infoQ2">
+        💡 Photo de <b>tout le portefeuille</b> (idées + pré-cadrages + projets lancés), indépendamment du scénario arbitré.
+      </div>
+      <div class="panel-body">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Volume Total</div>
+            <div class="kpi-val" id="pfTotal">0</div>
+            <div class="kpi-sub">idées + projets</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Idées / Pré-cad.</div>
+            <div class="kpi-val" id="pfIdees" style="color:#f59e0b">0</div>
+            <div class="kpi-sub">en instruction</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Projets Lancés</div>
+            <div class="kpi-val" id="pfPivots" style="color:#16a34a">0</div>
+            <div class="kpi-sub" id="pfPivotsSub">avec JSON CP</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Projets rattachés</div>
+            <div class="kpi-val" id="pfCoverage">—</div>
+            <div class="kpi-sub" id="pfOrphansSub">0 hors programme</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <div class="kpi-label" style="margin-bottom:8px;">Répartition par priorité (portefeuille global)</div>
+          <div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:#e2e8f0;" id="prioBar"></div>
+          <div style="display:flex; justify-content:space-between; margin-top:7px; font-size:11.5px; font-weight:800;" id="prioLabels"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUADRANT 3 : CAPACITÉ DNSI (LES MOYENS) -->
+    <section class="panel" data-quad-panel="q3">
+      <div class="panel-head">
+        <div class="panel-head-main">
+          <div class="panel-title">⚙️ 3. Capacité DNSI (Les Moyens)</div>
+          <div class="panel-sub">Potentiel global, MCO/RUN incompressible et réserve projets</div>
+        </div>
+        <div class="panel-head-actions no-print">
+          <button type="button" class="info-btn" data-info-target="infoQ3" aria-expanded="false" title="D'où viennent ces chiffres ?">ⓘ</button>
+          <a class="panel-link" href="Gouvernance - 3. Capacite.html">Ajuster ➔</a>
+        </div>
+      </div>
+      <div class="info-inline no-print" id="infoQ3">
+        💡 Capacité déclarative DNSI : <b>Potentiel brut − Maintenance incompressible (RUN/MCO) = Réserve projets</b> mobilisable pour l'arbitrage.
+      </div>
+      <div class="panel-body">
+        <div class="cap-layout">
+          <div class="pie-container">
+            <canvas id="pieCapacite" width="190" height="190"></canvas>
+          </div>
+          <div class="cap-legend">
+            <div class="cap-item" style="border-left:4px solid var(--potBlue);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Potentiel Total</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité humaine brute DNSI</div>
+              </div>
+              <div style="font-size:17px; font-weight:900;" class="mono" id="legPot">0 j</div>
+            </div>
+            <div class="cap-item" style="border-left:4px solid var(--hpOrange);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Hors-projet (MCO / RUN)</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Maintenance & charges incompressibles</div>
+              </div>
+              <div style="display:flex; align-items:center; white-space:nowrap;">
+                <span style="font-size:17px; font-weight:900;" class="mono" id="legHP">0 j</span>
+                <span class="hp-pct-pill mono" id="legHPPct" style="display:none;">0%</span>
+              </div>
+            </div>
+            <div class="cap-item" style="border-left:4px solid var(--remGreen);">
+              <div>
+                <div style="font-weight:900; font-size:13.5px;">Réserve Projets</div>
+                <div style="font-size:11.5px; color:var(--muted); margin-top:2px;">Capacité mobilisable pour arbitrer</div>
+              </div>
+              <div style="font-size:17px; font-weight:900; color:var(--ok);" class="mono" id="legRem">0 j</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUADRANT 4 : STRATÉGIE & ARBITRAGE (L'ÉQUILIBRE) -->
+    <section class="panel" data-quad-panel="q4">
+      <div class="panel-head">
+        <div class="panel-head-main">
+          <div class="panel-title">🧠 4. Stratégie & Arbitrage</div>
+          <div class="panel-sub">Scénario soumis au CODIR : <span id="stratName" style="font-weight:800; color:var(--text);">—</span></div>
+        </div>
+        <div class="panel-head-actions no-print">
+          <button type="button" class="info-btn" data-info-target="infoQ4" aria-expanded="false" title="D'où viennent ces chiffres ?">ⓘ</button>
+          <a class="panel-link" href="Gouvernance - 4. Strategie.html">Arbitrer ➔</a>
+        </div>
+      </div>
+      <div class="info-inline no-print" id="infoQ4">
+        💡 Équilibre entre la <b>réserve projets</b> (incluant un éventuel Delta « Et si ? ») et la <b>charge engagée</b> du scénario actif. Les projets cochés ⭐ apparaissent ci-dessous.
+      </div>
+      <div class="panel-body">
+
+        <div class="strat-box" id="stratAlert">
+          <div class="strat-title" id="stratVerdictTitle">⚖️ Analyse en cours...</div>
+          <div style="font-size:12.5px; margin-top:5px; color:var(--muted);" id="stratVerdictSub">Vérification de la balance charge / capacité.</div>
+          <div id="whatIfRow" style="display:none;"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:1px solid rgba(0,0,0,.06); gap:8px; flex-wrap:wrap;">
+            <div>
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;" id="stCapLbl">Réserve Projets</div>
+              <div style="font-size:16px; font-weight:900;" class="mono" id="stCap">0 j</div>
+            </div>
+            <div style="font-size:18px; color:var(--muted);">−</div>
+            <div>
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Charge Engagée</div>
+              <div style="font-size:16px; font-weight:900;" class="mono" id="stLoad">0 j</div>
+            </div>
+            <div style="font-size:18px; color:var(--muted);">=</div>
+            <div style="text-align:right;">
+              <div style="font-size:10.5px; font-weight:800; color:var(--muted); text-transform:uppercase;">Écart (Marge)</div>
+              <div style="font-size:18px; font-weight:900;" class="mono" id="stRest">0 j</div>
+            </div>
+          </div>
+
+          <!-- Consolidation budgétaire du scénario engagé -->
+          <div class="strat-budget-row">
+            <span>💶 Budget engagé (Inv.) : <b class="mono" id="stBudInv">0 k€</b></span>
+            <span>🔄 Fonctionnement : <b class="mono" id="stBudFct">0 k€/an</b></span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:6px; flex-wrap:wrap;">
+          <div style="font-weight:900; font-size:13px;">Projets phares du scénario (⭐ Sélection PDF)</div>
+          <span class="no-print" style="font-size:11px; color:var(--muted);">Touchez un projet lancé ↗ pour ouvrir sa fiche</span>
+        </div>
+        <table class="star-table">
+          <thead>
+            <tr>
+              <th style="width:44%">Nom du Projet</th>
+              <th style="width:26%">Programme</th>
+              <th style="width:12%">Prio.</th>
+              <th style="width:18%; text-align:right;">Reste à faire</th>
+            </tr>
+          </thead>
+          <tbody id="stratTableBody">
+            <tr class="empty-row"><td colspan="4" style="text-align:center; color:var(--muted); padding:14px;">Aucun projet mis en avant.</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:11.5px; color:var(--muted); margin-top:10px; text-align:right;">
+          Total des projets engagés dans ce scénario : <b id="stratCount">0</b>
+        </div>
+      </div>
+    </section>
+
   </div>
 
-  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.7) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+  <div class="footer-ver">Gouvernance DNSI — Support 0 : Synthèse CODIR (V2.8) • Source : <span class="mono">GOUVERNANCE_JSON</span></div>
+</div>
+
+<!-- Barre de navigation basse PWA au pouce (<= 900px) -->
+<nav class="bottom-nav no-print" aria-label="Navigation 5 piliers">
+  <div class="bottom-nav-row">
+    <a class="bnav-item active" href="Gouvernance - 0. Synthese.html">
+      <span class="bnav-ico">📊</span><span>Synthèse</span>
+    </a>
+    <a class="bnav-item" href="Gouvernance - 1. Programmes.html">
+      <span class="bnav-ico">🎯</span><span>Progs</span>
+    </a>
+    <a class="bnav-item" href="Gouvernance - 2. Portefeuille.html">
+      <span class="bnav-ico">📚</span><span>Portef.</span>
+    </a>
+    <a class="bnav-item" href="Gouvernance - 3. Capacite.html">
+      <span class="bnav-ico">⚙️</span><span>Capacité</span>
+    </a>
+    <a class="bnav-item" href="Gouvernance - 4. Strategie.html">
+      <span class="bnav-ico">🧠</span><span>Stratégie</span>
+    </a>
+  </div>
+</nav>
+
+<!-- Feuille d'actions mobile (Bottom Sheet via ⋯) -->
+<div class="sheet-backdrop no-print" id="sheetBackdrop" role="dialog" aria-modal="true" aria-label="Actions rapides">
+  <div class="action-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <div class="sheet-title">Actions &amp; Aide</div>
+      <div class="sheet-sync" id="sheetSync">Source : Gouvernance.json</div>
+    </div>
+    <div class="sheet-list">
+      <button type="button" class="sheet-btn" id="sheetGuide">❓ Comprendre cet écran</button>
+      <button type="button" class="sheet-btn" id="sheetImport">📥 Importer un fichier Gouvernance.json</button>
+      <button type="button" class="sheet-btn" id="sheetSave">💾 Sauvegarder Gouvernance.json</button>
+      <button type="button" class="sheet-btn dark" id="sheetPdf">🖨️ Exporter PDF (A3 Paysage)</button>
+      <button type="button" class="sheet-btn cancel" id="sheetCancel">Fermer</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const APP_VERSION = "V2.7";
+const APP_VERSION = "V2.8";
 const STORAGE_KEY = "GOUVERNANCE_JSON";
 const SUPPORT_PROJECT_URL = "https://sryzek.github.io/Gestion-supports-projet-/";
 const FALLBACK_COLORS = ["#8b5cf6", "#f59e0b", "#2563eb", "#10b981", "#ef4444", "#0891b2", "#475569"];
-const ZOOM_MIN = 0.35;
-const ZOOM_MAX = 2.0;
 
-let currentZoom = 1;
+let activeMobileQuad = "all";
 
 const $ = id => document.getElementById(id);
 const safeNum = n => (Number.isFinite(Number(n)) ? Number(n) : 0);
@@ -818,85 +1075,31 @@ function escapeHtml(s){
 }
 
 function toast(msg){
+  const prev = document.querySelector(".toast");
+  if(prev) prev.remove();
   const d = document.createElement("div");
   d.className = "toast";
   d.textContent = msg;
   document.body.appendChild(d);
-  setTimeout(() => d.remove(), 2500);
+  setTimeout(() => d.remove(), 2400);
 }
 
 /* =============================
-   Gestion du Zoom (Tactile & Boutons)
+   Filtre tactile par quadrant (<= 900px uniquement)
 ============================= */
-function clampZoom(val){
-  return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.round(val * 100) / 100));
+function applyMobileQuadFilter(){
+  const isMobile = window.matchMedia("(max-width: 900px)").matches;
+  document.querySelectorAll("[data-quad-panel]").forEach(panel => {
+    const qid = panel.getAttribute("data-quad-panel");
+    const shouldHide = isMobile && activeMobileQuad !== "all" && qid !== activeMobileQuad;
+    panel.classList.toggle("quad-hidden", shouldHide);
+  });
+  document.querySelectorAll(".quad-tab").forEach(btn => {
+    const isAct = btn.getAttribute("data-quad") === activeMobileQuad;
+    btn.classList.toggle("active", isAct);
+    btn.setAttribute("aria-selected", String(isAct));
+  });
 }
-
-function applyZoomToDom(){
-  const pctBtn = $("btnZoomReset");
-  if(pctBtn) pctBtn.textContent = `${Math.round(currentZoom * 100)}%`;
-  const content = $("zoomContent");
-  if(content) content.style.zoom = currentZoom;
-}
-
-function setZoom(val){
-  currentZoom = clampZoom(val);
-  applyZoomToDom();
-}
-
-function fitZoomToScreen(){
-  const zone = $("zoomZone");
-  const availW = zone ? zone.clientWidth : window.innerWidth;
-  if(currentZoom < 0.98){
-    setZoom(1);
-    toast("Zoom réinitialisé à 100 %");
-    return;
-  }
-  const target = availW < 520 ? 0.65 : availW < 960 ? 0.80 : 0.85;
-  setZoom(target);
-  toast(`Affichage ajusté (${Math.round(currentZoom * 100)}%)`);
-}
-
-function setupPinchToZoom(){
-  const zone = $("zoomZone");
-  if(!zone) return;
-  let startDist = 0;
-  let startZoom = 1;
-
-  zone.addEventListener("touchstart", e => {
-    if(e.touches.length === 2){
-      startDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      startZoom = currentZoom;
-    }
-  }, { passive: true });
-
-  zone.addEventListener("touchmove", e => {
-    if(e.touches.length === 2 && startDist > 0){
-      e.preventDefault();
-      const currDist = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      currentZoom = clampZoom(startZoom * (currDist / startDist));
-      applyZoomToDom();
-    }
-  }, { passive: false });
-
-  const endPinch = e => { if(e.touches.length < 2) startDist = 0; };
-  zone.addEventListener("touchend", endPinch, { passive: true });
-  zone.addEventListener("touchcancel", endPinch, { passive: true });
-}
-
-window.addEventListener("beforeprint", () => {
-  const content = $("zoomContent");
-  if(content) content.style.zoom = 1;
-});
-window.addEventListener("afterprint", () => {
-  applyZoomToDom();
-});
 
 /* =============================
    Helpers Données & Calculs (alignés Stratégie V3.0)
@@ -947,8 +1150,7 @@ function getProjectRAF(gov, p){
 
   const teams = pivot?.chargesProjet?.teams;
   if(Array.isArray(teams) && teams.length){
-    const sum = teams.reduce((acc, t) => acc + Math.max(0, Math.round(safeNum(t.estimated ?? t.estimation ?? t.jours ?? 0) * (1 - av / 100))), 0);
-    return sum;
+    return teams.reduce((acc, t) => acc + Math.max(0, Math.round(safeNum(t.estimated ?? t.estimation ?? t.jours ?? 0) * (1 - av / 100))), 0);
   }
   return 0;
 }
@@ -982,22 +1184,28 @@ function renderAll(){
   $("subDate").textContent = `Gouvernance DNSI • Édition du ${new Date().toLocaleDateString("fr-FR")}`;
 
   const onboardEl = $("emptyOnboarding");
-  const zoomZoneEl = $("zoomZone");
+  const gridEl = $("cockpitGrid");
+  const quadBarEl = $("mobileQuadBar");
 
   if(!GOV){
     $("chipSync").textContent = "Aucune donnée locale";
+    $("sheetSync").textContent = "Aucune donnée locale";
     if(onboardEl) onboardEl.style.display = "block";
-    if(zoomZoneEl) zoomZoneEl.style.display = "none";
+    if(gridEl) gridEl.style.display = "none";
+    if(quadBarEl) quadBarEl.style.visibility = "hidden";
     return;
   }
 
   if(onboardEl) onboardEl.style.display = "none";
-  if(zoomZoneEl) zoomZoneEl.style.display = "block";
+  if(gridEl) gridEl.style.display = "grid";
+  if(quadBarEl) quadBarEl.style.visibility = "visible";
 
   const last = GOV?.meta?.lastUpdatedAt || GOV?.meta?.dernier_enregistrement;
-  $("chipSync").textContent = last
+  const syncTxt = last
     ? `Dernière MAJ : ${new Date(last).toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"})}`
     : "Source : Gouvernance.json";
+  $("chipSync").textContent = syncTxt;
+  $("sheetSync").textContent = syncTxt;
 
   const projets = Array.isArray(GOV.portefeuille?.projets) ? GOV.portefeuille.projets : [];
   const pivotsMap = (GOV.portefeuille?.pivotsById && typeof GOV.portefeuille.pivotsById === "object") ? GOV.portefeuille.pivotsById : {};
@@ -1238,6 +1446,7 @@ function renderAll(){
 
   const tBody = $("stratTableBody");
   const pdfProjects = engagedProjects.filter(p => pdfIds.has(String(p.id)));
+  const isCompactCards = window.matchMedia("(max-width: 580px)").matches;
 
   if(pdfProjects.length > 0){
     tBody.innerHTML = pdfProjects.map(p => {
@@ -1260,8 +1469,20 @@ function renderAll(){
       const projCell = isLaunched
         ? `<button type="button" class="proj-link-title" data-open-proj="${encId}" title="Ouvrir ${escapeHtml(p.id)} dans Gestion-supports-projet-">${escapeHtml(p.nom || p.name || p.id)}</button><br/>
            <button type="button" class="proj-link-id mono" data-open-proj="${encId}" title="Ouvrir ${escapeHtml(p.id)} dans Gestion-supports-projet-">${escapeHtml(p.id)} ↗</button>`
-        : `<b style="font-size:12.5px;">${escapeHtml(p.nom || p.name || p.id)}</b><br/>
+        : `<b style="font-size:13px;">${escapeHtml(p.nom || p.name || p.id)}</b><br/>
            <span class="mono" style="color:var(--muted)">${escapeHtml(p.id)}</span>`;
+
+      if(isCompactCards){
+        return `
+          <tr>
+            <td>${projCell}</td>
+            <td class="td-meta-row">
+              <span style="display:inline-flex; gap:5px; align-items:center; flex-wrap:wrap;">${progBadgeHtml} <span class="badge ${prCls}">${pr}</span></span>
+              <span class="mono" style="font-weight:900; font-size:13px;">RAF : ${raf.toLocaleString("fr-FR")} j</span>
+            </td>
+          </tr>
+        `;
+      }
 
       return `
         <tr>
@@ -1279,43 +1500,47 @@ function renderAll(){
       });
     });
   } else {
-    tBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
+    tBody.innerHTML = `<tr class="empty-row"><td colspan="4" style="text-align:center; color:var(--muted); padding:16px;">Aucun projet mis en avant (coche ⭐ dans <b>4. Stratégie</b>).</td></tr>`;
   }
   $("stratCount").textContent = engagedProjects.length;
-  applyZoomToDom();
+  applyMobileQuadFilter();
 }
 
 /* =============================
-   Popovers ⓘ (tactile + desktop)
+   Accordéons d'aide ⓘ inline (zéro bulle coupée au bord)
 ============================= */
-function setupInfoPopovers(){
-  const wraps = Array.from(document.querySelectorAll(".info-wrap"));
-  const closeAll = (except=null) => {
-    wraps.forEach(w => {
-      if(w !== except){
-        w.classList.remove("open");
-        const b = w.querySelector(".info-btn");
-        if(b) b.setAttribute("aria-expanded", "false");
-      }
-    });
-  };
-
-  wraps.forEach(w => {
-    const btn = w.querySelector(".info-btn");
-    if(!btn) return;
-    btn.addEventListener("click", e => {
-      e.stopPropagation();
-      const willOpen = !w.classList.contains("open");
-      closeAll(w);
-      w.classList.toggle("open", willOpen);
-      btn.setAttribute("aria-expanded", String(willOpen));
+function setupInlineInfos(){
+  document.querySelectorAll(".info-btn[data-info-target]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-info-target");
+      const box = $(targetId);
+      if(!box) return;
+      const isOpen = box.classList.toggle("open");
+      btn.classList.toggle("open", isOpen);
+      btn.setAttribute("aria-expanded", String(isOpen));
     });
   });
+}
 
-  document.addEventListener("click", () => closeAll());
-  document.addEventListener("keydown", e => {
-    if(e.key === "Escape") closeAll();
-  });
+/* =============================
+   Feuille d'actions mobile (⋯) + Tiroir Comprendre
+============================= */
+function toggleGuide(forceState=null){
+  const drawer = $("guideDrawer");
+  const btn = $("btnToggleGuide");
+  const willOpen = (forceState === null) ? !drawer.classList.contains("open") : forceState;
+  drawer.classList.toggle("open", willOpen);
+  if(btn){
+    btn.classList.toggle("open", willOpen);
+    btn.setAttribute("aria-expanded", String(willOpen));
+  }
+  if(willOpen){
+    drawer.scrollIntoView({ behavior:"smooth", block:"nearest" });
+  }
+}
+
+function setSheetOpen(open){
+  $("sheetBackdrop").classList.toggle("open", open);
 }
 
 /* =============================
@@ -1353,41 +1578,62 @@ async function importGov(file){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  setupPinchToZoom();
-  setupInfoPopovers();
+  setupInlineInfos();
   renderAll();
 
-  // Tiroir "Comprendre cet écran" (replié par défaut)
-  $("btnToggleGuide").addEventListener("click", () => {
-    const drawer = $("guideDrawer");
-    const btn = $("btnToggleGuide");
-    const isOpen = drawer.classList.toggle("open");
-    btn.classList.toggle("open", isOpen);
-    btn.setAttribute("aria-expanded", String(isOpen));
+  // Onglets rapides 4 quadrants sur tactile
+  document.querySelectorAll(".quad-tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeMobileQuad = btn.getAttribute("data-quad") || "all";
+      applyMobileQuadFilter();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   });
 
-  // Boutons Zoom rapides
-  $("btnZoomOut").addEventListener("click", () => setZoom(currentZoom - 0.10));
-  $("btnZoomIn").addEventListener("click", () => setZoom(currentZoom + 0.10));
-  $("btnZoomReset").addEventListener("click", () => { setZoom(1); toast("Zoom réinitialisé à 100 %"); });
-  $("btnZoomFit").addEventListener("click", fitZoomToScreen);
-
-  $("btnRefresh").addEventListener("click", () => {
-    renderAll();
-    toast("Synthèse réactualisée 🔄");
+  // Réadaptation propre lors du pliage/dépliage d'écran ou rotation
+  let lastCompact = window.matchMedia("(max-width: 580px)").matches;
+  window.addEventListener("resize", () => {
+    applyMobileQuadFilter();
+    const nowCompact = window.matchMedia("(max-width: 580px)").matches;
+    if(nowCompact !== lastCompact){
+      lastCompact = nowCompact;
+      renderAll();
+    }
   });
-  $("btnPdf").addEventListener("click", () => {
-    const content = $("zoomContent");
-    if(content) content.style.zoom = 1;
-    window.print();
-  });
-  $("btnSaveJson").addEventListener("click", downloadGov);
 
+  // Guide "Comprendre cet écran"
+  $("btnToggleGuide").addEventListener("click", () => toggleGuide());
+  $("btnCloseGuide").addEventListener("click", () => toggleGuide(false));
+
+  // Actions communes
+  const doRefresh = () => { renderAll(); toast("Synthèse réactualisée 🔄"); };
   const openImportPicker = () => { $("fileInput").value = ""; $("fileInput").click(); };
+  const doPdf = () => { window.print(); };
+
+  $("btnRefresh").addEventListener("click", doRefresh);
+  $("btnRefreshMob").addEventListener("click", doRefresh);
+  $("btnPdf").addEventListener("click", doPdf);
+  $("btnSaveJson").addEventListener("click", downloadGov);
   $("btnImport").addEventListener("click", openImportPicker);
   $("btnOnboardImport").addEventListener("click", openImportPicker);
   $("fileInput").addEventListener("change", e => importGov(e.target.files?.[0]));
 
+  // Feuille d'actions mobile (⋯)
+  $("btnOpenSheet").addEventListener("click", () => setSheetOpen(true));
+  $("sheetCancel").addEventListener("click", () => setSheetOpen(false));
+  $("sheetBackdrop").addEventListener("click", e => {
+    if(e.target === $("sheetBackdrop")) setSheetOpen(false);
+  });
+  $("sheetGuide").addEventListener("click", () => { setSheetOpen(false); toggleGuide(true); });
+  $("sheetImport").addEventListener("click", () => { setSheetOpen(false); openImportPicker(); });
+  $("sheetSave").addEventListener("click", () => { setSheetOpen(false); downloadGov(); });
+  $("sheetPdf").addEventListener("click", () => { setSheetOpen(false); setTimeout(doPdf, 80); });
+
+  document.addEventListener("keydown", e => {
+    if(e.key === "Escape") setSheetOpen(false);
+  });
+
+  // Synchro temps réel inter-onglets
   window.addEventListener("storage", ev => {
     if(ev.key === STORAGE_KEY) renderAll();
   });
